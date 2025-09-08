@@ -1,0 +1,98 @@
+{
+    "train": {
+        "task": "fine-tune", 
+        "batch_size": 8,
+        "shuffle_buffer": 256,
+        "optimizer": "adam",
+        "learning_rate": 0.00002,
+        "momentum": 0.99,
+        "loss": "poisson_mn",
+        "total_weight": 0.2,
+        "warmup_steps": 5000,
+        "global_clipnorm": 0.1,
+        "adam_beta1": 0.9,
+        "adam_beta2": 0.999,
+        "patience": 150,
+        "train_epochs_min": 50,
+        "train_epochs_max": 5000,
+        "steps_per_epoch_max": 500,
+        "shuffle_records": true,
+        "has_targets": true,
+        "has_label": false,
+        "has_mask": false,
+        "has_repeat_mask": false,
+        "exon_loss_scale": 1.0,
+        "non_exon_loss_scale": 4.0,
+        "repeat_loss_scale": 1.0,
+        "non_repeat_loss_scale": 4.0,
+        "use_bert": true,
+        "annotation_loss_weight": null,
+        "exon_mut_rate": null,
+        "repeat_eval": 5
+    },
+    "model": {
+        "seq_length": 16384,
+        "augment_rc": false,
+        "augment_shift": 0,
+        "activation": "gelu",
+        "norm_type": "batch",
+        "bn_momentum": 0.9,
+        "kernel_initializer": "lecun_normal",
+        "l2_scale": 1.0e-6,
+        "trunk": [
+            {
+                "name": "conv_dna",
+                "filters": 96,
+                "kernel_size": 11,
+                "norm_type": null,
+                "activation": "linear"
+            },
+            {
+                "name": "res_tower",
+                "filters_init": 96,
+                "filters_end": 384,
+                "divisible_by": 32,
+                "kernel_size": 5,
+                "num_convs": 2,
+                "dropout": 0.05,
+                "pool_size": 2,
+                "repeat": 7
+            },
+            {
+                "name": "transformer_tower",
+                "key_size": 64,
+                "heads": 4,
+                "num_position_features": 32,
+                "dropout": 0.2,
+                "mha_l2_scale": 1.0e-8,
+                "l2_scale": 1.0e-8,
+                "kernel_initializer": "he_normal",
+                "repeat": 8
+            },
+            {
+                "name": "unet_conv",
+                "kernel_size": 3,
+                "upsample_conv": true
+            },
+            {
+                "name": "unet_conv",
+                "kernel_size": 3,
+                "upsample_conv": true
+            },
+            {
+                "name": "unet_conv",
+                "kernel_size": 3,
+                "upsample_conv": true
+            },
+            {
+                "name": "Cropping1D",
+                "cropping": 64
+            }
+        ],
+        "head": {
+            "name": "final",
+            "units": 5215,
+            "activation": "softplus"
+        }
+    }
+}
