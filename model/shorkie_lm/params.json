@@ -1,0 +1,113 @@
+{
+    "train": {
+        "task": "self-supervised", 
+        "num_gpu": 1,
+        "batch_size": 8,
+        "shuffle_buffer": 256,
+        "optimizer": "adam",
+        "learning_rate": 0.0001,
+        "loss": "mlm",
+        "mask_rate": 0.15,
+        "warmup_steps": 20000,
+        "global_clipnorm": 0.1,
+        "adam_beta1": 0.7,
+        "adam_beta2": 0.9,
+        "patience": 1000,
+        "train_epochs_min": 100,
+        "train_epochs_max": 10000,
+        "steps_per_epoch_max": 150,
+        "shuffle_records": true,
+        "has_targets": false,
+        "has_label": true,
+        "has_mask": true,
+        "has_repeat_mask": true,
+        "exon_loss_scale": 0.1,
+        "non_exon_loss_scale": 1.0,
+        "repeat_loss_scale": 0.1,
+        "non_repeat_loss_scale": 1.0,
+        "use_bert": true,
+        "annotation_loss_weight": null,
+        "repeat_eval": 5
+    },
+    "model": {
+        "seq_length": 16384,
+        "augment_rc": false,
+        "augment_shift": 0,
+        "activation": "gelu",
+        "norm_type": "batch",
+        "bn_momentum": 0.9,
+        "kernel_initializer": "lecun_normal",
+        "l2_scale": 1.0e-6,
+        "trunk": [
+            {
+                "name": "conv_dna",
+                "filters": 96,
+                "kernel_size": 11,
+                "norm_type": null,
+                "activation": "linear"
+            },
+            {
+                "name": "res_tower",
+                "filters_init": 96,
+                "filters_end": 384,
+                "divisible_by": 32,
+                "kernel_size": 5,
+                "num_convs": 2,
+                "dropout": 0.05,
+                "pool_size": 2,
+                "repeat": 7
+            },
+            {
+                "name": "transformer_tower",
+                "key_size": 64,
+                "heads": 4,
+                "num_position_features": 32,
+                "dropout": 0.2,
+                "mha_l2_scale": 1.0e-8,
+                "l2_scale": 1.0e-8,
+                "kernel_initializer": "he_normal",
+                "repeat": 8
+            },
+            {
+                "name": "unet_conv",
+                "kernel_size": 3,
+                "upsample_conv": true
+            },
+            {
+                "name": "unet_conv",
+                "kernel_size": 3,
+                "upsample_conv": true
+            },
+            {
+                "name": "unet_conv",
+                "kernel_size": 3,
+                "upsample_conv": true
+            },
+            {
+                "name": "unet_conv",
+                "kernel_size": 3,
+                "upsample_conv": true
+            },
+            {
+                "name": "unet_conv",
+                "kernel_size": 3,
+                "upsample_conv": true
+            },
+            {
+                "name": "unet_conv",
+                "kernel_size": 3,
+                "upsample_conv": true
+            },
+            {
+                "name": "unet_conv",
+                "kernel_size": 3,
+                "upsample_conv": true
+            }
+        ],
+        "head_human": {
+            "name": "final",
+            "units": 4,
+            "activation": "softmax"
+        }
+    }
+}
