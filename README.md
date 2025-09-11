@@ -1,8 +1,10 @@
-<img
-  src="./shorkie_logo.png"
-  alt="Shorkie logo"
-  style="display:block; margin-inline:auto; width:33.333%; height:auto;"
-/>
+<p align="center">
+    <img
+    src="./shorkie_logo.png"
+    alt="Shorkie logo"
+    style="display:block; margin-inline:auto; width:30%; height:auto;"
+    />
+</p>
 
 # Shorkie - Predicting dynamic expression patterns in budding yeast with a fungal DNA language model
 
