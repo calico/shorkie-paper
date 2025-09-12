@@ -13,7 +13,7 @@ Shorkie is a semi-supervised sequence-to-expression model for yeast: a masked DN
 
 This repository contains shell scripts, notebooks, and command snippets used to reproduce the analyses in the **Shorkie** paper. These analyses invoke functionality from the <a href="https://github.com/calico/baskerville-yeast" target="_blank"><strong>baskerville-yeast</strong></a>, and <a href="https://github.com/calico/westminster" target="_blank"><strong>westminster</strong></a> repositories. Please visit those repositories for installation and environment setup instructions.
 
-Contact *drk (at) @calicolabs.com*, *jlinder (at) @calicolabs.com*, or *kuanhao.chao (at) @gmail.com* for questions.
+Contact *[drk (at) @calicolabs.com](drk@calicolabs.com)*, *[jlinder (at) @calicolabs.com](jlinder@calicolabs.com)*, or *[kuanhao.chao (at) @gmail.com](kuanhao.chao@gmail.com)* for questions.
 
 ---
 
@@ -27,7 +27,7 @@ The model weights can be downloaded as .h5 files from the URLs below. We are rel
 
 ---
 
-## Data Availability
+## Training Data Availability
 
 ### Shorkie LM
 
@@ -39,6 +39,7 @@ To support reproducibility and the Shorkie LM variants introduced in the paper, 
 - 165_Saccharomycetales: [genomes] `gs://shorkie-paper/data/unsupervised/genome/165_Saccharomycetales/` | [tfrecord] `gs://shorkie-paper/data/unsupervised/processed/165_Saccharomycetales/`
 - 1341_Fungus: [genomes] `gs://shorkie-paper/data/unsupervised/genome/1341_Fungus/` | [tfrecord] `gs://shorkie-paper/data/unsupervised/processed/1341_Fungus/`
 
+- The training script is at [`model/shorkie_lm` on GitHub](https://github.com/calico/shorkie-paper/tree/main/model/shorkie_lm).
 
 ### Shorkie
 
@@ -51,6 +52,9 @@ Shorkie was fine-tuned from the Shorkie LM using large-scale transcriptomic and 
 - **Yeast strain RNA-seq**: RNA-seq datasets across diverse *S. cerevisiae* strains (Caudal, É. et al., *Nat Genet*, 2024).
 
 - **ChIP-exo** & **ChIP-MNase**: (Rossi, M.J. et al., *Nature*, 2021).
+
+- The training script is at [`model/shorkie` on GitHub](https://github.com/calico/shorkie-paper/tree/main/model/shorkie).
+
 
 ---
 
