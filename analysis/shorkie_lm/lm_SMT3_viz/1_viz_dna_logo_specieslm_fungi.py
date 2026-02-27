@@ -133,16 +133,18 @@ def main():
     # Load the PWM numpy array from file (assumed shape: (1003, 4))
     pwm_data = np.load("/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/dependencies_DNALM/all_prbs.npy")
     # pwm_data = np.load("/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/dependencies_DNALM/all_prbs_chrX_607855_608355.npy")
+    print("pwm_data shape: ", pwm_data.shape)   
+    # print("pwm_data: ", pwm_data)   
 
     # Create a dummy sequence template.
     # By using a string of '$' characters, we let the conservation score drive the letter heights.
     sequence_template = "$" * pwm_data.shape[0]
 
     # Define the region to plot (from 690 to 800)
-    plot_start = 690
-    plot_end = 986
-    # plot_start = 97
-    # plot_end = 207
+    # plot_start = 690
+    # plot_end = 986
+    plot_start = 97
+    plot_end = 207
 
     # Plot the DNA logo using the conservation score
     plot_dna_logo(pwm=pwm_data, 
