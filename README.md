@@ -87,6 +87,50 @@ We evaluate Shorkie and compare to DREAM models on two independent yeast *cis*-e
    - **Notes**: We benchmarked 683 variants, stratified into Promoter, UTR5, UTR3, and ORF categories.
 
 
-<!-- ---
+---
 
-## Example Notebook -->
+## Minimal Example: Variant Effect Prediction with Shorkie
+
+The [`minimal_example/`](./minimal_example/) directory contains a self-contained
+script that demonstrates how to load Shorkie and compute a **logSED** (log₂ Sequence 
+Effect Difference) score for a single SNP — no fine-tuning required.
+
+### Setup
+
+1. **Download model weights** (8 folds):
+   ```bash
+   mkdir -p my_shorkie/train
+   for i in 0 1 2 3 4 5 6 7; do
+     mkdir -p my_shorkie/train/f${i}c0/train
+     wget -O my_shorkie/train/f${i}c0/train/model_best.h5 \
+       https://storage.googleapis.com/seqnn-share/shorkie/f${i}/model_best.h5
+   done
+   ```
+
+2. **Provide a yeast genome FASTA + GTF** (e.g. *S. cerevisiae* R64).
+
+### Run
+
+```bash
+python minimal_example/run_shorkie_variant.py \
+  --model_dir  my_shorkie \
+  --params_file  minimal_example/params.json \
+  --targets_file minimal_example/sheet.txt \
+  --fasta_file   /path/to/genome.fasta \
+  --gtf_file     /path/to/genome.gtf \
+  --chrom chrI --pos 124373 --ref T --alt C --gene YAL016C-B
+```
+
+### Output
+
+```
+==================================================
+  Variant  : chrI:124373 T>C
+  Gene     : YAL016C-B
+  logSED   : +0.0557
+==================================================
+  logSED > 0 → alt increases predicted expression
+  logSED < 0 → alt decreases predicted expression
+```
+
+See [`minimal_example/README.md`](./minimal_example/README.md) for full documentation.
