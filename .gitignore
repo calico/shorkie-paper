@@ -205,3 +205,22 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# ---- shorkie-paper ----
+# User config copies (templates are committed as *.example.yaml)
+config/paths.yaml
+config/slurm.yaml
+# Downloaded large artifacts (default data_root)
+data_local/
+# Large binaries should never be committed (hosted on GCS; see data/manifest.json)
+*.h5
+*.bw
+*.bigwig
+*.tfr
+*.bam
+*.bai
+*.fasta
+*.fa
+*.fai
+# ...but keep the committed small reference files under data/
+!data/R64_annotations/**

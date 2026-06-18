@@ -1,0 +1,6 @@
+[submodule "external/baskerville-yeast"]
+	path = external/baskerville-yeast
+	url = git@github.com:calico/baskerville-yeast.git
+[submodule "external/westminster"]
+	path = external/westminster
+	url = git@github.com:calico/westminster.git

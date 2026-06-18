@@ -1,0 +1,46 @@
+# ---------------------------------------------------------------------------
+# shorkie-paper path configuration
+# ---------------------------------------------------------------------------
+# Copy this file to config/paths.yaml (git-ignored) and edit for your machine,
+# or point $SHORKIE_CONFIG at a copy elsewhere. Loaded by src/shorkie/config.py.
+#
+# Large data and model weights live OUTSIDE the repo. Set `data_root` to where
+# data/download.sh places fetched artifacts (or to an existing local copy).
+# Any ${token} below resolves to an environment variable of that name if set,
+# otherwise to another key in this file (dotted path, e.g. ${genome.fasta}).
+# ---------------------------------------------------------------------------
+
+# Root for downloaded large artifacts (TFRecords, BigWigs, model_best.h5).
+data_root: ./data_local
+
+# Small reference files committed in the repo (do not edit unless relocating).
+reference_dir: ./data/R64_annotations
+
+# --- S. cerevisiae R64 reference genome ---
+genome:
+  fasta:       ${data_root}/genome/GCA_000146045_2.cleaned.fasta
+  gtf:         ${data_root}/genome/GCA_000146045_2.59.gtf
+  chrom_sizes: ${reference_dir}/chrom.sizes
+  mask_bed:    ${reference_dir}/mask_rossi.bed
+  gaps_bed:    ${reference_dir}/assembly_gaps.bed
+
+# --- Trained model weights (download via data/download.sh) ---
+models:
+  num_folds: 8
+  shorkie_lm:        ${data_root}/models/shorkie_lm/train/model_best.h5
+  shorkie_finetuned: ${data_root}/models/shorkie           # holds train/f0c0..f7c0/
+  shorkie_scratch:   ${data_root}/models/shorkie_scratch   # holds train/f0c0..f7c0/
+
+# --- Datasets ---
+datasets:
+  # LM genome corpus (unsupervised pretraining). Tiers:
+  #   R64 | 80_strains | 165_Saccharomycetales | 1341_Fungus
+  lm_corpus_root: ${data_root}/lm_corpus
+  lm_tier:        165_Saccharomycetales        # released tier
+  # Supervised regulatory tracks (fine-tuning data).
+  supervised_root: ${data_root}/supervised
+  bigwigs:         ${data_root}/supervised/bigwigs
+  targets_sheet:   ${data_root}/supervised/cleaned_sheet.txt
+
+# --- Optional: legacy work-dir root (only for migrating/regenerating data) ---
+# work_root: /path/to/Yeast_ML

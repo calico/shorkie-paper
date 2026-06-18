@@ -1,0 +1,22 @@
+# ---------------------------------------------------------------------------
+# SLURM scheduler defaults for shorkie-paper
+# ---------------------------------------------------------------------------
+# Copy to config/slurm.yaml (git-ignored) and edit. Consumed by
+# scripts/common/submit.sh to generate #SBATCH headers, so the individual
+# pipeline scripts stay scheduler-agnostic and portable. Leave `email` blank
+# to disable mail notifications.
+# ---------------------------------------------------------------------------
+
+account:           your_account        # e.g. ssalzbe1_gpu
+partition_gpu:     a100
+partition_cpu:     parallel
+partition_bigmem:  bigmem
+gpu_gres:          gpu:1
+
+email:             ""                   # blank = no --mail-user
+mail_type:         end
+
+default_time:      "72:00:00"
+default_mem:       "20g"
+
+conda_env:         yeast_ml
