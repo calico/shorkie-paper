@@ -16,7 +16,7 @@ work_root: /home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML
 release_root: ./data_local
 
 # Small reference files committed in this repo.
-reference_dir: ./data/R64_annotations
+reference_dir: ${repo_root}/data/R64_annotations
 
 # --- Sub-roots of the work dir (preserve the existing tree structure) ---
 data_root:           ${work_root}/data
@@ -32,6 +32,10 @@ genome:
   chrom_sizes: ${reference_dir}/chrom.sizes
   mask_bed:    ${reference_dir}/mask_rossi.bed
   gaps_bed:    ${reference_dir}/assembly_gaps.bed
+  # Supervised-track TFRecord build uses the SGD S288C R64-3-1 assembly (publicly
+  # available; see scripts/01_data_build/supervised_tracks/README.md). Not committed
+  # (~12 MB) — point this at a local copy.
+  r64_supervised_fasta: ${seq_experiment_root}/R64_annotations/S288C_R64-3-1.fasta
 
 # --- Trained models ---
 models:
@@ -51,6 +55,9 @@ datasets:
   mpra:            ${data_root}/MPRA
   eqtl:            ${data_root}/eQTL
   lm_corpus_root:  ${data_root}/yeast/ensembl_fungi_59      # 4 corpus tiers live under here
+  # Chromosome-holdout split subdir under lm_corpus_root holding the 4 tier dirs
+  # (data_{r64,strains,saccharomycetales,fungi_1385}_gtf/) + per-tier species CSVs.
+  lm_corpus_split_root: ${datasets.lm_corpus_root}/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI
 
 # --- External code (in-repo git submodules) ---
 external:

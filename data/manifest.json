@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "description": "Catalog of released Shorkie artifacts (model weights + datasets) on Google Cloud Storage. Consumed by data/download.sh. Model bucket (gs://seqnn-share) is public; data bucket (gs://shorkie-paper) is requester-pays (pass a billing project to download.sh). md5 is the standard MD5 hex (matches `md5sum`); null means not pinned here (verified instead by gsutil's built-in integrity check on download).",
+  "buckets": {
+    "models": {
+      "gcs": "gs://seqnn-share",
+      "https": "https://storage.googleapis.com/seqnn-share",
+      "requester_pays": false
+    },
+    "data": {
+      "gcs": "gs://shorkie-paper",
+      "requester_pays": true
+    }
+  },
+  "models": {
+    "shorkie_lm": {
+      "description": "Masked DNA language model, pretrained on the 165_Saccharomycetales corpus. The --restore target for the fine-tuned model.",
+      "trained_on": "165_Saccharomycetales",
+      "files": [
+        {
+          "gs_uri": "gs://seqnn-share/shorkie_lm/train/model_best.h5",
+          "https_uri": "https://storage.googleapis.com/seqnn-share/shorkie_lm/train/model_best.h5",
+          "local_path": "models/shorkie_lm/train/model_best.h5",
+          "size_bytes": 55329168,
+          "md5": "ee95591a79332e49c4ef8bdf33e89d3b"
+        },
+        {
+          "gs_uri": "gs://seqnn-share/shorkie_lm/params.json",
+          "https_uri": "https://storage.googleapis.com/seqnn-share/shorkie_lm/params.json",
+          "local_path": "models/shorkie_lm/params.json",
+          "size_bytes": 3169,
+          "md5": null
+        }
+      ]
+    },
+    "shorkie_finetuned": {
+      "description": "Supervised 8-fold ensemble, fine-tuned from shorkie_lm on 5215 ChIP-exo/MNase/RNA-seq tracks. Averaged across folds for prediction.",
+      "num_folds": 8,
+      "fold_subdir": "f{fold}c0",
+      "files": [
+        { "gs_uri": "gs://seqnn-share/shorkie/f0/model_best.h5", "https_uri": "https://storage.googleapis.com/seqnn-share/shorkie/f0/model_best.h5", "local_path": "models/shorkie_finetuned/train/f0c0/train/model_best.h5", "size_bytes": 57571980, "md5": "23e79b7322df61a1ff6d0ea059370c78" },
+        { "gs_uri": "gs://seqnn-share/shorkie/f1/model_best.h5", "https_uri": "https://storage.googleapis.com/seqnn-share/shorkie/f1/model_best.h5", "local_path": "models/shorkie_finetuned/train/f1c0/train/model_best.h5", "size_bytes": 57571980, "md5": "8e32226b54137adce81a073bc7e863f0" },
+        { "gs_uri": "gs://seqnn-share/shorkie/f2/model_best.h5", "https_uri": "https://storage.googleapis.com/seqnn-share/shorkie/f2/model_best.h5", "local_path": "models/shorkie_finetuned/train/f2c0/train/model_best.h5", "size_bytes": 57571980, "md5": "aacbd24368e440bd2d6bf0fae06c3544" },
+        { "gs_uri": "gs://seqnn-share/shorkie/f3/model_best.h5", "https_uri": "https://storage.googleapis.com/seqnn-share/shorkie/f3/model_best.h5", "local_path": "models/shorkie_finetuned/train/f3c0/train/model_best.h5", "size_bytes": 57571980, "md5": "cbff5c95d778527e0cff711104543fa2" },
+        { "gs_uri": "gs://seqnn-share/shorkie/f4/model_best.h5", "https_uri": "https://storage.googleapis.com/seqnn-share/shorkie/f4/model_best.h5", "local_path": "models/shorkie_finetuned/train/f4c0/train/model_best.h5", "size_bytes": 57571980, "md5": "029291ee1e0114a1b8e4a4145ede7eda" },
+        { "gs_uri": "gs://seqnn-share/shorkie/f5/model_best.h5", "https_uri": "https://storage.googleapis.com/seqnn-share/shorkie/f5/model_best.h5", "local_path": "models/shorkie_finetuned/train/f5c0/train/model_best.h5", "size_bytes": 57571980, "md5": "3328e493196d9a95a971cba297603241" },
+        { "gs_uri": "gs://seqnn-share/shorkie/f6/model_best.h5", "https_uri": "https://storage.googleapis.com/seqnn-share/shorkie/f6/model_best.h5", "local_path": "models/shorkie_finetuned/train/f6c0/train/model_best.h5", "size_bytes": 57571980, "md5": "b2d69e7e395766cc59684e4bd45d3ffb" },
+        { "gs_uri": "gs://seqnn-share/shorkie/f7/model_best.h5", "https_uri": "https://storage.googleapis.com/seqnn-share/shorkie/f7/model_best.h5", "local_path": "models/shorkie_finetuned/train/f7c0/train/model_best.h5", "size_bytes": 57571980, "md5": "644b43e3be4439de932f64a162770ea3" },
+        { "gs_uri": "gs://seqnn-share/shorkie/params.json", "https_uri": "https://storage.googleapis.com/seqnn-share/shorkie/params.json", "local_path": "models/shorkie_finetuned/params.json", "size_bytes": 2752, "md5": null },
+        { "gs_uri": "gs://seqnn-share/shorkie/targets.txt", "https_uri": "https://storage.googleapis.com/seqnn-share/shorkie/targets.txt", "local_path": "models/shorkie_finetuned/targets.txt", "size_bytes": 781531, "md5": null }
+      ]
+    },
+    "shorkie_scratch": {
+      "description": "Supervised 8-fold ensemble trained from random init (no LM pretraining); ablation baseline. Identical data/architecture to shorkie_finetuned, minus --restore (lr 1e-4 vs 2e-5).",
+      "released": false,
+      "note": "Not publicly released. Reproduce via scripts/02_train/shorkie_scratch/ (added in Phase 5).",
+      "files": []
+    }
+  },
+  "datasets": {
+    "lm_corpus": {
+      "description": "Multi-species fungal pretraining corpus, 4 tiers. Each tier: raw genomes + matched 16384 bp ZLIB TFRecords. Requester-pays bucket. Species sets are committed in data/species_lists/. See scripts/01_data_build/lm_corpus/.",
+      "split": "valid = R64 chrXI/XIII/XV ; test = R64 chrXII/XIV/XVI ; chrXI-XVI excluded from train",
+      "tiers": {
+        "R64": {
+          "num_species": 1,
+          "species_list": "data/species_lists/species_r64_gtf.cleaned.csv",
+          "internal_dir": "data_r64_gtf",
+          "genome": "gs://shorkie-paper/data/unsupervised/genome/R64/",
+          "tfrecords": "gs://shorkie-paper/data/unsupervised/processed/R64/",
+          "statistics": { "seq_length": 16384, "test_seqs": 528, "valid_seqs": 518, "train_seqs": 1201 }
+        },
+        "80_strains": {
+          "num_species": 80,
+          "species_list": "data/species_lists/species_strains_gtf.cleaned.csv",
+          "internal_dir": "data_strains_gtf",
+          "genome": "gs://shorkie-paper/data/unsupervised/genome/80_strains/",
+          "tfrecords": "gs://shorkie-paper/data/unsupervised/processed/80_strains/",
+          "statistics": { "seq_length": 16384, "test_seqs": 528, "valid_seqs": 518, "train_seqs": 102315 }
+        },
+        "165_Saccharomycetales": {
+          "num_species": 165,
+          "released_lm_corpus": true,
+          "species_list": "data/species_lists/species_saccharomycetales_gtf.cleaned.csv",
+          "internal_dir": "data_saccharomycetales_gtf",
+          "genome": "gs://shorkie-paper/data/unsupervised/genome/165_Saccharomycetales/",
+          "tfrecords": "gs://shorkie-paper/data/unsupervised/processed/165_Saccharomycetales/",
+          "statistics": { "seq_length": 16384, "test_seqs": 528, "valid_seqs": 518, "train_seqs": 385551 }
+        },
+        "1341_Fungus": {
+          "num_species": 1361,
+          "name_note": "Public label is '1341_Fungus'; internal dir is data_fungi_1385_gtf; the cleaned corpus contains 1361 assemblies (authoritative). See data/species_lists/README.md.",
+          "species_list": "data/species_lists/species_fungi_1385_gtf.cleaned.csv",
+          "internal_dir": "data_fungi_1385_gtf",
+          "genome": "gs://shorkie-paper/data/unsupervised/genome/1341_Fungus/",
+          "tfrecords": "gs://shorkie-paper/data/unsupervised/processed/1341_Fungus/",
+          "statistics": { "seq_length": 16384, "test_seqs": 528, "valid_seqs": 518, "train_seqs": 625355 }
+        }
+      }
+    },
+    "supervised": {
+      "description": "5215-track supervised dataset (ChIP-exo / MNase / RNA-seq coverage) on S288C R64-3-1, 16 bp, 8-fold. Requester-pays bucket. See scripts/01_data_build/supervised_tracks/.",
+      "num_tracks": 5215,
+      "genome": "S288C R64-3-1 (SGD)",
+      "targets_sheet": "gs://seqnn-share/shorkie/targets.txt",
+      "bigwigs": { "gs_uri": "gs://shorkie-paper/data/supervised/bigwigs/", "approx_size": "~93 GB", "md5": null },
+      "tfrecords": { "gs_uri": "gs://shorkie-paper/data/supervised/processed/", "md5": null }
+    }
+  }
+}
