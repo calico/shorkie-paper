@@ -21,5 +21,6 @@ local/container fallback.
 | 04 | `04_analysis/` | eQTL, MPRA, motif/MoDISco, ISM, attention, UMAP, SMT3, dependency maps, phylogeny |
 | —  | `common/` | portable SLURM submit wrapper + shared runners |
 
-> The current `analysis/` and `model/` trees are migrated here in Phase 3
-> (`git mv`, preserving history). This README is the target map.
+Most leaf directories carry their own `README.md` with stage-specific detail. Shared
+helpers live in the installable [`shorkie`](../src/shorkie) package — scripts import them
+(`from shorkie.helpers.yeast_helpers import …`) rather than copying code.

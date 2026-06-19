@@ -44,6 +44,20 @@ dependencies:
   - busco
   - mash
   - meme            # FIMO / motif DB tooling
+  # --- notebooks / figure reproduction (notebooks/figNN_*.ipynb) ---
+  # attrs>=23 is REQUIRED: nbformat/jsonschema need attrs>=22.2, but some deps
+  # (e.g. kipoi) pin attrs 21.4, which silently breaks `import nbformat` and the
+  # whole Jupyter stack. Pin the floor here so a fresh env works out of the box.
+  - attrs>=23
+  - referencing
+  - jsonschema>=4.18
+  - jupyterlab
+  - ipykernel
+  - nbconvert
+  - nbformat
+  - papermill        # optional: parameterized notebook execution
+  - logomaker        # sequence/PWM logos (fig03/04/07/13)
+  - umap-learn       # promoter embedding UMAP (fig05)
   - pip
   - pip:
       - tensorflow~=2.15.0
@@ -61,5 +75,8 @@ dependencies:
 # NOTES
 #  * dashing2 (genome similarity) is not on bioconda; build from
 #    https://github.com/dnbaker/dashing2 or skip (only 3_genome_dist uses it).
+#  * If a dependency resolver warns that `kipoi` wants an older `attrs`, ignore it:
+#    the notebooks need attrs>=23 and the kipoi pin is not used at runtime here.
+#    On an already-broken env: `pip install -U 'attrs>=23' referencing jsonschema`.
 #  * GPU training additionally needs `tensorrt==8.6.1` (pip) + a CUDA-enabled
 #    TensorFlow build; the container image (containers/) bakes a known-good set.

@@ -17,6 +17,74 @@ Contact *[drk (at) @calicolabs.com](mailto:drk@calicolabs.com)*, *[jlinder (at) 
 
 ---
 
+## Reproducing the paper
+
+### Quickstart
+
+```bash
+git clone --recurse-submodules git@github.com:calico/shorkie-paper.git
+cd shorkie-paper
+conda env create -f environment.yml && conda activate yeast_ml      # env name: yeast_ml
+pip install -e external/baskerville-yeast -e external/westminster -e .   # model code + this package
+cp config/paths.example.yaml config/paths.yaml                      # then edit `work_root`
+bash data/download.sh --minimal                                     # 8 finetuned folds for the minimal example
+python -m ipykernel install --user --name yeast_ml                  # for the notebooks
+```
+
+`data/download.sh` also takes `--models` (all 9 `.h5` + sidecars), `--lm-corpus <tier>`, and
+`--supervised` (verified against [`data/manifest.json`](./data/manifest.json)). All filesystem
+paths resolve through `config/paths.yaml` — there are no hardcoded machine paths in the scripts.
+
+### Repository layout
+
+| Path | What |
+|---|---|
+| [`src/shorkie/`](./src/shorkie) | installable helper package — `config` (paths), `models.ensemble` (8-fold loader + `logSED`), `helpers.yeast_helpers`, `viz.load_cov` |
+| [`scripts/`](./scripts) | all pipelines, staged `00_setup → 01_data_build → 02_train → 03_eval → 04_analysis` (+ `common/`) |
+| [`notebooks/`](./notebooks) | 14 figure-reproduction notebooks (import from `shorkie`, pinned to the `yeast_ml` kernel) |
+| [`config/`](./config) | `paths.example.yaml`, `slurm.example.yaml` templates |
+| [`data/`](./data) | committed reference files + `manifest.json` + `download.sh` (large data is on GCS) |
+| [`external/`](./external) | pinned `baskerville-yeast` + `westminster` submodules |
+| [`minimal_example/`](./minimal_example) | self-contained logSED variant scorer • [`containers/`](./containers) scheduler-free image |
+
+### Reproducibility matrix
+
+| Variant | Data build | Train | Eval | Analysis |
+|---|---|---|---|---|
+| **Shorkie LM** (masked DNA LM) | [`01_data_build/lm_corpus/`](./scripts/01_data_build/lm_corpus) | [`02_train/shorkie_lm/`](./scripts/02_train/shorkie_lm) | [`03_eval/lm/`](./scripts/03_eval/lm) | [`04_analysis/shorkie_lm/`](./scripts/04_analysis/shorkie_lm) |
+| **Shorkie** (fine-tuned) | [`01_data_build/supervised_tracks/`](./scripts/01_data_build/supervised_tracks) | [`02_train/shorkie_finetuned/`](./scripts/02_train/shorkie_finetuned) | [`03_eval/supervised/`](./scripts/03_eval/supervised) | [`04_analysis/shorkie/`](./scripts/04_analysis/shorkie) |
+| **Shorkie scratch** (random-init ablation) | *(same supervised set)* | [`02_train/shorkie_scratch/`](./scripts/02_train/shorkie_scratch) | [`03_eval/supervised/`](./scripts/03_eval/supervised) | [`04_analysis/shorkie_scratch/`](./scripts/04_analysis/shorkie_scratch) |
+
+The only difference between *finetuned* and *scratch* is the `--restore` flag + learning rate
+(see [`scripts/02_train/README.md`](./scripts/02_train/README.md)).
+
+### Figures → notebooks → upstream stage
+
+Each paper figure has a notebook in [`notebooks/`](./notebooks); ✅ = runs end-to-end from released
+data (`data/download.sh`), ⬚ = load-and-plot from a gated intermediate produced by the cited stage.
+See [`notebooks/README.md`](./notebooks/README.md) for the full artifact + `config` key index.
+
+| Notebook | Figure | Runs from released data? | Upstream `scripts/` stage |
+|---|---|:--:|---|
+| `fig01_lm_architecture` | LM architecture schematic | ✅ | `04_analysis/others/viz_shorkie_lm_arch/` |
+| `fig02_lm_genome_eval` | LM perplexity / loss | ⬚ | `03_eval/lm/lm_model_eval/` |
+| `fig03_lm_motifs` | LM MoDISco motif logos | ⬚ | `04_analysis/shorkie_lm/motif_analysis/motif_lm/` |
+| `fig04_cross_species_motifs` | cross-species motifs | ⬚ | `…/motif_lm__unseen_species/` |
+| `fig05_promoter_umap` | promoter embedding UMAP | ⬚ | `04_analysis/shorkie_lm/umap_cluster_promoter/` |
+| `fig06_attention_map` | LM self-attention | ✅ GPU | *(recompute from LM weights)* |
+| `fig07_smt3_dependency` | SMT3 PWM + dependency maps | ⬚ | `04_analysis/shorkie_lm/lm_SMT3_viz/` |
+| `fig08_track_prediction` | predicted vs observed coverage | ✅ GPU | `03_eval/supervised/track_prediction_eval/` |
+| `fig09_track_eval_metrics` | track-prediction metrics | ⬚ | `02_train/` + `03_eval/supervised/` |
+| `fig10_variant_effect_logSED` | variant-effect logSED track | ✅ GPU | `04_analysis/shorkie/eqtl/` (+ `minimal_example/`) |
+| `fig11_eqtl_benchmark` | cis-eQTL ROC/PR benchmark | ⬚ | `04_analysis/shorkie/eqtl/` |
+| `fig12_mpra_benchmark` | MPRA DREAM benchmark | ⬚ | `04_analysis/shorkie/mpra/` |
+| `fig13_ism_motifs` | Shorkie ISM saliency + motifs | ⬚† | `04_analysis/shorkie/ism_motif/motif_shorkie__RP_TSS/` |
+| `fig14_ablations` | LM-pretraining ablations | ⬚ | `04_analysis/shorkie_scratch/` + figs 11–12 |
+
+† `fig13` ships code-validated but not executed (its ISM `scores.h5` intermediate is not retained on disk); regeneration steps are in the notebook.
+
+---
+
 ## Model Availability
 
 The model weights can be downloaded as .h5 files from the URLs below. We are releasing both Shorkie LM-DNA language model and Shorkie, fine-tuned with thousands of epigenomic and transcriptomic profiles. 
@@ -39,7 +107,7 @@ To support reproducibility and the Shorkie LM variants introduced in the paper, 
 - 165_Saccharomycetales: [genomes] `gs://shorkie-paper/data/unsupervised/genome/165_Saccharomycetales/` | [tfrecord] `gs://shorkie-paper/data/unsupervised/processed/165_Saccharomycetales/`
 - 1341_Fungus: [genomes] `gs://shorkie-paper/data/unsupervised/genome/1341_Fungus/` | [tfrecord] `gs://shorkie-paper/data/unsupervised/processed/1341_Fungus/`
 
-- The training script is at [`model/shorkie_lm` on GitHub](https://github.com/calico/shorkie-paper/tree/main/model/shorkie_lm).
+- The training script is at [`scripts/02_train/shorkie_lm/`](./scripts/02_train/shorkie_lm).
 
 ### Shorkie
 
@@ -53,7 +121,7 @@ Shorkie was fine-tuned from the Shorkie LM using large-scale transcriptomic and 
 
 - **ChIP-exo** & **ChIP-MNase**: (Rossi, M.J. et al., *Nature*, 2021).
 
-- The training script is at [`model/shorkie` on GitHub](https://github.com/calico/shorkie-paper/tree/main/model/shorkie).
+- The training script is at [`scripts/02_train/shorkie_finetuned/`](./scripts/02_train/shorkie_finetuned).
 
 
 ---
@@ -97,7 +165,9 @@ Effect Difference) score for a single SNP — no fine-tuning required.
 
 ### Setup
 
-1. **Download model weights** (8 folds):
+1. **Download model weights** (8 folds). Easiest: `bash data/download.sh --minimal`
+   (fetches into the `my_shorkie/train/f{i}c0/train/model_best.h5` layout below and
+   verifies MD5s against [`data/manifest.json`](./data/manifest.json)). Or manually:
    ```bash
    mkdir -p my_shorkie/train
    for i in 0 1 2 3 4 5 6 7; do

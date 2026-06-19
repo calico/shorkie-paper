@@ -2,51 +2,73 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## What this repository is (and is not)
+## What this repository is
 
-This is the **analysis/reproducibility repo for the Shorkie paper** — a collection of ~206 Python scripts, ~123 shell scripts, and a few notebooks that reproduce the figures and benchmarks in the paper. **It is not an installable package and has no build, lint, or test system.** There are no `setup.py`, `pyproject.toml`, `requirements.txt`, CI config, or tests; do not look for or invent them.
+This is the **analysis / reproducibility release for the Shorkie paper**: the scripts, an installable helper package, and figure-reproduction notebooks that rebuild the datasets, train the three model variants, and regenerate the paper's benchmarks and figures. Remote: `github.com/calico/shorkie-paper`.
 
-The actual model code (the `SeqNN` architecture, training loop, ISM/variant scoring, data writers) lives in two **external Calico repos** that this repo only *invokes*:
-- **baskerville-yeast** — `hound_*.py` scripts (e.g. `hound_train.py`, `hound_ism_bed.py`, `hound_ism_snp.py`, `hound_MPRA_folds.py`, `hound_model_viz.py`) and the importable `baskerville` package (`from baskerville import seqnn, dna, gene`). https://github.com/calico/baskerville-yeast
-- **westminster** — multi-fold orchestration, primarily `westminster_train_folds.py`. https://github.com/calico/westminster
+Unlike a typical analysis dump, this repo **is set up to be reproducible by an outside user**:
+- **Installable package** — `pyproject.toml` makes `src/shorkie/` importable (`pip install -e .`); there is a real `environment.yml` (conda env `yeast_ml`). (Earlier revisions had neither — do not trust older notes that say "no pyproject/requirements".)
+- **No hardcoded paths** — every filesystem path resolves through `config/paths.yaml` via `shorkie.config` (Python) or `scripts/common/env.sh` / a local `cfg()` helper (shell). The single machine-specific value is `work_root`.
+- **Pinned external code** — the model framework is **not** vendored; it lives in two git submodules under `external/` (see below).
+- **Catalogued data** — `data/manifest.json` lists every released artifact (gs:// URI, size, MD5) and `data/download.sh` fetches + verifies them.
 
-When a script's behavior depends on `hound_*`, `westminster_*`, or `baskerville.*`, the source of truth is the external repo, **not** this one. On this cluster they are checked out under the `Yeast_ML` root described below.
+The actual model code (the `SeqNN` architecture, training loop, ISM/variant scoring, data writers) lives in the **external Calico repos** this repo only *invokes*:
+- **`external/baskerville-yeast`** — `hound_*.py` scripts (`hound_train.py`, `hound_data.py`, `hound_ism_*.py`, `yeast_test_genes.py`, …) and the importable `baskerville` package (`from baskerville import seqnn, dna, gene`). Upstream: https://github.com/calico/baskerville-yeast
+- **`external/westminster`** — multi-fold orchestration, primarily `westminster_train_folds.py`. Upstream: https://github.com/calico/westminster
+
+When a script's behavior depends on `hound_*`, `westminster_*`, or `baskerville.*`, the source of truth is the submodule, **not** this repo. Init them with `git submodule update --init` (pinned commits) and `pip install -e external/baskerville-yeast -e external/westminster`. Config keys `external.baskerville_scripts` / `external.westminster_scripts` point shell scripts at the `hound_*`/`westminster_*` entrypoints.
+
+## The three model variants
+
+The model is two-stage: **Shorkie LM** (a masked DNA language model pretrained on fungal genomes) is fine-tuned with supervised epigenomic/transcriptomic tracks to produce **Shorkie**. The repo covers three variants end-to-end:
+
+| Variant | What | Train command | Differs by |
+|---|---|---|---|
+| **shorkie_lm** | masked DNA LM, multi-species fungal corpus (released tier = 165 Saccharomycetales), seq_len 16384 | `hound_train.py` (`loss=mlm`, `use_bert=true`, `unet_small_bert_drop`) | — (base) |
+| **shorkie_finetuned** | supervised, 5215 ChIP-exo/MNase/RNA-seq tracks, R64, 8-fold CV | `westminster_train_folds.py … --restore <LM .h5>` | `task=fine-tune`, `lr=2e-5` |
+| **shorkie_scratch** | **identical** supervised set, random init (ablation) | same command **without `--restore`** | `task=supervised`, `lr=1e-4` |
+
+The only mechanistic difference between finetuned and scratch is the `--restore` flag + learning rate (verified: the two `params.json` differ in exactly those two `train` fields; model blocks are byte-identical). `scripts/02_train/README.md` documents the comparison.
 
 ## Execution model — read this before running or editing scripts
 
-**Everything assumes the JHU Salzberg HPC cluster (SLURM) and a specific filesystem layout.** Scripts are not portable as-is.
+**Everything assumes the JHU Salzberg HPC cluster (SLURM) + the `yeast_ml` conda env.** GPU (`a100`/`ica100`, `-A ssalzbe1_gpu`) is only needed for model training/inference and a few notebooks (fig06/08/10); most data-wrangling/plotting is CPU. SLURM client binaries may be at `/cm/shared/apps/slurm/current/bin`.
 
-- **Conda env:** `yeast_ml` (canonical interpreter `/home/kchao10/miniconda3/envs/yeast_ml/bin/python3`). Most scripts assume it is already activated; the `minimal_example` uses the full path explicitly.
-- **SLURM:** 76 of the shell scripts are `sbatch` batch scripts with `#SBATCH` headers; run them with `sbatch script.sh`, not `bash`. Partitions/accounts seen in the repo: `bigmem` (`-A ssalzbe1_bigmem`, CPU-heavy preprocessing), `parallel`, and `a100` (`-A ssalzbe1_gpu`, GPU training/inference). GPU is only needed for model training and inference; most data-wrangling/plotting steps are CPU.
-- **Hardcoded paths everywhere (~409 occurrences):** scripts reference the absolute root `/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML`. `scr4_ssalzbe1` is a symlink to `/scratch4/ssalzbe1`, so this resolves to `/scratch4/ssalzbe1/khchao/Yeast_ML` — a **sibling of this repo**. That `Yeast_ML/` tree holds the genomes, TFRecords, BigWigs, trained model `.h5` files, and the `baskerville-yeast` checkout (westminster lives under `Yeast_ML/seq_experiment/westminster`). **To run anything outside this exact user/cluster, you must edit these paths.** When adapting a script, rewriting the hardcoded root is the first step, not an afterthought.
+- **Conda env:** `yeast_ml` (canonical interpreter `/home/kchao10/miniconda3/envs/yeast_ml/bin/python3`). Most scripts assume it is active; `minimal_example` uses the full path explicitly.
+- **Paths are config-driven, not hardcoded.** Copy `config/paths.example.yaml` → `config/paths.yaml` (git-ignored) and set `work_root` (default `/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML` = `/scratch4/ssalzbe1/khchao/Yeast_ML`). Other roots interpolate from it. A few legacy build/eval roots have their own keys (`corpus_build_*_root`, `ssm_results_root`, `yeast_seqnn_eval_root`, `tools.*`) — override them too if you rerun the corpus build / genome eval. `src/shorkie/config.py` loads `$SHORKIE_CONFIG` → `config/paths.yaml` → `config/paths.example.yaml` and supports `${...}` interpolation.
+- **SLURM scripts** carry `#SBATCH` headers; run with `sbatch script.sh`. `config/slurm.example.yaml` holds partition/account profiles. Large data/weights are on GCS — fetch via `data/download.sh` (see `data/manifest.json`); they are not in the repo.
 
-## Directory map / architecture
+## Directory map
 
-The repo is organized around the paper's two models and one ablation study. **The model is two-stage: `Shorkie LM` (a masked DNA language model pretrained on fungal genomes) is fine-tuned with supervised epigenomic/transcriptomic tracks to produce `Shorkie`.** The directory split mirrors this.
+- **`src/shorkie/`** — the installable package (single source of shared code; replaces the old copy-pasted helpers):
+  - `config.py` — path resolution (`load`, `get`, `path`, `repo_root`).
+  - `helpers/yeast_helpers.py` — sequence/coverage/ISM/plotting helpers (`process_sequence`, `predict_tracks`, `plot_coverage_track_bins`, `make_seq_1hot`, …).
+  - `models/ensemble.py` — 8-fold ensemble loader + scoring (`load_ensemble`, `make_input`, `ensemble_predict`, `predict`, `logSED`).
+  - `data/{util,bed_helper}.py`, `viz/load_cov.py` (`CovFace`, `read_coverage`, `seq_norm`).
+- **`scripts/`** — all pipelines, staged `00 → 04` (see `scripts/README.md`):
+  - `00_setup/` — submodule init, env checks, download wrappers.
+  - `01_data_build/{lm_corpus,supervised_tracks}/` — genome-corpus pipeline (download → RepeatMasker/DUST mask → paralog/repeat filter → TFRecords) and FASTQ→BAM→BigWig→peaks→`hound_data.py`.
+  - `02_train/{shorkie_lm,shorkie_finetuned,shorkie_scratch}/` — the three train drivers (each `params.json` + a config-parameterized `*.sh` with `--dry-run`).
+  - `03_eval/{lm,supervised}/` — LM perplexity / genome eval / arch comparison, and track-prediction metrics.
+  - `04_analysis/{shorkie_lm,shorkie,shorkie_scratch,others}/` — eQTL, MPRA, motif/MoDISco, ISM, attention, UMAP, SMT3, dependency maps, phylogeny, arch viz, ablations.
+  - `common/` — `env.sh` (exports config roots), `submit.sh`/`slurm_header.sh` (portable `#SBATCH` + local/container fallback).
+- **`notebooks/`** — 14 figure-reproduction notebooks (`figNN_<topic>.ipynb`), each importing from `shorkie`, pinned to the `yeast_ml` kernel; `notebooks/README.md` is the figure→notebook→upstream-stage→artifact index.
+- **`config/`** — `paths.example.yaml`, `slurm.example.yaml` (templates; copy to the `.yaml` form).
+- **`data/`** — small committed reference files (`R64_annotations/`, `species_lists/`) + `manifest.json` + `download.sh`. Large data is **not** committed.
+- **`external/`** — the two pinned submodules. **`minimal_example/`** — self-contained logSED variant scorer (best place to learn model load + scoring). **`containers/`** — Dockerfile + Apptainer def (scheduler-free path).
 
-- **`model/`** — the published training commands (just the launch snippets; real logic is in baskerville/westminster):
-  - `model/shorkie_lm/` — LM pretraining via `hound_train.py` (`train.sh`).
-  - `model/shorkie/` — supervised fine-tuning from the LM checkpoint, 8 folds, via `westminster_train_folds.py` (`make_model.sh`), restoring `LM_Johannes/.../model_best.h5`.
-  Each has its own `params.json` (two top-level keys: `train` and `model`).
+## Conventions when editing or adding scripts
 
-- **`analysis/shorkie_lm/`** — analyses of the language model. Notably `data_preprocessing/` is the full genome-corpus pipeline (download FASTA/GTF → repeat masking with RepeatMasker/RepeatModeler/DUST → paralog/repeat filtering with minimap2 & nucmer/mummer → genome-similarity with dashing2/mash → TFRecord generation). Also `genome_evaluation/` (BUSCO, window stats), `lm_model_eval/`, `motif_analysis/` (heavy tfmodisco use), `attention_map/`, `umap_cluster_promoter/`, `lm_SMT3_viz/`.
+- **Numbered pipeline steps** (`0_`, `1_`, `2_`, sometimes `0a_`/`s5_`) encode order within a directory; preserve it when adding steps. Subdirectories nest the same way.
+- **`.py` + `.sh` pairing:** a `foo.py` doing the work has a sibling `foo.sh` SLURM wrapper supplying paths/args. Follow this when adding a compute step.
+- **Paths via config, never hardcoded.** Python: `from shorkie import config` then `config.path('<dotted.key>')` / module-level `ROOT = str(config.path('work_root'))` + f-strings. Shell: `source scripts/common/env.sh` for `${WORK_ROOT}`/`${DATA_ROOT}`/… or the self-contained one-liner used throughout `04_analysis`:
+  `cfg() { python -c "import sys; from shorkie import config; print(config.get(sys.argv[1]) or '')" "$1"; }` then `VAR="$(cfg dotted.key)"`. No `--mail-user=` literals (use `config/slurm.yaml`).
+- **Shared code is imported, not copied.** Use `from shorkie.helpers.yeast_helpers import …`, `from shorkie.models.ensemble import …`, etc. Do not reintroduce the old per-directory `yeast_helpers.py`/`util.py`/`bed_helper.py`/`load_cov.py` copies.
+- **Model layout:** trained models are an **8-fold ensemble** at `<model_dir>/train/f{0..7}c0/train/model_best.h5`, scored by averaging fold predictions. Accompanied by `params.json` (two keys: `train`, `model`) and a TSV targets sheet (`cleaned_sheet.txt`, ~5215 tracks).
+- **Model input encoding:** Shorkie takes `(16384, 170)` tensors — channels 0–3 are DNA one-hot (A/C/G/T), 4–169 are species identity (column 114 = *S. cerevisiae*). See `minimal_example/run_shorkie_variant.py` and `shorkie.models.ensemble.make_input`.
+- **logSED** = `log2(Σ_alt_bins + 1) − log2(Σ_ref_bins + 1)` over gene-body output bins; the core variant-effect metric throughout the eQTL and MPRA analyses.
+- **Chromosome naming gotcha:** the Ensembl GTF uses bare Roman (`I`..`XVI`); the cleaned FASTA + released bigwigs use `chrI`..`chrXVI`. When fetching by gene, remap (see fig06/fig08 `to_fasta_chrom`).
 
-- **`analysis/shorkie/`** — analyses of the fine-tuned model: `track_data_preprocess/` (ChIP/MNase/RNA-seq → BAM → BigWig coverage via STAR/samtools/macs3/bedtools), `track_prediction_eval/`, `eqtl/` (cis-eQTL benchmarking — see its own `README.md`), `eqtl_data/`, `mpra/` (DREAM Challenge MPRA benchmark, logSED scoring), `ism_motif/` (in-silico mutagenesis + modisco motif discovery over RP/TSS genes and induction time-series).
+## Heavy external tools
 
-- **`analysis/shorkie_Random_Init/`** — ablation baselines trained from random init (no LM pretraining): `1_architecture_search/`, `2_lr_search/`, `3_finetuning_datasets/`, `ism_motif/`.
-
-- **`analysis/others/`** — `phylogenetic_tree/` (species tree from NCBI taxonomy) and `viz_shorkie_lm_arch/`.
-
-- **`minimal_example/`** — the one self-contained, documented entry point: `run_shorkie_variant.py` computes a logSED variant-effect score for a single SNP from a trained ensemble. Best place to learn how the model is loaded and scored without the cluster pipeline. `run_example.sh` is its SLURM wrapper.
-
-- **`data/R64_annotations/`** — small committed reference files (`chrom.sizes`, repeat/gap BEDs) for the *S. cerevisiae* R64 genome. Large data (genomes, TFRecords, BigWigs, weights) is **not** in the repo — see the `gs://shorkie-paper/...` and `gs://seqnn-share/...` URLs in `README.md`.
-
-## Conventions to follow when editing or adding scripts
-
-- **Numbered pipeline steps:** filenames are prefixed `0_`, `1_`, `2_`, … (sometimes `0a_`) to encode execution order within a directory. Subdirectories nest the same way (`1_data_download/`, `2_repeat_region_masking/`, …). Preserve this ordering when adding steps.
-- **`.py` + `.sh` pairing:** a `foo.py` doing the work commonly has a sibling `foo.sh` that is the SLURM wrapper supplying paths/args. When adding a compute step, follow this pattern.
-- **Duplicated helpers, not shared imports:** `yeast_helpers.py` (sequence/coverage/plotting helpers) is **copied** into ~9 analysis subdirectories rather than imported from a package; `util.py` and `bed_helper.py` are likewise duplicated. There is no `__init__.py`/package root. If you fix a bug in one `yeast_helpers.py`, check whether sibling copies need the same fix.
-- **Model layout:** trained models are an **8-fold ensemble** at `<model_dir>/train/f{0..7}c0/train/model_best.h5`, scored by averaging fold predictions. Accompanied by `params.json` (architecture) and a tab-separated targets sheet (`sheet.txt` / `cleaned_sheet.txt`, ~5215 ChIP/RNA-seq tracks).
-- **Model input encoding:** Shorkie takes `(16384, 170)` tensors — channels 0–3 are DNA one-hot (A/C/G/T), channels 4–169 are species identity (column 114 = *S. cerevisiae*). See `minimal_example/run_shorkie_variant.py:make_input`.
-- **logSED** = `log2(Σ_alt_bins + 1) − log2(Σ_ref_bins + 1)` over gene-body output bins; the core variant-effect metric, computed throughout the eQTL and MPRA analyses.
-- **Heavy external tools** invoked from shell scripts (must be on `PATH`/in the env): `modisco`/`tfmodisco` (motif discovery — by far the most used), `bedtools`, `samtools`, `STAR`, `macs3`, `RepeatMasker`/`RepeatModeler`, `minimap2`, `nucmer`/`mummerplot`/`show-coords`, `busco`, `dashing2`, `mash`.
+Invoked from shell scripts (must be on `PATH` / in the env, or pointed to via `tools.*` config keys): `modisco`/`tfmodisco` (most used), `bedtools`, `samtools`, `STAR`, `macs3`, `RepeatMasker`/`RepeatModeler`, `minimap2`, `nucmer`/`mummerplot`/`show-coords`, `busco`, `dashing2`, `mash`, `meme`/`fimo`. Most are in `environment.yml`; `dashing2` is not on bioconda (build from source). GPU training also needs `tensorrt` + a CUDA TensorFlow build (baked into `containers/`).
