@@ -18,10 +18,13 @@ python -m ipykernel install --user --name yeast_ml     # register the pinned ker
 jupyter lab                                  # open any figNN_*.ipynb
 ```
 
-> **Env note:** the current `yeast_ml` lockfile ships a `jsonschema`/`referencing`
-> vs `attrs` mismatch that breaks `import nbformat` (and therefore the Jupyter
-> stack). If `jupyter` fails to start, `pip install -U attrs referencing jsonschema`
-> in the env. (Tracked for the Phase-8 `environment.yml` pin refresh.)
+> **Env note:** older `yeast_ml` lockfiles shipped a `jsonschema`/`referencing`
+> vs `attrs` mismatch that broke `import nbformat` (and therefore the Jupyter
+> stack). The refreshed [`../environment.yml`](../environment.yml) pins
+> `attrs>=23` + `referencing` + `jsonschema` alongside `jupyterlab`/`ipykernel`/
+> `nbconvert`/`nbformat`/`papermill`/`logomaker`/`umap-learn`, so a fresh env
+> works out of the box. (On an older env, `pip install -U attrs referencing
+> jsonschema` repairs it in place.)
 
 ## Released-data vs. gated figures
 

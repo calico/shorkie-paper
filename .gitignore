@@ -210,6 +210,9 @@ __marimo__/
 # User config copies (templates are committed as *.example.yaml)
 config/paths.yaml
 config/slurm.yaml
+# Transient SLURM job logs from notebook execution (Phase 7b GPU runs)
+notebooks/_gpu_*.out
+notebooks/*.out
 # Downloaded large artifacts (default data_root)
 data_local/
 # Large binaries should never be committed (hosted on GCS; see data/manifest.json)

@@ -116,92 +116,44 @@ def read_coverage(genome_cov_file, chrm, start, end):
     return cov
 
 
-def seq_norm(seq_cov_nt):
-    # -w 16 \
-    # -c 1024 \
-    usage = "usage: %prog [options] <genome_cov_file> <seqs_bed_file> <seqs_cov_file>"
-    parser = OptionParser(usage)
-    parser.add_option(
-        "-b",
-        dest="blacklist_bed",
-        help="Set blacklist nucleotides to a baseline value.",
+def seq_norm(
+    seq_cov_nt,
+    pool_width=16,
+    clip=1024,
+    clip_soft=None,
+    clip_pct=0.9999999,
+    crop_bp=0,
+    interp_nan=False,
+    scale=1.0,
+    sum_stat="sum",
+    blacklist_pct=0.5,
+):
+    """Bin + normalize per-nucleotide coverage into model target bins.
+
+    Mirrors baskerville/hound_data's target processing (16 bp sum-pooling, clip 1024
+    by default) -- the same transform the supervised tracks were trained on -- so an
+    observed bigwig track can be compared against model predictions on one scale.
+
+    NOTE: originally consolidated from a CLI ``main()`` body that called
+    ``OptionParser.parse_args()`` on ``sys.argv``; that raised ``SystemExit`` when the
+    function was imported and called as a library (e.g. inside Jupyter). Rewritten as a
+    pure function taking the same options as keyword arguments. Numeric behavior is
+    unchanged: defaults match the original parser, and ``pool_width``/``clip`` are still
+    forced to 16/1024 below to match the model's 16 bp output bins.
+    """
+    from types import SimpleNamespace
+
+    options = SimpleNamespace(
+        pool_width=pool_width,
+        clip=clip,
+        clip_soft=clip_soft,
+        clip_pct=clip_pct,
+        crop_bp=crop_bp,
+        interp_nan=interp_nan,
+        scale=scale,
+        sum_stat=sum_stat,
+        blacklist_pct=blacklist_pct,
     )
-    parser.add_option('--model_type', dest='model_type', default='self_supervised', type='str', help='train type')
-    parser.add_option(
-        "--time_group",
-        dest="time_group",
-        default="T0",
-        help="Time group to evaluate: 'T0', 'T5', 'T10', 'T15', 'T20', 'T25', 'T30', 'T35', 'T40', 'T45', 'T50', 'T55', 'T60', 'T65', 'T70', 'T75', 'T80', 'T85', 'T90', 'T120', 'T180'. [Default: T0]",
-    )
-    parser.add_option(
-        "--dataset_type",
-        dest="dataset_type",
-        default=None,
-        help="Group of dataset to evaluate: 'Chip-exo', 'Chip-MNase', or 'RNAseq'. [Default: evaluate all]",
-    )
-    parser.add_option(
-        "--black_pct",
-        dest="blacklist_pct",
-        default=0.5,
-        type="float",
-        help="Clip blacklisted regions to this distribution value [Default: %default",
-    )
-    parser.add_option(
-        "-c",
-        dest="clip",
-        default=None,
-        type="float",
-        help="Clip values post-summary to a maximum [Default: %default]",
-    )
-    parser.add_option(
-        "--clip_soft",
-        dest="clip_soft",
-        default=None,
-        type="float",
-        help="Soft clip values, applying sqrt to the execess above the threshold [Default: %default]",
-    )
-    parser.add_option(
-        "--clip_pct",
-        dest="clip_pct",
-        default=0.9999999,
-        type="float",
-        help="Clip extreme values to this distribution value [Default: %default",
-    )
-    parser.add_option(
-        "--crop",
-        dest="crop_bp",
-        default=0,
-        type="int",
-        help="Crop bp off each end [Default: %default]",
-    )
-    parser.add_option(
-        "-i",
-        dest="interp_nan",
-        default=False,
-        action="store_true",
-        help="Interpolate NaNs [Default: %default]",
-    )
-    parser.add_option(
-        "-s",
-        dest="scale",
-        default=1.0,
-        type="float",
-        help="Scale values by [Default: %default]",
-    )
-    parser.add_option(
-        "-u",
-        dest="sum_stat",
-        default="sum",
-        help="Summary statistic to compute in windows [Default: %default]",
-    )
-    parser.add_option(
-        "-w",
-        dest="pool_width",
-        default=1,
-        type="int",
-        help="Average pooling width [Default: %default]",
-    )
-    (options, args) = parser.parse_args()
 
     # if len(args) != 3:
     #     parser.error("")

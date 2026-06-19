@@ -91,16 +91,16 @@ results:
   modisco_ism:    ${experiments_root}/motif_LM_fine_tuned_RP_TSS/1_modisco_analysis
   # Shorkie ISM score .h5 (RP/TSS genes)  (.../ism_motif/motif_shorkie__RP_TSS/)
   ism_scores:     ${experiments_root}/motif_LM_fine_tuned_RP_TSS
-  # Promoter LM embeddings (embeddings*.h5) + UMAP coords  (.../umap_cluster_promoter/)
-  umap:           ${experiments_root}/umap_cluster_promoter
+  # Promoter LM embeddings (embeddings_LM_sequence/embeddings_chr*.h5) + UMAP coords  (.../UMAP_cluster_promoter/)
+  umap:           ${experiments_root}/UMAP_cluster_promoter
   # Precomputed attention tensors — optional; fig06 instead recomputes from models.shorkie_lm  (.../attention_map/)
   attention:      ${experiments_root}/attention_map
   # eQTL per-model score TSVs: <key>/negset_<n>/<exp>_Shorkie{,_LM,_Random_Init}_scores.tsv  (.../eqtl/3_visualization/)
   eqtl_scores:    ${work_root}/revision_experiments/eQTL/viz_new/results
   # DREAM MPRA-model eQTL eval TSVs (baseline comparison for the eQTL benchmark)  (.../eqtl/)
   mpra_eval:      ${experiments_root}/SUM_data_process/eQTL/eqtl_MPRA_modeals_eval
-  # MPRA logSED prediction NPZ/TSV  (scripts/04_analysis/shorkie/mpra/5_mpra_viz/)
-  mpra_viz:       ${experiments_root}/SUM_data_process/MPRA/results/single_measurement_stranded
+  # MPRA per-context logSED prediction NPZ: <key>/results/<seq_type>/<SYMBOL>_<ORF>_avg_outputs/<ORF>_context_<i>_*.npz  (scripts/04_analysis/shorkie/mpra/5_mpra_viz/)
+  mpra_viz:       ${experiments_root}/SUM_data_process/MPRA/MPRA_promoter_seqs/scores_avg
   # Per-fold training logs: <key>/{supervised,self_supervised}_unet_small_bert_drop/train/f<i>c0/train.out  (scripts/03_eval/supervised/, scripts/04_analysis/shorkie_scratch/)
   train_logs:     ${datasets.supervised_root}
 
