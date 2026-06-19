@@ -73,6 +73,37 @@ datasets:
   # path that no longer exists.
   lm_train_dir: ${datasets.lm_corpus_split_root}/data_saccharomycetales_gtf
 
+# --- Analysis intermediates (NOT in the released data/manifest.json) ---
+# These artifacts are produced by the cited upstream scripts/ stages and are large /
+# work-dir-only. The figure-reproduction notebooks (notebooks/figNN_*.ipynb) read
+# them through these keys. To reproduce a "gated" figure, first run its upstream
+# stage, then point the relevant key at where you wrote the output (defaults below
+# follow the paper's work_root layout). The runnable notebooks (fig01/06/08/10) do
+# NOT need this block — they recompute from released weights + genome/bigwigs.
+results:
+  # LM test perplexity/loss logs: <key>/lm_<tier>_gtf/lm_<tier>_gtf_<arch>/test_testset_perplexity_region/test_testset_perplexity_region.out  (scripts/03_eval/lm/lm_model_eval/)
+  lm_eval_logs:   ${lm_experiment_root}/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/LM_Johannes
+  # In-distribution LM tfmodisco: <key>/<arch>/modisco_results_w16384_n100000.h5  (.../motif_analysis/motif_lm/)
+  modisco_lm:     ${experiments_root}/motif_LM/saccharomycetales_viz_seq
+  # Cross-species LM tfmodisco: <key>/<tier>_viz_seq/<arch>/modisco_results_w_16384_n_1000000.h5  (.../motif_lm__unseen_species/)
+  modisco_unseen: ${experiments_root}/motif_LM__unseen_species
+  # Shorkie ISM tfmodisco: <key>/<exp>/f0c0/logSED/modisco_results_10000_500.h5  (.../ism_motif/motif_shorkie__RP_TSS/2_modisco_analysis/)
+  modisco_ism:    ${experiments_root}/motif_LM_fine_tuned_RP_TSS/1_modisco_analysis
+  # Shorkie ISM score .h5 (RP/TSS genes)  (.../ism_motif/motif_shorkie__RP_TSS/)
+  ism_scores:     ${experiments_root}/motif_LM_fine_tuned_RP_TSS
+  # Promoter LM embeddings (embeddings*.h5) + UMAP coords  (.../umap_cluster_promoter/)
+  umap:           ${experiments_root}/umap_cluster_promoter
+  # Precomputed attention tensors — optional; fig06 instead recomputes from models.shorkie_lm  (.../attention_map/)
+  attention:      ${experiments_root}/attention_map
+  # eQTL per-model score TSVs: <key>/negset_<n>/<exp>_Shorkie{,_LM,_Random_Init}_scores.tsv  (.../eqtl/3_visualization/)
+  eqtl_scores:    ${work_root}/revision_experiments/eQTL/viz_new/results
+  # DREAM MPRA-model eQTL eval TSVs (baseline comparison for the eQTL benchmark)  (.../eqtl/)
+  mpra_eval:      ${experiments_root}/SUM_data_process/eQTL/eqtl_MPRA_modeals_eval
+  # MPRA logSED prediction NPZ/TSV  (scripts/04_analysis/shorkie/mpra/5_mpra_viz/)
+  mpra_viz:       ${experiments_root}/SUM_data_process/MPRA/results/single_measurement_stranded
+  # Per-fold training logs: <key>/{supervised,self_supervised}_unet_small_bert_drop/train/f<i>c0/train.out  (scripts/03_eval/supervised/, scripts/04_analysis/shorkie_scratch/)
+  train_logs:     ${datasets.supervised_root}
+
 # --- External code (in-repo git submodules) ---
 external:
   baskerville_scripts: ${repo_root}/external/baskerville-yeast/src/baskerville/scripts
