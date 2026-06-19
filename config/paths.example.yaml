@@ -1,46 +1,58 @@
 # ---------------------------------------------------------------------------
 # shorkie-paper path configuration
 # ---------------------------------------------------------------------------
-# Copy this file to config/paths.yaml (git-ignored) and edit for your machine,
-# or point $SHORKIE_CONFIG at a copy elsewhere. Loaded by src/shorkie/config.py.
-#
-# Large data and model weights live OUTSIDE the repo. Set `data_root` to where
-# data/download.sh places fetched artifacts (or to an existing local copy).
-# Any ${token} below resolves to an environment variable of that name if set,
-# otherwise to another key in this file (dotted path, e.g. ${genome.fasta}).
+# Copy this file to config/paths.yaml (git-ignored) and edit `work_root` for
+# your machine, or point $SHORKIE_CONFIG at a copy elsewhere. Loaded by
+# src/shorkie/config.py.  ${token} resolves to an environment variable of that
+# name if set, otherwise to another key here (dotted path, e.g. ${genome.fasta}).
+# ${repo_root} is injected automatically (the repository root).
 # ---------------------------------------------------------------------------
 
-# Root for downloaded large artifacts (TFRecords, BigWigs, model_best.h5).
-data_root: ./data_local
+# Legacy work directory that holds the large data / model / experiment trees.
+# This is the ONE place an absolute machine path is recorded; override it.
+work_root: /home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML
 
-# Small reference files committed in the repo (do not edit unless relocating).
+# Where data/download.sh places downloaded PUBLIC artifacts (clean layout).
+release_root: ./data_local
+
+# Small reference files committed in this repo.
 reference_dir: ./data/R64_annotations
 
-# --- S. cerevisiae R64 reference genome ---
+# --- Sub-roots of the work dir (preserve the existing tree structure) ---
+data_root:           ${work_root}/data
+seq_experiment_root: ${work_root}/seq_experiment
+lm_experiment_root:  ${work_root}/lm_experiment
+experiments_root:    ${work_root}/experiments
+
+# --- S. cerevisiae R64 reference genome (lives in the LM corpus data tree) ---
+r64_data_dir: ${data_root}/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_r64_gtf
 genome:
-  fasta:       ${data_root}/genome/GCA_000146045_2.cleaned.fasta
-  gtf:         ${data_root}/genome/GCA_000146045_2.59.gtf
+  fasta:       ${r64_data_dir}/fasta/GCA_000146045_2.cleaned.fasta
+  gtf:         ${r64_data_dir}/gtf/GCA_000146045_2.59.gtf
   chrom_sizes: ${reference_dir}/chrom.sizes
   mask_bed:    ${reference_dir}/mask_rossi.bed
   gaps_bed:    ${reference_dir}/assembly_gaps.bed
 
-# --- Trained model weights (download via data/download.sh) ---
+# --- Trained models ---
 models:
   num_folds: 8
-  shorkie_lm:        ${data_root}/models/shorkie_lm/train/model_best.h5
-  shorkie_finetuned: ${data_root}/models/shorkie           # holds train/f0c0..f7c0/
-  shorkie_scratch:   ${data_root}/models/shorkie_scratch   # holds train/f0c0..f7c0/
+  # Shorkie_LM directory and its best checkpoint (the --restore target).
+  shorkie_lm:            ${lm_experiment_root}/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/LM_Johannes/lm_saccharomycetales_gtf/lm_saccharomycetales_gtf_unet_small_bert_drop
+  shorkie_lm_checkpoint: ${models.shorkie_lm}/train/model_best.h5
+  # Supervised 8-fold models (each holds train/f0c0..f7c0/).
+  shorkie_finetuned:     ${seq_experiment_root}/exp_histone__chip_exo__rna_seq_no_norm_5215_tracks/16bp/self_supervised_unet_small_bert_drop
+  shorkie_scratch:       ${seq_experiment_root}/exp_histone__chip_exo__rna_seq_no_norm_5215_tracks/16bp/shorkie_models/shorkie_random_initialization
 
 # --- Datasets ---
 datasets:
-  # LM genome corpus (unsupervised pretraining). Tiers:
-  #   R64 | 80_strains | 165_Saccharomycetales | 1341_Fungus
-  lm_corpus_root: ${data_root}/lm_corpus
-  lm_tier:        165_Saccharomycetales        # released tier
-  # Supervised regulatory tracks (fine-tuning data).
-  supervised_root: ${data_root}/supervised
-  bigwigs:         ${data_root}/supervised/bigwigs
-  targets_sheet:   ${data_root}/supervised/cleaned_sheet.txt
+  supervised_root: ${seq_experiment_root}/exp_histone__chip_exo__rna_seq_no_norm_5215_tracks/16bp
+  targets_sheet:   ${datasets.supervised_root}/cleaned_sheet.txt
+  bigwigs:         ${data_root}/bigwigs
+  mpra:            ${data_root}/MPRA
+  eqtl:            ${data_root}/eQTL
+  lm_corpus_root:  ${data_root}/yeast/ensembl_fungi_59      # 4 corpus tiers live under here
 
-# --- Optional: legacy work-dir root (only for migrating/regenerating data) ---
-# work_root: /path/to/Yeast_ML
+# --- External code (in-repo git submodules) ---
+external:
+  baskerville_scripts: ${repo_root}/external/baskerville-yeast/src/baskerville/scripts
+  westminster_scripts: ${repo_root}/external/westminster/src/westminster/scripts

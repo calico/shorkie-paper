@@ -1,22 +1,39 @@
 # ---------------------------------------------------------------------------
-# SLURM scheduler defaults for shorkie-paper
+# SLURM scheduler configuration for shorkie-paper
 # ---------------------------------------------------------------------------
 # Copy to config/slurm.yaml (git-ignored) and edit. Consumed by
-# scripts/common/submit.sh to generate #SBATCH headers, so the individual
-# pipeline scripts stay scheduler-agnostic and portable. Leave `email` blank
-# to disable mail notifications.
+# scripts/common/submit.sh, which emits #SBATCH directives keyed by a
+# --profile {gpu|cpu|bigmem} argument, so the pipeline scripts themselves stay
+# scheduler-agnostic. Leave `email` blank to disable mail notifications.
 # ---------------------------------------------------------------------------
 
-account:           your_account        # e.g. ssalzbe1_gpu
-partition_gpu:     a100
-partition_cpu:     parallel
-partition_bigmem:  bigmem
-gpu_gres:          gpu:1
+email:        ""          # blank = no --mail-user; otherwise your address
+mail_type:    end
+conda_env:    yeast_ml
 
-email:             ""                   # blank = no --mail-user
-mail_type:         end
+default_time: "48:00:00"
+default_mem:  "32G"
 
-default_time:      "72:00:00"
-default_mem:       "20g"
-
-conda_env:         yeast_ml
+# Partition profiles observed on the JHU Salzberg cluster. Edit for your site.
+profiles:
+  gpu:
+    partition: a100
+    account:   ssalzbe1_gpu
+    gres:      "gpu:1"
+    time:      "72:00:00"
+    mem:       "32G"
+    ntasks_per_node: 1
+  cpu:
+    partition: parallel
+    account:   ssalzbe1-chess
+    gres:      ""
+    time:      "48:00:00"
+    mem:       "32G"
+    ntasks_per_node: 8
+  bigmem:
+    partition: bigmem
+    account:   ssalzbe1_bigmem
+    gres:      ""
+    time:      "48:00:00"
+    mem:       "64G"
+    ntasks_per_node: 8

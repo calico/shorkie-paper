@@ -117,6 +117,8 @@ def load(path: str | None = None) -> Config:
     cfg_path = Path(path) if path else _config_path()
     with open(cfg_path) as fh:
         raw = yaml.safe_load(fh) or {}
+    # Inject the repo root so ${repo_root} resolves (e.g. for in-repo submodules).
+    raw.setdefault("repo_root", str(_REPO_ROOT))
     # two passes so keys that reference other keys (which themselves reference
     # env vars) settle.
     resolved = _interpolate(raw, raw)
