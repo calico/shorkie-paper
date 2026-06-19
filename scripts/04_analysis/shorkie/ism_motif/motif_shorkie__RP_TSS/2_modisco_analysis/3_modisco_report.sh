@@ -11,6 +11,9 @@
 #SBATCH --mail-type=end
 #SBATCH --array=0
 
+cfg() { python -c "import sys; from shorkie import config; print(config.get(sys.argv[1]) or '')" "$1"; }
+MOTIF_DB_DIR="$(cfg motif_db_dir)"
+
 # Define the model architectures
 scores=('logSED')
 dataset="gene_exp_motif_test_RP"
@@ -31,4 +34,4 @@ report_dir="${dataset}/f0c0/${score}/report"
 echo "output_file : ${output_file}"
 
 # Run TF-MoDISco
-modisco report -i "$output_file" -o "$report_dir" -s "$report_dir" -m /home/kchao10/tools/motif_databases/YEAST/merged_meme.meme
+modisco report -i "$output_file" -o "$report_dir" -s "$report_dir" -m ${MOTIF_DB_DIR}/merged_meme.meme

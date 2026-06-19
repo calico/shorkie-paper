@@ -10,6 +10,9 @@
 #SBATCH --mem=64G
 #SBATCH --array=0
 
+cfg() { python -c "import sys; from shorkie import config; print(config.get(sys.argv[1]) or '')" "$1"; }
+MOTIF_DB_DIR="$(cfg motif_db_dir)"
+
 # model_archs=('unet_small_bert_drop' 'unet_small_bert_drop_retry_1' 'unet_small_bert_drop_retry_2')
 model_archs=('unet_small_bert_drop')
 # datasets=('strains_select' 'schizosaccharomycetales')
@@ -31,4 +34,4 @@ output_file="${dataset}_viz_seq/${model}/modisco_results_w_${w_val}_n_${n_val}.h
 report_dir="${dataset}_viz_seq/${model}/report_w_${w_val}_n_${n_val}/"
 
 # Run TF-MoDISco report
-modisco report -i "$output_file" -o "$report_dir" -s "$report_dir" -m /home/kchao10/tools/motif_databases/YEAST/merged_meme.meme 
+modisco report -i "$output_file" -o "$report_dir" -s "$report_dir" -m ${MOTIF_DB_DIR}/merged_meme.meme

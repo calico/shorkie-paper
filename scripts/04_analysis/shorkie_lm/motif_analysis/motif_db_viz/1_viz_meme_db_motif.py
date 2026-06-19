@@ -8,6 +8,10 @@ import os
 # logomaker import
 import logomaker
 
+from shorkie import config
+
+MOTIF_DB_DIR = str(config.path('motif_db_dir'))
+
 def read_meme(filename):
     motifs = {}
 
@@ -115,7 +119,7 @@ if __name__ == "__main__":
     ##############################
     motif_db_dir = 'viz_self_motif_db/'
     os.makedirs(motif_db_dir, exist_ok=True)
-    meme_motif_db = '/home/kchao10/tools/motif_databases/YEAST/merged_meme.meme'
+    meme_motif_db = f'{MOTIF_DB_DIR}/merged_meme.meme'
     motifs = read_meme(meme_motif_db)
     print("motifs: ", len(motifs))
     

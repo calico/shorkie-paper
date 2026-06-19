@@ -24,11 +24,34 @@ reference_dir: ${repo_root}/data/R64_annotations
 # committed (external download/build) — override for your machine.
 motif_db_dir: /home/kchao10/tools/motif_databases/YEAST
 
+# External-tool binaries / library files required by the LM-corpus build + genome-eval
+# pipelines (RepeatMasker repeat masking, the RMRB RepeatMasker library, and the
+# dashing2 genome-sketch tool). These are external downloads/builds — install them and
+# point these keys at your local copies (documented as prerequisites in the relevant
+# stage READMEs).
+tools:
+  repeatmasker_lib: /home/khc/bin/RepeatMasker/Libraries/RepeatMasker.lib
+  rmrb_lib:         /home/khc/tools/RMRB/Libraries/RMRBSeqs.fasta
+  dashing2_bin:     /home/khc/bin/dashing2
+
 # --- Sub-roots of the work dir (preserve the existing tree structure) ---
 data_root:           ${work_root}/data
 seq_experiment_root: ${work_root}/seq_experiment
 lm_experiment_root:  ${work_root}/lm_experiment
 experiments_root:    ${work_root}/experiments
+
+# --- Legacy data-build / genome-eval working roots (separate from work_root) ---
+# The LM-corpus build (scripts/01_data_build/lm_corpus/) and genome/model evaluation
+# (scripts/03_eval/lm/{genome_evaluation,model_evaluation}/) were run under a separate
+# scratch root, `yeast_ssm`, distinct from work_root above. Override for your machine.
+corpus_build_data_root:    /scratch4/khc/yeast_ssm/data
+corpus_build_results_root: /scratch4/khc/yeast_ssm/results
+# Legacy ssm paralog/genome-similarity results read by the corpus paralog-coords step
+# (scripts/01_data_build/lm_corpus/3_data_filtering/.../nucmer/s5_get_paralog_coords.py).
+ssm_results_root:          /home/khc/projects/ssm/results
+# Legacy yeast-seqNN gene-level eval root for the big-UNet self/supervised comparison
+# (scripts/03_eval/lm/model_evaluation/); holds {self_supervised,supervised}_unet_big/.
+yeast_seqnn_eval_root:     /home/khc/projects/yeast_seqNN/self_supervised/exp_105/histone__chip_exo__rna_seq/16bp
 
 # --- S. cerevisiae R64 reference genome (lives in the LM corpus data tree) ---
 r64_data_dir: ${data_root}/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_r64_gtf

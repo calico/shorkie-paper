@@ -1,13 +1,16 @@
 import sys
 import matplotlib.pyplot as plt
 import pandas as pd
+from shorkie import config
+
+CORPUS_BUILD_RESULTS_ROOT = str(config.path('corpus_build_results_root'))
 
 data_target = sys.argv[1]
 
 for data_type in ["train", "test", "valid"]:
     # Data from the provided file
-    fname = f"/scratch4/khc/yeast_ssm/results/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/{data_target}/dataset_stats/removed_repeats/{data_type}/removal_ratios.txt"
-    fout = f"/scratch4/khc/yeast_ssm/results/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/{data_target}/dataset_stats/removed_repeats/{data_type}/removal_ratios.png"
+    fname = f"{CORPUS_BUILD_RESULTS_ROOT}/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/{data_target}/dataset_stats/removed_repeats/{data_type}/removal_ratios.txt"
+    fout = f"{CORPUS_BUILD_RESULTS_ROOT}/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/{data_target}/dataset_stats/removed_repeats/{data_type}/removal_ratios.png"
     df = pd.read_csv(fname, sep='\t', skiprows=1, header=None, names=['Threshold', 'Ratio'])
 
     # Create scatter plot

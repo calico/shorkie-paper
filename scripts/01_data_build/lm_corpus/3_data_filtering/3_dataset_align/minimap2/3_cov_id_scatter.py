@@ -1,5 +1,8 @@
 import os, sys
 import matplotlib.pyplot as plt
+from shorkie import config
+
+CORPUS_BUILD_RESULTS_ROOT = str(config.path('corpus_build_results_root'))
 
 def read_aln_stats(aln_stats_file):
     """
@@ -29,7 +32,7 @@ def main():
     x_threshold = 80
     y_threshold = 10
     for target in ["test", "valid"]:
-        aln_fn = f"/scratch4/khc/yeast_ssm/results/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/{data_type}/dataset_stats/dataset_similarity/minimap2/overlaps_ratio_{target}.txt"
+        aln_fn = f"{CORPUS_BUILD_RESULTS_ROOT}/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/{data_type}/dataset_stats/dataset_similarity/minimap2/overlaps_ratio_{target}.txt"
         print("aln_fn: ", aln_fn)
         ids, cov = read_aln_stats(aln_fn)
         # Create a square plot
@@ -47,7 +50,7 @@ def main():
         plt.fill_betweenx([y_threshold, 105], 0, 105, color='red', alpha=0.2)
         plt.fill_betweenx([0, y_threshold], x_threshold, 105, color='red', alpha=0.2)
         plt.fill_betweenx([0, y_threshold], 0, x_threshold, color='green', alpha=0.2)
-        plt.savefig(f"/scratch4/khc/yeast_ssm/results/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/{data_type}/dataset_stats/dataset_similarity/minimap2/overlaps_ratio_{target}.png")
+        plt.savefig(f"{CORPUS_BUILD_RESULTS_ROOT}/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/{data_type}/dataset_stats/dataset_similarity/minimap2/overlaps_ratio_{target}.png")
         plt.clf()
 
 

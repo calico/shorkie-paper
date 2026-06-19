@@ -1,8 +1,11 @@
 #!/bin/bash
 
+cfg() { python -c "import sys; from shorkie import config; print(config.get(sys.argv[1]) or '')" "$1"; }
+CORPUS_BUILD_DATA_ROOT="$(cfg corpus_build_data_root)"
+
 data_type=$1
 # Directory containing the fasta files
-FASTA_DIR="/scratch4/khc/yeast_ssm/data/yeast/ensembl_fungi_59/data_${data_type}/fasta"
+FASTA_DIR="${CORPUS_BUILD_DATA_ROOT}/yeast/ensembl_fungi_59/data_${data_type}/fasta"
 
 # Function to convert masked regions to lowercase
 convert_to_lowercase() {

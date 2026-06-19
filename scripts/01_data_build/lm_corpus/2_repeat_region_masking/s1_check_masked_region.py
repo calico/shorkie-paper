@@ -3,6 +3,9 @@ import numpy as np
 import os, sys
 import pandas as pd
 import subprocess
+from shorkie import config
+
+CORPUS_BUILD_DATA_ROOT = str(config.path('corpus_build_data_root'))
 
 def run_bash_command(command):
     """Runs a Bash command and returns the output and error (if any)."""
@@ -34,7 +37,7 @@ def find_masked_regions(original_seq, masked_seq):
 
 data_type = sys.argv[1]
 # Load the sequences from the FASTA files
-masked_files_dir = f"/scratch4/khc/yeast_ssm/data/yeast/ensembl_fungi_59/data_{data_type}/fasta/"  # Replace with the actual directory path
+masked_files_dir = f"{CORPUS_BUILD_DATA_ROOT}/yeast/ensembl_fungi_59/data_{data_type}/fasta/"  # Replace with the actual directory path
 
 # Get masked files
 masked_files = [f for f in os.listdir(masked_files_dir) if f.endswith(".rm.fasta")]
@@ -82,4 +85,4 @@ for masked_file in masked_files:
 # Create DataFrame and print results
 df_results = pd.DataFrame(results)
 print(df_results)
-df_results.to_csv(f"/scratch4/khc/yeast_ssm/data/yeast/ensembl_fungi_59/data_{data_type}/masked_n_results.csv", index=False)
+df_results.to_csv(f"{CORPUS_BUILD_DATA_ROOT}/yeast/ensembl_fungi_59/data_{data_type}/masked_n_results.csv", index=False)

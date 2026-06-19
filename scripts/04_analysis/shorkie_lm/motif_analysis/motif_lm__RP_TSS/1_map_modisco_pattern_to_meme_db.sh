@@ -11,6 +11,9 @@
 #SBATCH --array=0
 source "$(git rev-parse --show-toplevel)/scripts/common/env.sh"
 
+cfg() { python -c "import sys; from shorkie import config; print(config.get(sys.argv[1]) or '')" "$1"; }
+MOTIF_DB_DIR="$(cfg motif_db_dir)"
+
 # Define the model architectures
 model_archs=('unet_small_bert_drop' 'unet_small_bert_drop_retry_1' 'unet_small_bert_drop_retry_2')
 
@@ -39,7 +42,7 @@ mkdir -p $out_dir
 echo python 0_map_modisco_pattern_to_meme_db.py --modisco_h5 ${WORK_ROOT}/experiments/motif_LM_RP_TSS/lm_saccharomycetales_gtf_unet_small_bert_drop/eval_RP/modisco_results_w16384_n100000.h5 \
     --seq_bed ${bedfile} \
     --out_dir $out_dir/ \
-    --meme_db /home/kchao10/tools/motif_databases/YEAST/merged_meme.meme \
+    --meme_db ${MOTIF_DB_DIR}/merged_meme.meme \
     --trim_threshold 0.3 \
     --trim_min_length 3 \
     --tomtom_exec tomtom 

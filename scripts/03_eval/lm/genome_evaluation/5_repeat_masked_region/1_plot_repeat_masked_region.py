@@ -2,6 +2,9 @@ import matplotlib.pyplot as plt
 from Bio import SeqIO
 import sys, os
 import pandas as pd
+from shorkie import config
+
+CORPUS_BUILD_DATA_ROOT = str(config.path('corpus_build_data_root'))
 
 repeat_ratios = []
 
@@ -46,8 +49,8 @@ def plot_lowercase_regions(fasta_file, basename, window_size=500):
 # Usage example
 data_type = sys.argv[1]
 print("data_type: ", data_type)
-fasta_dir = f'/scratch4/khc/yeast_ssm/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_{data_type}/fasta/'
-species_csv = f'/scratch4/khc/yeast_ssm/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/species_{data_type}.cleaned.csv'
+fasta_dir = f'{CORPUS_BUILD_DATA_ROOT}/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_{data_type}/fasta/'
+species_csv = f'{CORPUS_BUILD_DATA_ROOT}/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/species_{data_type}.cleaned.csv'
 species_df = pd.read_csv(species_csv)
 accession_df = species_df[["Name", "Accession"]]
 accession_df["Accession"] = accession_df["Accession"].str.replace(".", "_")

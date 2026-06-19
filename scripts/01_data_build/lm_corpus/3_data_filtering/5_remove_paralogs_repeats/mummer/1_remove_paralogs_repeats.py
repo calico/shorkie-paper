@@ -1,5 +1,9 @@
 import sys
 from Bio import SeqIO
+from shorkie import config
+
+CORPUS_BUILD_DATA_ROOT = str(config.path('corpus_build_data_root'))
+CORPUS_BUILD_RESULTS_ROOT = str(config.path('corpus_build_results_root'))
 
 def read_ids_to_remove(ids_file):
     """
@@ -38,16 +42,16 @@ def remove_sequences(fasta_file, ids_to_remove, output_file):
 
 dataset = sys.argv[1]
 threshold = "0.070"
-out_dir = f"/scratch4/khc/yeast_ssm/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_{dataset}/"
+out_dir = f"{CORPUS_BUILD_DATA_ROOT}/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_{dataset}/"
 test_seqs = 0
 valid_seqs = 0
 for data_type in ['test', 'valid']:
     # Example usage
-    fasta_file = f"/scratch4/khc/yeast_ssm/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_{dataset}/extracted_fasta/sequences_{data_type}.fasta"
-    repeat_to_remove_file = f"/scratch4/khc/yeast_ssm/results/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/{dataset}/dataset_stats/removed_repeats/{data_type}/removed_sequences_threshold_{threshold}.txt"
+    fasta_file = f"{CORPUS_BUILD_DATA_ROOT}/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_{dataset}/extracted_fasta/sequences_{data_type}.fasta"
+    repeat_to_remove_file = f"{CORPUS_BUILD_RESULTS_ROOT}/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/{dataset}/dataset_stats/removed_repeats/{data_type}/removed_sequences_threshold_{threshold}.txt"
     ids_to_remove = read_ids_to_remove(repeat_to_remove_file)    
     print(f"Removing paralogs from {data_type} data in {dataset} dataset...")
-    output_file = f"/scratch4/khc/yeast_ssm/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_{dataset}/extracted_fasta/sequences_{data_type}.cleaned.fasta"
+    output_file = f"{CORPUS_BUILD_DATA_ROOT}/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_{dataset}/extracted_fasta/sequences_{data_type}.cleaned.fasta"
     train_seq_count, _ = remove_sequences(fasta_file, ids_to_remove, output_file)
     if data_type == 'test':
         test_seqs = train_seq_count
@@ -57,10 +61,10 @@ for data_type in ['test', 'valid']:
 
 for data_type in ['train']:
     # Example usage
-    fasta_file = f"/scratch4/khc/yeast_ssm/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_{dataset}/extracted_fasta/sequences_{data_type}.fasta"
-    paralog_to_remove_test_file = f"/scratch4/khc/yeast_ssm/results/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/{dataset}/dataset_stats/dataset_similarity/mummer/4_filter_aln_{dataset}_train_test_paralogs_for_{data_type}.txt"
-    paralog_to_remove_valid_file = f"/scratch4/khc/yeast_ssm/results/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/{dataset}/dataset_stats/dataset_similarity/mummer/4_filter_aln_{dataset}_train_valid_paralogs_for_{data_type}.txt"
-    repeat_to_remove_file = f"/scratch4/khc/yeast_ssm/results/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/{dataset}/dataset_stats/removed_repeats/{data_type}/removed_sequences_threshold_{threshold}.txt"
+    fasta_file = f"{CORPUS_BUILD_DATA_ROOT}/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_{dataset}/extracted_fasta/sequences_{data_type}.fasta"
+    paralog_to_remove_test_file = f"{CORPUS_BUILD_RESULTS_ROOT}/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/{dataset}/dataset_stats/dataset_similarity/mummer/4_filter_aln_{dataset}_train_test_paralogs_for_{data_type}.txt"
+    paralog_to_remove_valid_file = f"{CORPUS_BUILD_RESULTS_ROOT}/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/{dataset}/dataset_stats/dataset_similarity/mummer/4_filter_aln_{dataset}_train_valid_paralogs_for_{data_type}.txt"
+    repeat_to_remove_file = f"{CORPUS_BUILD_RESULTS_ROOT}/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/{dataset}/dataset_stats/removed_repeats/{data_type}/removed_sequences_threshold_{threshold}.txt"
 
     print("paralog_to_remove_test_file: ", paralog_to_remove_test_file)
     print("paralog_to_remove_valid_file: ", paralog_to_remove_valid_file)
@@ -76,7 +80,7 @@ for data_type in ['train']:
     merged_set = paralog_to_remove_test.union(paralog_to_remove_valid, repeat_to_remove)
     print("merged_set: ", len(merged_set))
     print(f"Removing paralogs from {data_type} data in {dataset} dataset...")
-    output_file = f"/scratch4/khc/yeast_ssm/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_{dataset}/extracted_fasta/sequences_{data_type}.cleaned.fasta"
+    output_file = f"{CORPUS_BUILD_DATA_ROOT}/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_{dataset}/extracted_fasta/sequences_{data_type}.cleaned.fasta"
     train_seq_count, species_count = remove_sequences(fasta_file, merged_set, output_file)
     print("train_seq_count: ", train_seq_count)
     print("species_count: ", species_count)

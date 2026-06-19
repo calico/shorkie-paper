@@ -2,6 +2,9 @@ import pandas as pd
 import os
 import matplotlib.pyplot as plt
 import sys
+from shorkie import config
+
+CORPUS_BUILD_RESULTS_ROOT = str(config.path('corpus_build_results_root'))
 
 data_type = sys.argv[1]
 print("data_type: ", data_type)
@@ -39,5 +42,5 @@ ax[1].legend(bbox_to_anchor=(1.05, 1), loc='upper left', fontsize='small')
 
 plt.tight_layout()
 # rect=[0, 0, 0.75, 1])
-os.makedirs(f"/scratch4/khc/yeast_ssm/results/ensembl_fungi_59/{data_type}/repeat_eval", exist_ok=True)
-plt.savefig(f"/scratch4/khc/yeast_ssm/results/ensembl_fungi_59/{data_type}/repeat_eval/masked_genome_stats.png", dpi=300)
+os.makedirs(f"{CORPUS_BUILD_RESULTS_ROOT}/ensembl_fungi_59/{data_type}/repeat_eval", exist_ok=True)
+plt.savefig(f"{CORPUS_BUILD_RESULTS_ROOT}/ensembl_fungi_59/{data_type}/repeat_eval/masked_genome_stats.png", dpi=300)

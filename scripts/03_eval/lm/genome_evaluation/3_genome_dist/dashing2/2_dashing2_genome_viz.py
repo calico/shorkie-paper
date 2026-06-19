@@ -1,6 +1,10 @@
 import os, sys
 import pandas as pd
 import matplotlib.pyplot as plt
+from shorkie import config
+
+CORPUS_BUILD_DATA_ROOT = str(config.path('corpus_build_data_root'))
+CORPUS_BUILD_RESULTS_ROOT = str(config.path('corpus_build_results_root'))
 
 # Sample data to mimic the file content and directory structure
 def is_number(s):
@@ -31,13 +35,13 @@ def parse_file_content(fname):
 
 def main(data_type):
     # Directory containing the fasta files
-    REF_FASTA = "/scratch4/khc/yeast_ssm/data/yeast/ensembl_fungi_59/data_r64_gtf/fasta/GCA_000146045_2.cleaned.fasta"
-    REF_GTF = "/scratch4/khc/yeast_ssm/data/yeast/ensembl_fungi_59/data_r64_gtf/gtf/GCA_000146045_2.59.gtf"
+    REF_FASTA = f"{CORPUS_BUILD_DATA_ROOT}/yeast/ensembl_fungi_59/data_r64_gtf/fasta/GCA_000146045_2.cleaned.fasta"
+    REF_GTF = f"{CORPUS_BUILD_DATA_ROOT}/yeast/ensembl_fungi_59/data_r64_gtf/gtf/GCA_000146045_2.59.gtf"
     ref_base_name = os.path.basename(REF_FASTA).replace(".cleaned.fasta", "")
 
-    FASTA_DIR = f"/scratch4/khc/yeast_ssm/data/yeast/ensembl_fungi_59/data_{data_type}/fasta"
-    GTF_DIR = f"/scratch4/khc/yeast_ssm/data/yeast/ensembl_fungi_59/data_{data_type}/gtf"
-    OUTPUT_DIR = f"/scratch4/khc/yeast_ssm/results/ensembl_fungi_59/{data_type}/genome_dist/{data_type}/dashing2"
+    FASTA_DIR = f"{CORPUS_BUILD_DATA_ROOT}/yeast/ensembl_fungi_59/data_{data_type}/fasta"
+    GTF_DIR = f"{CORPUS_BUILD_DATA_ROOT}/yeast/ensembl_fungi_59/data_{data_type}/gtf"
+    OUTPUT_DIR = f"{CORPUS_BUILD_RESULTS_ROOT}/ensembl_fungi_59/{data_type}/genome_dist/{data_type}/dashing2"
 
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 

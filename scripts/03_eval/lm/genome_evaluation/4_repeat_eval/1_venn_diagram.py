@@ -4,6 +4,9 @@ from Bio import SeqIO
 import numpy as np
 import os
 import glob
+from shorkie import config
+
+CORPUS_BUILD_DATA_ROOT = str(config.path('corpus_build_data_root'))
 
 def find_lowercase_indices(fasta_file):
     lowercase_indices = set()
@@ -50,7 +53,7 @@ def plot_venn_and_metrics(fasta_files, condition1, condition2, output_dir):
     return precision, recall, accuracy
 
 data_type = "fungi_gtf"
-FASTA_DIR = f"/scratch4/khc/yeast_ssm/data/yeast/ensembl_fungi_59/data_{data_type}/fasta"
+FASTA_DIR = f"{CORPUS_BUILD_DATA_ROOT}/yeast/ensembl_fungi_59/data_{data_type}/fasta"
 
 precision_list = []
 recall_list = []
@@ -61,11 +64,11 @@ for fasta_file in glob.glob(os.path.join(FASTA_DIR, "*.cleaned.fasta")):
     base_name = os.path.basename(fasta_file).replace(".cleaned.fasta", "")
     print(base_name)  # Do something with base_name
 
-    file1 = f'/scratch4/khc/yeast_ssm/data/yeast/ensembl_fungi_59/data_{data_type}/fasta/{base_name}.sm.fasta'
+    file1 = f'{CORPUS_BUILD_DATA_ROOT}/yeast/ensembl_fungi_59/data_{data_type}/fasta/{base_name}.sm.fasta'
     file1_condition = 'ENSEMBL soft mask release'
 
-    file2_1 = f'/scratch4/khc/yeast_ssm/data/yeast/ensembl_fungi_59/data_{data_type}/fasta/{base_name}.cleaned.fasta.masked'
-    file2_2 = f'/scratch4/khc/yeast_ssm/data/yeast/ensembl_fungi_59/data_{data_type}/fasta/{base_name}.cleaned.fasta.masked.dust.softmask'
+    file2_1 = f'{CORPUS_BUILD_DATA_ROOT}/yeast/ensembl_fungi_59/data_{data_type}/fasta/{base_name}.cleaned.fasta.masked'
+    file2_2 = f'{CORPUS_BUILD_DATA_ROOT}/yeast/ensembl_fungi_59/data_{data_type}/fasta/{base_name}.cleaned.fasta.masked.dust.softmask'
 
     file2s_condition = ['RepeatModeler \n(RMBlast + Dfam)', 'RepeatModeler \n(RMBlast + Dfam) + Dust']
 

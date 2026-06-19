@@ -2,6 +2,10 @@ import pandas as pd
 import argparse
 import matplotlib.pyplot as plt
 import os, sys
+from shorkie import config
+
+CORPUS_BUILD_DATA_ROOT = str(config.path('corpus_build_data_root'))
+CORPUS_BUILD_RESULTS_ROOT = str(config.path('corpus_build_results_root'))
 
 coding_ratio = []
 
@@ -66,12 +70,12 @@ def viz(input, output, select_name):
 
 def main(data_type):
     # Directory containing the fasta files
-    FASTA_DIR = f"/scratch4/khc/yeast_ssm/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_{data_type}/fasta"
-    OUTPUT_DIR = f"/scratch4/khc/yeast_ssm/results/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/{data_type}/window_eval"
+    FASTA_DIR = f"{CORPUS_BUILD_DATA_ROOT}/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_{data_type}/fasta"
+    OUTPUT_DIR = f"{CORPUS_BUILD_RESULTS_ROOT}/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/{data_type}/window_eval"
     # Create the output directory if it doesn't exist
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-    species_csv = f'/scratch4/khc/yeast_ssm/data/yeast/ensembl_fungi_59/species_{data_type}.cleaned.csv'
+    species_csv = f'{CORPUS_BUILD_DATA_ROOT}/yeast/ensembl_fungi_59/species_{data_type}.cleaned.csv'
     species_df = pd.read_csv(species_csv)
     accession_df = species_df[["Name", "Accession"]]
     accession_df["Accession"] = accession_df["Accession"].str.replace(".", "_")

@@ -3,6 +3,10 @@ import numpy as np
 import os
 import pandas as pd
 import sys
+from shorkie import config
+
+CORPUS_BUILD_DATA_ROOT = str(config.path('corpus_build_data_root'))
+CORPUS_BUILD_RESULTS_ROOT = str(config.path('corpus_build_results_root'))
 
 data_type = sys.argv[1]
 print("data_type: ", data_type)
@@ -34,7 +38,7 @@ def calculate_percentage_masked(total_masked_length, total_length):
     return (total_masked_length / total_length) * 100 if total_length > 0 else 0
 
 # Load the sequences from the FASTA files
-masked_files_dir = f"/scratch4/khc/yeast_ssm/data/yeast/ensembl_fungi_59/data_{data_type}/fasta/"  # Replace with the actual directory path
+masked_files_dir = f"{CORPUS_BUILD_DATA_ROOT}/yeast/ensembl_fungi_59/data_{data_type}/fasta/"  # Replace with the actual directory path
 
 # Get masked files
 cleaned_files = [f for f in os.listdir(masked_files_dir) if f.endswith(".cleaned.fasta")]
@@ -173,5 +177,5 @@ for cleaned_file in cleaned_files:
 
 # Convert results to a DataFrame and save as TSV
 tsv_df = pd.DataFrame(tsv_results, columns=["Genome File", "Percentage Masked SM", "Percentage Masked My Mask", "Overlapping Ratio SM", "Overlapping Ratio My Mask"])
-os.makedirs(f"/scratch4/khc/yeast_ssm/results/ensembl_fungi_59/{data_type}/repeat_eval", exist_ok=True)
-tsv_df.to_csv(f"/scratch4/khc/yeast_ssm/results/ensembl_fungi_59/{data_type}/repeat_eval/masked_genome_stats.tsv", sep="\t", index=False)
+os.makedirs(f"{CORPUS_BUILD_RESULTS_ROOT}/ensembl_fungi_59/{data_type}/repeat_eval", exist_ok=True)
+tsv_df.to_csv(f"{CORPUS_BUILD_RESULTS_ROOT}/ensembl_fungi_59/{data_type}/repeat_eval/masked_genome_stats.tsv", sep="\t", index=False)

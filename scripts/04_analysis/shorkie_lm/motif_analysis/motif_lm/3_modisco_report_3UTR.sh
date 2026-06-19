@@ -13,6 +13,9 @@
 #SBATCH --mem=32G
 #SBATCH --array=0-2
 
+cfg() { python -c "import sys; from shorkie import config; print(config.get(sys.argv[1]) or '')" "$1"; }
+MOTIF_DB_DIR="$(cfg motif_db_dir)"
+
 # Define arrays for the parameter combinations
 model_archs=('unet_small_bert_drop' 'unet_small_bert_drop_retry_1' 'unet_small_bert_drop_retry_2')
 window_sizes=(16384)      # Try full-length (16k) and a cropped window (2k)
@@ -47,4 +50,4 @@ report_dir="saccharomycetales_viz_seq/${model}/report_w${window}_n${n_val}_3UTR/
 # Print chosen parameters (useful for debugging)
 echo "Running TF-MoDISco report with model: ${model}, window size: ${window}, n value: ${n_val}"
 
-modisco report -i "$output_file" -o "$report_dir" -s "$report_dir" -m /home/kchao10/tools/motif_databases/YEAST/3UTR_prob.meme
+modisco report -i "$output_file" -o "$report_dir" -s "$report_dir" -m ${MOTIF_DB_DIR}/3UTR_prob.meme

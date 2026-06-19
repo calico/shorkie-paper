@@ -1,6 +1,10 @@
 import os
 import sys
 from Bio import SeqIO
+from shorkie import config
+
+CORPUS_BUILD_DATA_ROOT = str(config.path('corpus_build_data_root'))
+CORPUS_BUILD_RESULTS_ROOT = str(config.path('corpus_build_results_root'))
 
 def check_nucleotide_ratio(fasta_file, thresholds, output_dir):
     os.makedirs(output_dir, exist_ok=True)
@@ -61,9 +65,9 @@ def check_nucleotide_ratio(fasta_file, thresholds, output_dir):
 data_target = sys.argv[1]
 # for data_type in ["train", "test", "valid"]:
 for data_type in ["test", "valid"]:
-    fasta_file = f"/scratch4/khc/yeast_ssm/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_{data_target}/extracted_fasta/sequences_{data_type}.fasta"
+    fasta_file = f"{CORPUS_BUILD_DATA_ROOT}/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_{data_target}/extracted_fasta/sequences_{data_type}.fasta"
     print(f"Calculating masked nucleotide ratios for {data_type} data in {data_target} dataset...")
     thresholds = [i * 0.005 for i in range(1, 16)]
     # thresholds = [0.070]
-    output_dir = f"/scratch4/khc/yeast_ssm/results/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/{data_target}/dataset_stats/removed_repeats/{data_type}/"  # Replace with the actual path to your output directory
+    output_dir = f"{CORPUS_BUILD_RESULTS_ROOT}/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/{data_target}/dataset_stats/removed_repeats/{data_type}/"  # Replace with the actual path to your output directory
     check_nucleotide_ratio(fasta_file, thresholds, output_dir)

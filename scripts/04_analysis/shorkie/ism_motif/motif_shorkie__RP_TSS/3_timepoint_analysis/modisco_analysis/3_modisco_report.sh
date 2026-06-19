@@ -9,6 +9,9 @@
 #SBATCH --mail-type=end
 #SBATCH --array=0-7
 
+cfg() { python -c "import sys; from shorkie import config; print(config.get(sys.argv[1]) or '')" "$1"; }
+MOTIF_DB_DIR="$(cfg motif_db_dir)"
+
 # # Define the arrays for experiment directories, target TFs, time points, and scores.
 # exp_dirs=("gene_exp_motif_test_TSS/f0c0" "gene_exp_motif_test_RP/f0c0")
 # target_tfs=("RPN4_" "MET4_")
@@ -80,4 +83,4 @@ echo "Report directory : ${report_dir}"
 mkdir -p "${report_dir}"
 
 # Run modisco report.
-modisco report -i "$output_file" -o "$report_dir" -s "$report_dir" -m /home/kchao10/tools/motif_databases/YEAST/merged_meme.meme
+modisco report -i "$output_file" -o "$report_dir" -s "$report_dir" -m ${MOTIF_DB_DIR}/merged_meme.meme

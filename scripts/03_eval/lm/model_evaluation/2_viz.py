@@ -1,14 +1,17 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+from shorkie import config
+
+YEAST_SEQNN_EVAL_ROOT = str(config.path('yeast_seqnn_eval_root'))
 
 # Initialize lists to store metrics
 metrics = {"idx": [], "model": [], "pearsonr": [], "pearsonr_norm": [], "r2": [], "r2_norm": []}
 
 for idx in range(8):
     # File paths
-    self_supervised_acc_fn = f"/home/khc/projects/yeast_seqNN/self_supervised/exp_105/histone__chip_exo__rna_seq/16bp/self_supervised_unet_big/gene_level_eval/f{idx}c0/acc.txt"
-    supervised_acc_fn = f"/home/khc/projects/yeast_seqNN/self_supervised/exp_105/histone__chip_exo__rna_seq/16bp/supervised_unet_big/gene_level_eval/f{idx}c0/acc.txt"
+    self_supervised_acc_fn = f"{YEAST_SEQNN_EVAL_ROOT}/self_supervised_unet_big/gene_level_eval/f{idx}c0/acc.txt"
+    supervised_acc_fn = f"{YEAST_SEQNN_EVAL_ROOT}/supervised_unet_big/gene_level_eval/f{idx}c0/acc.txt"
     
     # Load data
     self_supervised_acc_df = pd.read_csv(self_supervised_acc_fn, sep="\t")

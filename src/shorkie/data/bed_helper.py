@@ -325,6 +325,6 @@ def generate_beds(species_df, save_suffix, out_dir, train_exclude_dict, valid_in
     # targets_out = open(targets_file, 'w')
 
     # print("\tidentifier\tfile\tclip\tclip_soft\tscale\tsum_stat\tstrand_pair\tdescription", file=targets_out)
-    # print("0\tRNA-MISSI.1\t/home/jlinder/tillage/datasets/yeast/rna/RNA-MISSI.1/coverage.w5\t1\t1\t1.0\tsum_sqrt\t0\tRNA:missing", file=targets_out)
+    # print("0\tRNA-MISSI.1\t<data_root>/yeast/rna/RNA-MISSI.1/coverage.w5\t1\t1\t1.0\tsum_sqrt\t0\tRNA:missing", file=targets_out)
 
     # targets_out.close()

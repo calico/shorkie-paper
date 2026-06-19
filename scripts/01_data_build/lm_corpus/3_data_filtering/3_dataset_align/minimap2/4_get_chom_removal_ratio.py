@@ -1,6 +1,10 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import sys
+from shorkie import config
+
+CORPUS_BUILD_DATA_ROOT = str(config.path('corpus_build_data_root'))
+CORPUS_BUILD_RESULTS_ROOT = str(config.path('corpus_build_results_root'))
 
 data_type = sys.argv[1]
 
@@ -8,7 +12,7 @@ x_threshold = 80.0
 y_threshold = 10.0
 
 for target in ["test", "valid"]:
-    alns = f"/scratch4/khc/yeast_ssm/results/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/{data_type}/dataset_stats/dataset_similarity/minimap2/overlaps_ratio_{target}.txt"
+    alns = f"{CORPUS_BUILD_RESULTS_ROOT}/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/{data_type}/dataset_stats/dataset_similarity/minimap2/overlaps_ratio_{target}.txt"
     alns_df = pd.read_csv(alns, sep=' ', header=None)
     alns_df = alns_df[(alns_df[2].astype(float) > x_threshold) | (alns_df[3].astype(float) > y_threshold)]
     print("alns_df: ", alns_df)
@@ -38,7 +42,7 @@ for target in ["test", "valid"]:
                 #     print(f"\tseq_id: {seq_id}")
 
     all_dict = {}
-    train_bed = f"/scratch4/khc/yeast_ssm/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_{data_type}/sequences.bed"
+    train_bed = f"{CORPUS_BUILD_DATA_ROOT}/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_{data_type}/sequences.bed"
     print("train_bed: ", train_bed)
     train_bed_df = pd.read_csv(train_bed, sep='\t', header=None)
     print("train_bed_df: ", train_bed_df)
@@ -131,7 +135,7 @@ for target in ["test", "valid"]:
 
     # Adjust layout and display the chart
     plt.tight_layout()
-    plt.savefig(f"/scratch4/khc/yeast_ssm/results/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/{data_type}/dataset_stats/dataset_similarity/minimap2/removal_ratios_{target}.png")
+    plt.savefig(f"{CORPUS_BUILD_RESULTS_ROOT}/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/{data_type}/dataset_stats/dataset_similarity/minimap2/removal_ratios_{target}.png")
 
     plt.clf()
     # Print the removal ratios

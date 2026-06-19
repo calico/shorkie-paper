@@ -1,16 +1,20 @@
 #!/bin/bash
 
+cfg() { python -c "import sys; from shorkie import config; print(config.get(sys.argv[1]) or '')" "$1"; }
+CORPUS_BUILD_DATA_ROOT="$(cfg corpus_build_data_root)"
+CORPUS_BUILD_RESULTS_ROOT="$(cfg corpus_build_results_root)"
+
 data_type=$1
 # Directory containing the fasta files
-SEQ_BED_DIR="/scratch4/khc/yeast_ssm/data/data_${data_type}/sequences_train_split"
+SEQ_BED_DIR="${CORPUS_BUILD_DATA_ROOT}/data_${data_type}/sequences_train_split"
 
-REF_FASTA="/scratch4/khc/yeast_ssm/data/yeast/ensembl_fungi_59/data_r64_gtf/fasta/GCA_000146045_2.cleaned.fasta"
-REF_GTF="/scratch4/khc/yeast_ssm/data/yeast/ensembl_fungi_59/data_r64_gtf/gtf/GCA_000146045_2.59.gtf"
+REF_FASTA="${CORPUS_BUILD_DATA_ROOT}/yeast/ensembl_fungi_59/data_r64_gtf/fasta/GCA_000146045_2.cleaned.fasta"
+REF_GTF="${CORPUS_BUILD_DATA_ROOT}/yeast/ensembl_fungi_59/data_r64_gtf/gtf/GCA_000146045_2.59.gtf"
 ref_base_name=$(basename "$REF_FASTA" .cleaned.fasta)
 
-FASTA_DIR="/scratch4/khc/yeast_ssm/data/yeast/ensembl_fungi_59/data_${data_type}/fasta"
-GTF_DIR="/scratch4/khc/yeast_ssm/data/yeast/ensembl_fungi_59/data_${data_type}/gtf"
-OUTPUT_DIR="/scratch4/khc/yeast_ssm/results/ensembl_fungi_59/${data_type}/genome_dist/${data_type}/mummer"
+FASTA_DIR="${CORPUS_BUILD_DATA_ROOT}/yeast/ensembl_fungi_59/data_${data_type}/fasta"
+GTF_DIR="${CORPUS_BUILD_DATA_ROOT}/yeast/ensembl_fungi_59/data_${data_type}/gtf"
+OUTPUT_DIR="${CORPUS_BUILD_RESULTS_ROOT}/ensembl_fungi_59/${data_type}/genome_dist/${data_type}/mummer"
 
 mkdir -p $OUTPUT_DIR
 

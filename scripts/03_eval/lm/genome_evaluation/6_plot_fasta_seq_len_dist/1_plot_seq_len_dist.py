@@ -1,5 +1,9 @@
 import matplotlib.pyplot as plt
 from Bio import SeqIO
+from shorkie import config
+
+REPEATMASKER_LIB = str(config.path('tools.repeatmasker_lib'))
+RMRB_LIB = str(config.path('tools.rmrb_lib'))
 
 def plot_sequence_length_distribution(fasta_files, dbtypes):
     plt.figure(figsize=(10, 6))
@@ -18,6 +22,6 @@ def plot_sequence_length_distribution(fasta_files, dbtypes):
     plt.savefig("combined_length_distribution.png")
 
 # Example usage
-fasta_files = ["/home/khc/RMRB/Libraries/RMRBSeqs.fasta", "/home/khc/bin/RepeatMasker/Libraries/RepeatMasker.lib"]
+fasta_files = [RMRB_LIB, REPEATMASKER_LIB]
 dbtypes = ["RepBase", "Dfam"]
 plot_sequence_length_distribution(fasta_files, dbtypes)
