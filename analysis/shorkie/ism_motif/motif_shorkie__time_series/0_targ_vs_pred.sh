@@ -9,9 +9,9 @@
 #SBATCH --nodes=1
 #SBATCH --export=ALL
 #SBATCH --mail-type=end
-#SBATCH --mail-user=kuanhao.chao@gmail.com
 #SBATCH --mem=64G
 #SBATCH --array=0
+source "$(git rev-parse --show-toplevel)/scripts/common/env.sh"
 
 # Define arrays for model architectures and learning types
 model_archs=("unet_small_bert_drop")
@@ -50,7 +50,7 @@ model_arch=${model_archs[$model_idx]}
 learning_type=${learning_types[$learning_idx]}
 
 # Paths
-root_dir="/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/seq_experiment/${fine_tune_exp}/16bp/${learning_type}_${model_arch}"
+root_dir="${WORK_ROOT}/seq_experiment/${fine_tune_exp}/16bp/${learning_type}_${model_arch}"
 
 split=train
 output_dir="${root_dir}/gene_target_preds_${split}"
@@ -68,14 +68,14 @@ echo "Index: $idx"
 echo "============================"
 
 # Run the Python script
-echo python /home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/baskerville-yeast/src/baskerville/scripts/hound_target_preds_gene_cmp.py \
+echo python ${BASKERVILLE_SCRIPTS}/hound_target_preds_gene_cmp.py \
     "${root_dir}/params.json" \
     "${root_dir}/train/f${idx}c0/train/model_best.h5" \
     "${root_dir}/train/f${idx}c0/data0/" \
-    "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_r64_gtf/gtf/GCA_000146045_2.59.gtf" \
+    "${WORK_ROOT}/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_r64_gtf/gtf/GCA_000146045_2.59.gtf" \
     --rc \
     --split ${split} \
-    -t /home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/seq_experiment/${fine_tune_exp}/16bp/cleaned_sheet.txt \
+    -t ${WORK_ROOT}/seq_experiment/${fine_tune_exp}/16bp/cleaned_sheet.txt \
     --dataset_type "${data_type}" \
     --file_type gtf \
     --eval_dir "${root_dir}/train/f${idx}c0/data0/" --no_unclip \

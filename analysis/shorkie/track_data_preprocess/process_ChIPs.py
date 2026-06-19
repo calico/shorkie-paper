@@ -7,8 +7,9 @@ import numpy as np
 import math
 import time
 
-sys.path += ["/home/mo/shared_repos/basenji/basenji"]
 import slurm
+
+_SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 def generate_basic_bigwig(args, merged_bam, sample_path, sample_name):
     genomecov_cmd = " ".join([
@@ -42,7 +43,7 @@ def generate_bamcov_bigwig(merged_bam, sample_path, sample_name):
     
     if not os.path.exists(output_file):
         bamcov_cmd = " ".join([
-            "python /home/mo/shared_repos/basenji/bin/bam_cov.py -c",
+            "python bam_cov.py -c",  # bam_cov.py: basenji/baskerville tool, ensure it is on PATH
             merged_bam,
             output_file, 
         ])
@@ -141,7 +142,7 @@ def process_samples(sample_sheet, args):
         )
         for sra in sample_sheet.iloc[i]['replicates']:
             shell_cmd = " ".join([
-                "bash /home/mo/mmagzoub/yeast_sequence_models/bioinformatics/chipseq2bam.sh",
+                f"bash {_SCRIPT_DIR}/chipseq2bam.sh",
                 f"-i {sra}",
                 f"-f {fastq_dir}",
                 f"-r {args.reference}",
@@ -237,7 +238,7 @@ def main():
             batch_sheet = sample_sheet.loc[sample_sheet["batch_id"] == batch]
             batch_sheet.to_csv(os.path.join(args.savedir, f"{batch}_sheet.csv"), index = False)
             batch_cmd = [
-                "python /home/mo/mmagzoub/yeast_sequence_models/bioinformatics/process_ChIPs.py",
+                f"python {_SCRIPT_DIR}/process_ChIPs.py",
                 f"--sample_sheet {os.path.join(args.savedir, f'{batch}_sheet.csv')}",
                 f"--savedir {args.savedir}",
                 f"--reference {args.reference}",
@@ -292,7 +293,7 @@ def main():
 # --control /group/idea/basenji_yeast/data/rossi_et_al/bigwigs/negative_control/NOTAG/NOTAG.bam \
 # --macs
 
-# python /home/mo/mmagzoub/yeast_sequence_models/bioinformatics/process_ChIPs.py \
+# python process_ChIPs.py \
 # --sample_sheet sample_sheet.csv \
 # --savedir ./ \
 # --reference /group/idea/basenji_yeast/data/references/S288C_R64-3-1.fsa \

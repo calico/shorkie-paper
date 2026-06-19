@@ -10,10 +10,13 @@ from scipy.stats import pearsonr, spearmanr
 from matplotlib import pyplot as plt
 from matplotlib.lines import Line2D
 
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
+
 ######################################
 # 1. Load Ground Truth and CSV Data  #
 ######################################
-root_dir = '/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/MPRA/'
+root_dir = f'{WORK_ROOT}/data/MPRA/'
 TRIM_DOTS = False       # Whether to trim furthest‐away points (unchanged)
 ZERO_THRESHOLD = 1e-3  # “Close to y=0” threshold for predicted scores
     
@@ -242,7 +245,7 @@ def visualize_group_by_distance(gene_list, ground_truth, seq_type, group_label):
                 corr_pearson, corr_spearman = np.nan, np.nan
         title = f"{SEQ_NAME_MAPPING[seq_type]}:\nAggregated across {group_label} genes, {distance} bp"
         out_dir = os.path.join(
-            "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/SUM_data_process/MPRA",
+            f"{WORK_ROOT}/experiments/SUM_data_process/MPRA",
             "results", "single_measurement_stranded", "viz",
             "scatterplots", seq_type, "aggregated", group_label, f"{distance}bp"
         )
@@ -315,7 +318,7 @@ def plot_trend_correlation_group(gene_list, ground_truth, seq_type, group_label)
     plt.grid(True)
     plt.legend()
     out_dir = os.path.join(
-        "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/SUM_data_process/MPRA",
+        f"{WORK_ROOT}/experiments/SUM_data_process/MPRA",
         "results", "single_measurement_stranded", "viz",
         "correlation_trends", seq_type, "aggregated", group_label
     )
@@ -370,7 +373,7 @@ def analyze_and_plot_group(aggregated_data, ground_truth, seq_type, group_label)
         valid_indices = full_indices[mask]
         zero_full_indices = valid_indices[zero_indices]  
         out_dir = os.path.join(
-            "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/SUM_data_process/MPRA",
+            f"{WORK_ROOT}/experiments/SUM_data_process/MPRA",
             "results", "single_measurement_stranded", "viz", "scatterplots", seq_type, "zero_dot_sequences"
         )
         os.makedirs(out_dir, exist_ok=True)
@@ -405,7 +408,7 @@ def analyze_and_plot_group(aggregated_data, ground_truth, seq_type, group_label)
         zero_gt_full_indices = valid_indices[zero_gt_indices]
 
         out_dir = os.path.join(
-            "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/SUM_data_process/MPRA",
+            f"{WORK_ROOT}/experiments/SUM_data_process/MPRA",
             "results", "single_measurement_stranded", "viz",
             "scatterplots", seq_type, "zero_dot_sequences"
         )
@@ -462,7 +465,7 @@ def analyze_and_plot_group(aggregated_data, ground_truth, seq_type, group_label)
 
     title = f"{SEQ_NAME_MAPPING[seq_type]}:\nAggregated across {group_label} genes"
     out_dir = os.path.join(
-        "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/SUM_data_process/MPRA",
+        f"{WORK_ROOT}/experiments/SUM_data_process/MPRA",
         "results", "single_measurement_stranded", "viz",
         "scatterplots", seq_type, "aggregated"
     )
@@ -512,7 +515,7 @@ def main():
         for strand, mapping in [('+', pos_gene_mapping), ('-', neg_gene_mapping)]:
             for gene_name, target_gene in mapping.items():
                 print(f"\nProcessing {seq_type} gene {target_gene} (symbol: {gene_name}) on strand {strand}...")
-                input_dir = f"/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/SUM_data_process/MPRA/results/single_measurement_stranded/all_seq_types/{seq_type}/{gene_name}_{target_gene}_{'pos' if strand=='+' else 'neg'}_outputs"
+                input_dir = f"{WORK_ROOT}/experiments/SUM_data_process/MPRA/results/single_measurement_stranded/all_seq_types/{seq_type}/{gene_name}_{target_gene}_{'pos' if strand=='+' else 'neg'}_outputs"
                 output_dir = os.path.join(input_dir, "plots")
                 gene_stats = process_gene_plots(target_gene, gene_name, seq_type, input_dir=input_dir, output_dir=output_dir)
                 if gene_stats is not None:

@@ -1,5 +1,8 @@
 import h5py
 
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
+
 def extract_seqlet_positions(h5_filepath):
     """
     Opens the TF-MoDISco results HDF5 file and extracts the start and end positions,
@@ -45,22 +48,22 @@ def extract_seqlet_positions(h5_filepath):
 if __name__ == "__main__":
     # Path to your modisco_results.h5 file
     # Paths to your modisco results file and the BED files in the same order
-    # modisco_h5 = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/motif_LM/saccharomycetales_viz_seq_v1/unet_small_bert_drop/modisco_results.h5"
+    # modisco_h5 = "${WORK_ROOT}/experiments/motif_LM/saccharomycetales_viz_seq_v1/unet_small_bert_drop/modisco_results.h5"
 
-    # modisco_h5 = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/motif_LM/saccharomycetales_viz_seq/unet_small_bert_drop/modisco_results_w500_n5000.h5"
+    # modisco_h5 = "${WORK_ROOT}/experiments/motif_LM/saccharomycetales_viz_seq/unet_small_bert_drop/modisco_results_w500_n5000.h5"
 
-    # modisco_h5 = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/motif_LM/saccharomycetales_viz_seq/unet_small_bert_drop/modisco_results_w500_n20000.h5"
+    # modisco_h5 = "${WORK_ROOT}/experiments/motif_LM/saccharomycetales_viz_seq/unet_small_bert_drop/modisco_results_w500_n20000.h5"
 
-    # modisco_h5 = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/motif_LM/saccharomycetales_viz_seq/unet_small_bert_drop/modisco_results_w2000_n5000.h5"
+    # modisco_h5 = "${WORK_ROOT}/experiments/motif_LM/saccharomycetales_viz_seq/unet_small_bert_drop/modisco_results_w2000_n5000.h5"
 
-    # modisco_h5 = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/motif_LM/saccharomycetales_viz_seq/unet_small_bert_drop/modisco_results_w2000_n20000.h5"
+    # modisco_h5 = "${WORK_ROOT}/experiments/motif_LM/saccharomycetales_viz_seq/unet_small_bert_drop/modisco_results_w2000_n20000.h5"
 
-    # modisco_h5 = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/motif_LM/saccharomycetales_viz_seq/unet_small_bert_drop/modisco_results_w16384_n20000.h5"
-    # modisco_h5 = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/motif_LM/saccharomycetales_viz_seq/unet_small_bert_drop_retry_1/modisco_results_w16384_n20000.h5"
-    # modisco_h5 = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/motif_LM/saccharomycetales_viz_seq/unet_small_bert_drop_retry_2/modisco_results_w16384_n20000.h5"
+    # modisco_h5 = "${WORK_ROOT}/experiments/motif_LM/saccharomycetales_viz_seq/unet_small_bert_drop/modisco_results_w16384_n20000.h5"
+    # modisco_h5 = "${WORK_ROOT}/experiments/motif_LM/saccharomycetales_viz_seq/unet_small_bert_drop_retry_1/modisco_results_w16384_n20000.h5"
+    # modisco_h5 = "${WORK_ROOT}/experiments/motif_LM/saccharomycetales_viz_seq/unet_small_bert_drop_retry_2/modisco_results_w16384_n20000.h5"
 
 
-    modisco_h5 = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/motif_LM/saccharomycetales_viz_seq/unet_small_bert_drop/modisco_results_w16384_n100000.h5"
+    modisco_h5 = f"{WORK_ROOT}/experiments/motif_LM/saccharomycetales_viz_seq/unet_small_bert_drop/modisco_results_w16384_n100000.h5"
 
     positions = extract_seqlet_positions(modisco_h5)
     

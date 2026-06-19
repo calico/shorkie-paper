@@ -2,6 +2,9 @@ import os
 import h5py
 import numpy as np
 
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
+
 ########################
 # Adjustable parameters #
 ########################
@@ -57,9 +60,9 @@ def main():
     datasets = ["schizosaccharomycetales_viz_seq", "strains_select_viz_seq"]
     for dataset in datasets:
         for model in models:
-            modisco_h5py = f"/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/motif_LM_unseen_species/{dataset}/{model}/modisco_results.h5"
+            modisco_h5py = f"{WORK_ROOT}/experiments/motif_LM_unseen_species/{dataset}/{model}/modisco_results.h5"
             # Output directory where you want to store motifs
-            out_dir = f"/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/motif_LM_unseen_species/{dataset}/{model}/motifs_meme"
+            out_dir = f"{WORK_ROOT}/experiments/motif_LM_unseen_species/{dataset}/{model}/motifs_meme"
             os.makedirs(out_dir, exist_ok=True)
 
             modisco_results = h5py.File(modisco_h5py, 'r')

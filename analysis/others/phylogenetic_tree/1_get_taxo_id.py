@@ -2,6 +2,9 @@
 import csv
 import sys
 
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
+
 def get_taxon_ids(filename):
     taxon_ids = []
     with open(filename, newline='') as csvfile:
@@ -14,7 +17,7 @@ def get_taxon_ids(filename):
     return taxon_ids
 
 if __name__ == "__main__":
-    filename = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/species_fungi_1385_gtf.cleaned.csv"
+    filename = f"{WORK_ROOT}/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/species_fungi_1385_gtf.cleaned.csv"
     taxon_ids = get_taxon_ids(filename)
     # Print each Taxon ID on its own line
     for taxon in taxon_ids:

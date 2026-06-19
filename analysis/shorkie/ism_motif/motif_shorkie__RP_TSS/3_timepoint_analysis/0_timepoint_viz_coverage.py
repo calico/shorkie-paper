@@ -16,7 +16,10 @@ import pyBigWig
 from collections import defaultdict
 import re
 
-from yeast_helpers import *  # Assumes you have functions such as make_seq_1hot
+from shorkie.helpers.yeast_helpers import *  # Assumes you have functions such as make_seq_1hot
+
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
 
 FIG_SIZE=(7, 6)
 
@@ -77,7 +80,7 @@ def main():
     (options, args) = parser.parse_args()
 
     # Set directories and file paths (update these paths as needed)
-    root_dir = '/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML'
+    root_dir = f'{WORK_ROOT}'
     fasta_file = f'{root_dir}/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_r64_gtf/fasta/GCA_000146045_2.cleaned.fasta'
     target_f = f"{root_dir}/seq_experiment/exp_histone__chip_exo__rna_seq_no_norm_5215_tracks/16bp/cleaned_sheet_RNA-Seq.txt"
 

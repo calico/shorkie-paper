@@ -4,6 +4,9 @@ import seaborn as sns
 import os
 import numpy as np
 
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
+
 def plot_motif_and_background_distributions(true_csv, bg_csv, output_dir="distance_histograms"):
     """
     Plot histogram distributions of TSS distances for each motif, overlaying the true motif distribution
@@ -81,7 +84,7 @@ if __name__ == "__main__":
     exp_species = "strains_select"   # or "schizosaccharomycetales"
     # exp_species = "schizosaccharomycetales"
 
-    root_dir = f"/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/motif_LM__unseen_species/2_motif_to_tss_dist/results/{exp_species}_motif_hits"
+    root_dir = f"{WORK_ROOT}/experiments/motif_LM__unseen_species/2_motif_to_tss_dist/results/{exp_species}_motif_hits"
     true_csv = f"{root_dir}/motif_tss_distances.csv"          # CSV with true motif TSS distances
     bg_csv = f"{root_dir}/background_tss_distances.csv"         # CSV with background distances
     output_dir=f"results/{exp_species}_motif_hits/distance_histograms"

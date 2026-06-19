@@ -1,5 +1,8 @@
 import h5py
 
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
+
 def read_bed_files(bed_files):
     """
     Read multiple BED files and return a list of entries.
@@ -138,14 +141,14 @@ if __name__ == "__main__":
 
     if exp_dataset == "schizosaccharomycetales":
         # Paths to your modisco results file and the BED file
-        modisco_h5 = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/motif_LM__unseen_species/schizosaccharomycetales_viz_seq/unet_small_bert_drop/modisco_results_w_16384_n_1000000.h5"
+        modisco_h5 = f"{WORK_ROOT}/experiments/motif_LM__unseen_species/schizosaccharomycetales_viz_seq/unet_small_bert_drop/modisco_results_w_16384_n_1000000.h5"
         bed_files = [
-            "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_schizosaccharomycetales_gtf_full/sequences_train.cleaned.bed"
+            f"{WORK_ROOT}/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_schizosaccharomycetales_gtf_full/sequences_train.cleaned.bed"
         ]
     elif exp_dataset == "strains_select":
-        modisco_h5 = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/motif_LM__unseen_species/strains_select_viz_seq/unet_small_bert_drop/modisco_results_w_16384_n_1000000.h5"
+        modisco_h5 = f"{WORK_ROOT}/experiments/motif_LM__unseen_species/strains_select_viz_seq/unet_small_bert_drop/modisco_results_w_16384_n_1000000.h5"
         bed_files = [
-            "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_strains_select_gtf/sequences_train.cleaned.bed"
+            f"{WORK_ROOT}/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_strains_select_gtf/sequences_train.cleaned.bed"
         ]
     
     # Map all seqlets to genome coordinates

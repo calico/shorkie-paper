@@ -13,8 +13,7 @@ from tqdm import tqdm
 import gc
 
 # Add path to import yeast_helpers_selfsupervised from positive directory
-sys.path.append("/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/revision_experiments/eQTL/kita_etal_Shorkie/positive")
-from yeast_helpers_selfsupervised import *
+from shorkie.helpers.yeast_helpers import *
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Score negative variants using Shorkie (logSED) for Kita et al.")

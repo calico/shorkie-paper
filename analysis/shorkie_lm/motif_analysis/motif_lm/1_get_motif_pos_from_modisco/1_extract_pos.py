@@ -1,5 +1,8 @@
 import h5py
 
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
+
 def read_bed_files(bed_files):
     """
     Read multiple BED files and return a list of entries.
@@ -134,26 +137,26 @@ def map_all_seqlets(h5_filepath, bed_files):
 
 if __name__ == "__main__":
     # Paths to your modisco results file and the BED files in the same order
-    # modisco_h5 = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/motif_LM/saccharomycetales_viz_seq_v1/unet_small_bert_drop/modisco_results.h5"
+    # modisco_h5 = "${WORK_ROOT}/experiments/motif_LM/saccharomycetales_viz_seq_v1/unet_small_bert_drop/modisco_results.h5"
 
-    # modisco_h5 = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/motif_LM/saccharomycetales_viz_seq/unet_small_bert_drop/modisco_results_w500_n5000.h5"
+    # modisco_h5 = "${WORK_ROOT}/experiments/motif_LM/saccharomycetales_viz_seq/unet_small_bert_drop/modisco_results_w500_n5000.h5"
 
-    # modisco_h5 = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/motif_LM/saccharomycetales_viz_seq/unet_small_bert_drop/modisco_results_w500_n20000.h5"
+    # modisco_h5 = "${WORK_ROOT}/experiments/motif_LM/saccharomycetales_viz_seq/unet_small_bert_drop/modisco_results_w500_n20000.h5"
 
-    # modisco_h5 = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/motif_LM/saccharomycetales_viz_seq/unet_small_bert_drop/modisco_results_w2000_n5000.h5"
+    # modisco_h5 = "${WORK_ROOT}/experiments/motif_LM/saccharomycetales_viz_seq/unet_small_bert_drop/modisco_results_w2000_n5000.h5"
 
-    # modisco_h5 = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/motif_LM/saccharomycetales_viz_seq/unet_small_bert_drop/modisco_results_w2000_n20000.h5"
+    # modisco_h5 = "${WORK_ROOT}/experiments/motif_LM/saccharomycetales_viz_seq/unet_small_bert_drop/modisco_results_w2000_n20000.h5"
 
-    # modisco_h5 = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/motif_LM/saccharomycetales_viz_seq/unet_small_bert_drop/modisco_results_w16384_n20000.h5"
-    # modisco_h5 = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/motif_LM/saccharomycetales_viz_seq/unet_small_bert_drop_retry_1/modisco_results_w16384_n20000.h5"
-    modisco_h5 = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/motif_LM/saccharomycetales_viz_seq/unet_small_bert_drop_retry_2/modisco_results_w16384_n100000.h5"
+    # modisco_h5 = "${WORK_ROOT}/experiments/motif_LM/saccharomycetales_viz_seq/unet_small_bert_drop/modisco_results_w16384_n20000.h5"
+    # modisco_h5 = "${WORK_ROOT}/experiments/motif_LM/saccharomycetales_viz_seq/unet_small_bert_drop_retry_1/modisco_results_w16384_n20000.h5"
+    modisco_h5 = f"{WORK_ROOT}/experiments/motif_LM/saccharomycetales_viz_seq/unet_small_bert_drop_retry_2/modisco_results_w16384_n100000.h5"
 
-    # modisco_h5 = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/motif_LM/saccharomycetales_viz_seq/unet_small_bert_drop/modisco_results_w16384_n5000.h5"
+    # modisco_h5 = "${WORK_ROOT}/experiments/motif_LM/saccharomycetales_viz_seq/unet_small_bert_drop/modisco_results_w16384_n5000.h5"
     
     bed_files = [
-        "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_saccharomycetales_gtf/sequences_train_r64.cleaned.bed",
-        "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_r64_gtf/sequences_test.cleaned.bed",
-        "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_saccharomycetales_gtf/sequences_valid.cleaned.bed"
+        f"{WORK_ROOT}/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_saccharomycetales_gtf/sequences_train_r64.cleaned.bed",
+        f"{WORK_ROOT}/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_r64_gtf/sequences_test.cleaned.bed",
+        f"{WORK_ROOT}/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_saccharomycetales_gtf/sequences_valid.cleaned.bed"
     ]
     
     # Map all seqlets to genome coordinates

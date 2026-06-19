@@ -9,7 +9,6 @@
 #SBATCH --ntasks-per-node=8
 #SBATCH --export=ALL
 #SBATCH --mail-type=end
-#SBATCH --mail-user=kuanhao.chao@gmail.com
 #SBATCH --array=0
 
 # Define the model architectures

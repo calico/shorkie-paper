@@ -32,6 +32,9 @@ from typing import List, Tuple, Optional
 import numpy as np
 import matplotlib.pyplot as plt
 
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
+
 
 # ------------------------------ Config ------------------------------
 
@@ -291,7 +294,7 @@ def plot_losses(
 def build_argparser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(description="Plot training/validation losses for multiple models.")
     p.add_argument("--root-dir", type=str,
-                   default="/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/lm_experiment/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/",
+                   default=f"{WORK_ROOT}/lm_experiment/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/",
                    help="Base directory containing model subfolders.")
     p.add_argument("--outdir", type=str, default="viz/unet_small_comparison/",
                    help="Where to write PNGs.")

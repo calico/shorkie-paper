@@ -28,8 +28,8 @@ from baskerville import seqnn
 from baskerville import gene as bgene
 from baskerville import dataset
 from baskerville import layers
-from yeast_helpers import *
-from load_cov import *
+from shorkie.helpers.yeast_helpers import *
+from shorkie.viz.load_cov import *
 
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 os.environ['CUDA_VISIBLE_DEVICES'] = '-1'

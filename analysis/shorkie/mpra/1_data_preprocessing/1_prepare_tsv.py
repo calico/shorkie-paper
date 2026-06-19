@@ -2,6 +2,9 @@ import csv
 import random
 import json
 
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
+
 def reverse_complement(seq):
     """
     Return the reverse complement of a DNA sequence.
@@ -74,19 +77,19 @@ def write_sampled_row_ids(sampled_rows, output_file):
 
 # Load public leaderboard indices from JSON files.
 # These JSON files are assumed to have keys that can be converted to integers.
-with open('/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/MPRA/public_leaderboard_ids/high_exp_indices.json', 'r') as f:
+with open(f"{WORK_ROOT}/data/MPRA/public_leaderboard_ids/high_exp_indices.json", 'r') as f:
     public_high = [int(ind) for ind in list(json.load(f).keys())]
 
-with open('/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/MPRA/public_leaderboard_ids/low_exp_indices.json', 'r') as f:
+with open(f"{WORK_ROOT}/data/MPRA/public_leaderboard_ids/low_exp_indices.json", 'r') as f:
     public_low = [int(ind) for ind in list(json.load(f).keys())]
 
-with open('/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/MPRA/public_leaderboard_ids/yeast_exp_indices.json', 'r') as f:
+with open(f"{WORK_ROOT}/data/MPRA/public_leaderboard_ids/yeast_exp_indices.json", 'r') as f:
     public_yeast = [int(ind) for ind in list(json.load(f).keys())]
 
-with open('/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/MPRA/public_leaderboard_ids/random_exp_indices.json', 'r') as f:
+with open(f"{WORK_ROOT}/data/MPRA/public_leaderboard_ids/random_exp_indices.json", 'r') as f:
     public_random = [int(ind) for ind in list(json.load(f).keys())]
 
-with open('/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/MPRA/public_leaderboard_ids/challenging_exp_indices.json', 'r') as f:
+with open(f"{WORK_ROOT}/data/MPRA/public_leaderboard_ids/challenging_exp_indices.json", 'r') as f:
     public_challenging = [int(ind) for ind in list(json.load(f).keys())]
 
 # Combine all public leaderboard indices into a single set.
@@ -101,10 +104,10 @@ target_ls = ["all_random_seqs", "challenging_seqs"]
 
 for target in target_ls:
     print(f"Processing target: {target}")
-    input_csv = f"/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/MPRA/test_subset_ids/{target}.csv"
-    output_tsv_original = f"/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/MPRA/test_subset_ids/fix/{target}_fix.csv"
-    output_tsv_reversed = f"/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/MPRA/test_subset_ids/fix/{target}_fix_rev.csv"
-    output_sample_ids = f"/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/MPRA/test_subset_ids/fix/{target}_sample_ids.tsv"
+    input_csv = f"{WORK_ROOT}/data/MPRA/test_subset_ids/{target}.csv"
+    output_tsv_original = f"{WORK_ROOT}/data/MPRA/test_subset_ids/fix/{target}_fix.csv"
+    output_tsv_reversed = f"{WORK_ROOT}/data/MPRA/test_subset_ids/fix/{target}_fix_rev.csv"
+    output_sample_ids = f"{WORK_ROOT}/data/MPRA/test_subset_ids/fix/{target}_sample_ids.tsv"
 
     # Sample rows from the CSV file (removing rows with public leaderboard indices).
     sampled_rows = sample_csv_rows(input_csv, sample_size=1000, remove_ids=remove_ids)

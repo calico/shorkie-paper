@@ -30,6 +30,9 @@ import matplotlib.pyplot as plt
 
 from sklearn.metrics import roc_curve, auc, precision_recall_curve, average_precision_score
 
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
+
 # ============================================================================
 # --- Utility Functions ---
 # ----------------------------------------------------------------------------
@@ -395,7 +398,7 @@ if __name__ == "__main__":
     }
     
     # Base directory for NPZ files.
-    base_results_dir = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/SUM_data_process/MPRA/results/single_measurement_stranded/all_seq_types"
+    base_results_dir = f"{WORK_ROOT}/experiments/SUM_data_process/MPRA/results/single_measurement_stranded/all_seq_types"
     # Output directory for classification results.
     output_dir = f"{base_results_dir}/classification_results"
     os.makedirs(output_dir, exist_ok=True)

@@ -7,6 +7,9 @@ import pandas as pd
 import sys
 from Bio import motifs
 
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
+
 def parse_fasta_header(header):
     """
     Parses a FASTA header to extract chromosome, start, end, and species.
@@ -55,10 +58,10 @@ def main():
     # for target_type in ['train', 'test', 'valid']:
     for target_type in ['train']:
         # File paths for each dataset
-        sequences_bed_file = f'/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_{dataset}_gtf/sequences_{target_type}.cleaned.bed'
-        cleaned_sequences_fasta_file = f'/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_{dataset}_gtf/extracted_fasta/sequences_{target_type}.cleaned.fasta'
+        sequences_bed_file = f'{WORK_ROOT}/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_{dataset}_gtf/sequences_{target_type}.cleaned.bed'
+        cleaned_sequences_fasta_file = f'{WORK_ROOT}/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_{dataset}_gtf/extracted_fasta/sequences_{target_type}.cleaned.fasta'
         if target_type == 'train':
-            predictions_file = f'/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/lm_experiment/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/LM_Johannes/lm_saccharomycetales_gtf/lm_saccharomycetales_gtf_{model_arch}/test_trainset_{dataset}/preds_{target_type}.npz'
+            predictions_file = f'{WORK_ROOT}/lm_experiment/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/LM_Johannes/lm_saccharomycetales_gtf/lm_saccharomycetales_gtf_{model_arch}/test_trainset_{dataset}/preds_{target_type}.npz'
 
         # Load sequences BED file
         seqs_df = pd.read_csv(sequences_bed_file, sep='\t', names=['Chromosome', 'Start', 'End', 'label', 'species'])

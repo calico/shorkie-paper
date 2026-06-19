@@ -5,9 +5,12 @@ import pandas as pd
 from scipy.stats import pearsonr, spearmanr
 from matplotlib import pyplot as plt
 
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
+
 # Directories
-ROOT_DIR = '/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/MPRA/'
-OUTPUT_DIR = '/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/SUM_data_process/MPRA/results/single_measurement_stranded/viz'
+ROOT_DIR = f'{WORK_ROOT}/data/MPRA/'
+OUTPUT_DIR = f'{WORK_ROOT}/experiments/SUM_data_process/MPRA/results/single_measurement_stranded/viz'
 
 def load_expression(filename):
     """Load expression values (assumes second column) from a file."""
@@ -164,7 +167,7 @@ def process_seq_type(seq_type, pairs_csv, sample_tsv, gt_full, pred_full, nice_s
 def main():
     # Load full ground truth and model predictions.
     gt_full   = load_expression(os.path.join(ROOT_DIR, 'filtered_test_data_with_MAUDE_expression.txt'))
-    pred_full = load_expression("/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/random-promoter-dream-challenge-2022/data/DREAM-RNN_output.txt")
+    pred_full = load_expression(f"{WORK_ROOT}/data/random-promoter-dream-challenge-2022/data/DREAM-RNN_output.txt")
     
     csv_indices_dict = {
         "all_SNVs_seqs": (

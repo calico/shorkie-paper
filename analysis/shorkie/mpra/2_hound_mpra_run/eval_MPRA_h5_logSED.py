@@ -1,8 +1,11 @@
 import h5py
 import numpy as np
 
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
+
 # Path to your HDF5 file
-h5_path = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/seq_experiment/exp_histone__chip_exo__rna_seq_no_norm_5215_tracks/16bp/self_supervised_unet_small_bert_drop/train//f0c0/MPRA/all_random_seqs/AIM11_neg/sed.h5"
+h5_path = f"{WORK_ROOT}/seq_experiment/exp_histone__chip_exo__rna_seq_no_norm_5215_tracks/16bp/self_supervised_unet_small_bert_drop/train//f0c0/MPRA/all_random_seqs/AIM11_neg/sed.h5"
 
 # Open the file and read the ALT, REF, and logSED datasets
 with h5py.File(h5_path, "r") as f:

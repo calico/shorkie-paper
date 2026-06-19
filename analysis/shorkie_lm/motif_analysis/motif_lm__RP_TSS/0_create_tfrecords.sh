@@ -6,10 +6,10 @@
 #SBATCH --job-name=eval_bed
 #SBATCH --output=job_output_%A_%a.log
 #SBATCH --mail-type=end
-#SBATCH --mail-user=kuanhao.chao@gmail.com
 #SBATCH -A ssalzbe1_gpu
 #SBATCH --mem=64G
 #SBATCH --array=0-5
+source "$(git rev-parse --show-toplevel)/scripts/common/env.sh"
 
 # ------------------------------------------------------------------------------
 # 1) Define your arrays
@@ -55,9 +55,9 @@ mkdir -p "${current_experiment}/"
 # 5) Choose the BED file based on the dataset
 # ------------------------------------------------------------------------------
 if [ "${current_dataset}" = "RP" ]; then
-    bedfile="/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/gene_exp_ism_window/RP_windows.bed"
+    bedfile="${WORK_ROOT}/data/gene_exp_ism_window/RP_windows.bed"
 elif [ "${current_dataset}" = "TSS" ]; then
-    bedfile="/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/gene_exp_ism_window/TSS_windows_ex_chrmt.bed"
+    bedfile="${WORK_ROOT}/data/gene_exp_ism_window/TSS_windows_ex_chrmt.bed"
 else
     echo "Error: Unknown dataset: ${current_dataset}"
     exit 1
@@ -68,8 +68,8 @@ fi
 # ------------------------------------------------------------------------------
 python 1_write_data_with_gtf.py \
     --bed "${bedfile}" \
-    --fasta /home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_r64_gtf/fasta/GCA_000146045_2.cleaned.fasta \
-    --gtf /home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_r64_gtf/gtf/GCA_000146045_2.59.gtf \
+    --fasta ${WORK_ROOT}/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_r64_gtf/fasta/GCA_000146045_2.cleaned.fasta \
+    --gtf ${WORK_ROOT}/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_r64_gtf/gtf/GCA_000146045_2.59.gtf \
     --save_suffix "${current_experiment}" \
     --start 0 \
     --end 16384 \

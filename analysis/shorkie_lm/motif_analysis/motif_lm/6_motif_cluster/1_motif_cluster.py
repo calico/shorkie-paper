@@ -7,6 +7,9 @@ from scipy.cluster.hierarchy import dendrogram, linkage
 from scipy.spatial.distance import pdist
 import pandas as pd
 
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
+
 def parse_motifs_html(motifs_html_file, qval_threshold):
     """
     Parse the motifs.html report to extract motif mapping.
@@ -139,10 +142,10 @@ def plot_dendrogram(Z, motif_name, n_seqlets, output_fig, qval0=None):
 
 if __name__ == "__main__":
     # Path to your TF-MoDISco HDF5 results file.
-    modisco_h5 = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/motif_LM/saccharomycetales_viz_seq/unet_small_bert_drop/modisco_results_w16384_n100000.h5"
+    modisco_h5 = f"{WORK_ROOT}/experiments/motif_LM/saccharomycetales_viz_seq/unet_small_bert_drop/modisco_results_w16384_n100000.h5"
     
     # Path to the motifs.html file for motif mapping.
-    motifs_html = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/motif_LM/saccharomycetales_viz_seq/unet_small_bert_drop/report_w16384_n100000/motifs.html"
+    motifs_html = f"{WORK_ROOT}/experiments/motif_LM/saccharomycetales_viz_seq/unet_small_bert_drop/report_w16384_n100000/motifs.html"
     mapping_file = "motif_mapping.tsv"
     
     # Create mapping dictionary from motifs.html if available.

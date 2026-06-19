@@ -8,6 +8,9 @@ import pickle
 import sys
 import argparse  # Added for parsing command-line arguments
 
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
+
 def get_insertion_position(fname):
     """
     Extract the insertion position from the filename by mapping the extracted index 
@@ -276,7 +279,7 @@ def main():
     seq_types = [s.strip() for s in args.seq_types.split(",")]
     visualize_genes = not args.skip_visualization
 
-    root_dir = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/SUM_data_process/MPRA/results/single_measurement_stranded"
+    root_dir = f"{WORK_ROOT}/experiments/SUM_data_process/MPRA/results/single_measurement_stranded"
     output_root_dir = os.path.join(root_dir, "viz", "expression_vs_position")
     os.makedirs(output_root_dir, exist_ok=True)
     

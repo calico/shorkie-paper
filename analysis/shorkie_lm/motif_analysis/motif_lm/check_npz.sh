@@ -7,7 +7,6 @@
 #SBATCH --job-name=tfmodisco
 #SBATCH --output=job_output_%A_%a.log
 #SBATCH --mail-type=end
-#SBATCH --mail-user=kuanhao.chao@gmail.com
 #SBATCH -A ssalzbe1_gpu
 #SBATCH --mem=64G
 #SBATCH --array=0

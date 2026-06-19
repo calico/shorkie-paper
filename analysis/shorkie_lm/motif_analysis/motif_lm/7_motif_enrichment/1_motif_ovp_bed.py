@@ -5,6 +5,9 @@ import pandas as pd
 import numpy as np
 from collections import defaultdict
 
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
+
 # ---- Helper functions for chromosome conversion ----
 
 def roman_to_int(s):
@@ -400,16 +403,16 @@ def compute_bin_level_metrics(pred_dict, gt_dict, bin_size=10):
 
 if __name__ == "__main__":
     # Define paths for modisco results, sequence BED files, and motifs HTML.
-    modisco_h5 = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/motif_LM/saccharomycetales_viz_seq/unet_small_bert_drop/modisco_results_w16384_n100000.h5"
+    modisco_h5 = f"{WORK_ROOT}/experiments/motif_LM/saccharomycetales_viz_seq/unet_small_bert_drop/modisco_results_w16384_n100000.h5"
     bed_files = [
-        "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_saccharomycetales_gtf/sequences_train_r64.cleaned.bed",
-        "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_r64_gtf/sequences_test.cleaned.bed",
-        "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_saccharomycetales_gtf/sequences_valid.cleaned.bed"
+        f"{WORK_ROOT}/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_saccharomycetales_gtf/sequences_train_r64.cleaned.bed",
+        f"{WORK_ROOT}/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_r64_gtf/sequences_test.cleaned.bed",
+        f"{WORK_ROOT}/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_saccharomycetales_gtf/sequences_valid.cleaned.bed"
     ]
-    motifs_html = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/motif_LM/saccharomycetales_viz_seq/unet_small_bert_drop/report_w16384_n100000/motifs.html"
+    motifs_html = f"{WORK_ROOT}/experiments/motif_LM/saccharomycetales_viz_seq/unet_small_bert_drop/report_w16384_n100000/motifs.html"
     
     # Chip peaks directory: each BED file is named like "Abf1_CX.bed"
-    chip_peak_dir = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/chip_peaks"
+    chip_peak_dir = f"{WORK_ROOT}/data/chip_peaks"
     chip_bed_files = [os.path.join(chip_peak_dir, f) for f in os.listdir(chip_peak_dir) if f.endswith("_CX.bed")]
     
     # Create a base output directory

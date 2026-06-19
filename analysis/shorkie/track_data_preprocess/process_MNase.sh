@@ -3,19 +3,21 @@
 EXP_DIR=/group/idea/basenji_yeast/data/rossi_et_al/bigwigs/histone_marks
 SAMPLE_SHEET="${EXP_DIR}/sample_sheet.csv"
 
-source /home/mo/mo_envs/cb2.bashrc
+source ${WORK_ROOT}/mo_envs/cb2.bashrc # TODO: verify path
 conda activate yeast_seq
 
 bamcov_bigwig () {
     SAMPLE_DIR=${EXP_DIR}/${SAMPLE_NAME}
 
-    java -jar /home/mo/idea_bioinformatics/picard.jar MarkDuplicates \
+    # TODO: verify path
+    java -jar ${WORK_ROOT}/idea_bioinformatics/picard.jar MarkDuplicates \
     --REMOVE_DUPLICATES \
     -I "${SAMPLE_DIR}/${SAMPLE_NAME}.bam" \
     -O "${SAMPLE_DIR}/${SAMPLE_NAME}_rmdup.bam" \
     -M "${SAMPLE_DIR}/${SAMPLE_NAME}_rmdup_metrics.txt"
 
-    python /home/mo/shared_repos/basenji/bin/bam_cov.py -c \
+    # TODO: verify path
+    python ${WORK_ROOT}/shared_repos/basenji/bin/bam_cov.py -c \
     "${SAMPLE_DIR}/${SAMPLE_NAME}_rmdup.bam" \
     "${SAMPLE_DIR}/${SAMPLE_NAME}_bamcov.bw"
 

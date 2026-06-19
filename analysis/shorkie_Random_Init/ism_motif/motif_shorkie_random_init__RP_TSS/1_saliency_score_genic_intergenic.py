@@ -12,8 +12,11 @@ import numpy as np
 import pandas as pd
 import pyranges as pr
 import pysam
-from yeast_helpers import make_seq_1hot
+from shorkie.helpers.yeast_helpers import make_seq_1hot
 import matplotlib.pyplot as plt
+
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
 
 
 def parse_args():
@@ -120,11 +123,11 @@ def main():
     os.makedirs(opts.output_dir, exist_ok=True)
 
     target_exp = opts.target_exp
-    bed_file_dir = os.path.join(f"/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/gene_exp_ism_window/{opts.target_exp}_chunk/")
+    bed_file_dir = os.path.join(f"{WORK_ROOT}/data/gene_exp_ism_window/{opts.target_exp}_chunk/")
     # list all bed files in the directory
     bed_files = [os.path.join(bed_file_dir, f) for f in os.listdir(bed_file_dir) if f.endswith('.bed')]
 
-    score_file_dir = os.path.join(f"/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/SUM_data_process/motif_shorkie_RP_TSS/gene_exp_motif_test_{opts.target_exp}/f0c0/")
+    score_file_dir = os.path.join(f"{WORK_ROOT}/experiments/SUM_data_process/motif_shorkie_RP_TSS/gene_exp_motif_test_{opts.target_exp}/f0c0/")
     # list all h5 files in the directory
     score_files =[]
     for num in range(len(bed_files)):

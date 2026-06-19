@@ -1,6 +1,9 @@
 import pandas as pd
 import pysam
-import os 
+import os
+
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
 
 def read_gvcf_to_df(file_path):
     records = []
@@ -51,7 +54,7 @@ def write_df_to_vcf(df, output_file, template_file):
     print(f"Saved VCF file: {output_file}")
 
 
-gvcf_file = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/eQTL/1011Matrix.gvcf"
+gvcf_file = f"{WORK_ROOT}/data/eQTL/1011Matrix.gvcf"
 # Read GVCF file and convert to DataFrame
 gvcf_df = read_gvcf_to_df(gvcf_file)
 print("GVCF DataFrame:")
@@ -59,11 +62,11 @@ print(gvcf_df.head())
 print(gvcf_df.tail())
 print("\tlen(gvcf_df): ", len(gvcf_df))   
 
-output_dir = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/eQTL/selected_eQTL/"
+output_dir = f"{WORK_ROOT}/data/eQTL/selected_eQTL/"
 os.makedirs(output_dir, exist_ok=True)
 for distance_type in ["CIS", "TRANS"]:  
     # Define file paths
-    GWAS_output_dir = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/eQTL/GWAS/"
+    GWAS_output_dir = f"{WORK_ROOT}/data/eQTL/GWAS/"
     eqtl_file = f"{GWAS_output_dir}GWAS_combined_lgcCorr_ldPruned_noBonferroni_20221207_cleaned_{distance_type}.tab"
 
     # Read the eQTL data

@@ -5,6 +5,9 @@ import pandas as pd
 import sys
 import os
 
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
+
 def process_fold(filename, target_gene, t0_positions):
     """
     Load HDF5, extract entries for target_gene, and sample columns by T0 positions.
@@ -117,7 +120,7 @@ if __name__ == "__main__":
     strands = ['+', '-']
     # Define the fold numbers (0 to 7).
     folds = list(range(8))
-    t0_indices_file = '/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/SUM_data_process/MPRA/results/t0_indices.tsv'
+    t0_indices_file = f'{WORK_ROOT}/experiments/SUM_data_process/MPRA/results/t0_indices.tsv'
     for strand in strands:
         if strand == '+':
             genes = ["GPM3", "SLI1", "VPS52", "YMR160W", "MRPS28", "YCT1", "RDL2", "PHS1", "RTC3", "MSN4"]
@@ -149,7 +152,7 @@ if __name__ == "__main__":
                 "MAE1": "YKL029C", 
                 "MRPL1": "YDR116C"
             }
-        root_dir = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/SUM_data_process/MPRA/results/single_measurement_stranded"
+        root_dir = f"{WORK_ROOT}/experiments/SUM_data_process/MPRA/results/single_measurement_stranded"
         for seq_type in seq_types:
             for gene_name in genes:
                 target_gene = gene_name_2_id[gene_name]
@@ -157,7 +160,7 @@ if __name__ == "__main__":
                 if strand == '+':
                     for fold in folds:
                         h5_filename = (
-                            f"/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/"
+                            f"{WORK_ROOT}/"
                             f"seq_experiment/exp_histone__chip_exo__rna_seq_no_norm_5215_tracks/"
                             f"16bp/self_supervised_unet_small_bert_drop/train/f{fold}c0/MPRA/"
                             f"{seq_type}/{gene_name}_pos/sed.h5"
@@ -167,7 +170,7 @@ if __name__ == "__main__":
                 elif strand == '-':
                     for fold in folds:
                         h5_filename = (
-                            f"/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/"
+                            f"{WORK_ROOT}/"
                             f"seq_experiment/exp_histone__chip_exo__rna_seq_no_norm_5215_tracks/"
                             f"16bp/self_supervised_unet_small_bert_drop/train/f{fold}c0/MPRA/"
                             f"{seq_type}/{gene_name}_neg/sed.h5"

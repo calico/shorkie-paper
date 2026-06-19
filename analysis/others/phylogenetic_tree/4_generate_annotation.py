@@ -2,12 +2,15 @@
 import csv
 import sys
 
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
+
 # # Usage: python filter_saccharomycetales.py input.csv output.txt
 # if len(sys.argv) < 3:
 #     print("Usage: {} input.csv output.txt".format(sys.argv[0]))
 #     sys.exit(1)
 
-input_file = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/species_saccharomycetales_gtf.cleaned.csv"
+input_file = f"{WORK_ROOT}/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/species_saccharomycetales_gtf.cleaned.csv"
 output_file = "species_saccharomycetales_gtf.txt"
 
 # Open the CSV file and read it as a dictionary.

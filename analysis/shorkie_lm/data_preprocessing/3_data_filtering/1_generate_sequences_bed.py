@@ -7,7 +7,7 @@ import time
 import pandas as pd
 import numpy as np
 import pysam
-from bed_helper import generate_beds
+from shorkie.data.bed_helper import generate_beds
 
 usage = 'usage: %prog [options] arg'
 parser = OptionParser(usage)

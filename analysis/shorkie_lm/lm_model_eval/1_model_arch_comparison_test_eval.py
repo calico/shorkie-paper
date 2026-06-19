@@ -2,6 +2,9 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
+
 # ---------------------------------------------------
 # 1. Define the datasets, model names, and paths
 # ---------------------------------------------------
@@ -60,11 +63,11 @@ for ds in datasets:
             model_suffix_fix = model_suffix
             
         if ds == "saccharomycetales":            
-            test_file = f"/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/lm_experiment/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/LM_Johannes/lm_{ds}_gtf/lm_{ds}_gtf_{model_suffix_fix}/test_testset/test_testset.out"
+            test_file = f"{WORK_ROOT}/lm_experiment/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/LM_Johannes/lm_{ds}_gtf/lm_{ds}_gtf_{model_suffix_fix}/test_testset/test_testset.out"
         elif ds == "fungi_1385":
-            test_file = f"/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/lm_experiment/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/LM_Johannes/lm_{ds}_gtf/lm_{ds}_gtf_{model_suffix_fix}/test_testset/test_testset.out"
+            test_file = f"{WORK_ROOT}/lm_experiment/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/LM_Johannes/lm_{ds}_gtf/lm_{ds}_gtf_{model_suffix_fix}/test_testset/test_testset.out"
         else:
-            test_file = f"/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/lm_experiment/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/lm_{ds}_gtf/lm_{ds}_gtf_{model_suffix_fix}/test/test.out"
+            test_file = f"{WORK_ROOT}/lm_experiment/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/lm_{ds}_gtf/lm_{ds}_gtf_{model_suffix_fix}/test/test.out"
         print("test_file: ", test_file)
         if not os.path.exists(test_file):
             print(f"Warning: test file not found: {test_file}")

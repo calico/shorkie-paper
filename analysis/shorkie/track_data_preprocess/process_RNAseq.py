@@ -6,9 +6,9 @@ import configargparse
 import math
 import numpy as np
 
-# sys.path += ["/group/singlecell/scpipe/scutil"]
-sys.path += ["/home/mo/shared_repos/basenji/basenji"]
 import slurm
+
+_SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 def generate_basic_bigwig(args, merged_bam, sample_path, sample_name):
     genomecov_cmd = " ".join([
@@ -41,7 +41,7 @@ def generate_bamcov_bigwig(merged_bam, sample_path, sample_name):
     
     if not os.path.exists(bamcov_out):
         bamcov_cmd = " ".join([
-            "python /home/mo/shared_repos/basenji/bin/bam_cov.py -a",
+            "python bam_cov.py -a",  # bam_cov.py: basenji/baskerville tool, ensure it is on PATH
             merged_bam,
             bamcov_out
         ])
@@ -79,7 +79,7 @@ def process_samples(sample_sheet, args):
                 r1 = os.path.join(batch_dir, sample_dir, f"{sample_dir}_trimmed_R1.fastq.gz")
                 r2 = os.path.join(batch_dir, sample_dir, f"{sample_dir}_trimmed_R2.fastq.gz")          
                 shell_cmd = " ".join([
-                    "bash /home/mo/mmagzoub/yeast_sequence_models/bioinformatics/rnaseq2bam.sh",
+                    f"bash {_SCRIPT_DIR}/rnaseq2bam.sh",
                     f"-i {sample_dir}",
                     f"-r {args.reference}",
                     f"-s {args.star_reference}",
@@ -157,7 +157,7 @@ def main():
             batch_sheet = sample_sheet.loc[sample_sheet["batch_id"] == batch]
             batch_sheet.to_csv(os.path.join(args.savedir, f"{batch}_sheet.csv"), index = False)
             batch_cmd = [
-                "python /home/mo/mmagzoub/yeast_sequence_models/bioinformatics/process_RNAseq.py",
+                f"python {_SCRIPT_DIR}/process_RNAseq.py",
                 f"--sample_sheet {os.path.join(args.savedir, f'{batch}_sheet.csv')}",
                 f"--savedir {args.savedir}",
                 f"--reference {args.reference}",
@@ -197,7 +197,7 @@ def main():
 ################################################
         
 # # example use
-# python /home/mo/mmagzoub/yeast_sequence_models/bioinformatics/process_RNAseq.py \
+# python process_RNAseq.py \
 # --sample_sheet ./sample_sheet.csv \
 # --n_batches 10 \
 # --savedir ./ \

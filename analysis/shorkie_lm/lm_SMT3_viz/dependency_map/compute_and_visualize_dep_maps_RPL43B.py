@@ -6,6 +6,9 @@ import matplotlib.pyplot as plt
 from datasets import Dataset
 from transformers import BertForMaskedLM, AutoTokenizer, DefaultDataCollator
 
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
+
 # Load the model
 model_name = "johahi/specieslm-fungi-upstream-k1"
 model = BertForMaskedLM.from_pretrained(model_name, trust_remote_code=True) 
@@ -141,7 +144,7 @@ def extract_sequence_from_fasta(fasta_path, chrom, start, end):
     raise ValueError(f"Chromosome {chrom} not found in FASTA file {fasta_path}")
 
 # Define parameters for sequence extraction
-fasta_path = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_r64_gtf/fasta/GCA_000146045_2.cleaned.fasta"  # Update this with the path to your FASTA file
+fasta_path = f"{WORK_ROOT}/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_r64_gtf/fasta/GCA_000146045_2.cleaned.fasta"  # Update this with the path to your FASTA file
 chrom = "chrX"            # Update this with the correct chromosome or record id
 start_coord = 607855                    # Update with your start coordinate (0-indexed)
 end_coord = 608355                   # Update with your end coordinate (exclusive)

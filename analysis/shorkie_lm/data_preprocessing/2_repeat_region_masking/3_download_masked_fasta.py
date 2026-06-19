@@ -5,7 +5,7 @@ import os
 
 import pandas as pd
 
-import util
+from shorkie.data import util
 import shutil
 
 '''

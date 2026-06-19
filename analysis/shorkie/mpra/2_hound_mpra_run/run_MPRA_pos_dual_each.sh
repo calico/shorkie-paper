@@ -7,8 +7,8 @@
 #SBATCH --ntasks-per-node=8
 #SBATCH --export=ALL
 #SBATCH --mail-type=end
-#SBATCH --mail-user=kuanhao.chao@gmail.com
 #SBATCH --array=0-29
+source "$(git rev-parse --show-toplevel)/scripts/common/env.sh"
 
 # Define the arrays (4 genes x 5 experiments = 20 jobs)
 genes=("GPM3" "SLI1" "VPS52" "YMR160W" "MRPS28" "YCT1" "RDL2" "PHS1" "RTC3" "MSN4")
@@ -30,19 +30,19 @@ strand="pos"
 
 if [ $strand == "pos" ]; then
     output_dir="MPRA/${exp}/${gene}_pos"
-    promoter_seqs="/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/MPRA/test_subset_ids/fix/${exp}_fix.csv"
+    promoter_seqs="${WORK_ROOT}/data/MPRA/test_subset_ids/fix/${exp}_fix.csv"
 elif [ $strand == "neg" ]; then
     output_dir="MPRA/${exp}/${gene}_neg"
-    promoter_seqs="/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/MPRA/test_subset_ids/fix/${exp}_fix_rev.csv"
+    promoter_seqs="${WORK_ROOT}/data/MPRA/test_subset_ids/fix/${exp}_fix_rev.csv"
 fi
 
 # Run the Python script with the computed values
-python /home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/baskerville-yeast/src/baskerville/scripts/hound_MPRA_dual_folds.py --f_list 7 \
+python ${BASKERVILLE_SCRIPTS}/hound_MPRA_dual_folds.py --f_list 7 \
     -e yeast_ml -r --tsv ${promoter_seqs} \
-    --ctx /home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/MPRA/genes/pos/${gene}.tsv -o ${output_dir} \
+    --ctx ${WORK_ROOT}/experiments/MPRA/genes/pos/${gene}.tsv -o ${output_dir} \
     --rc -q bigmem --stats logSED,logSED_ALT_ORIG,logSED_REF_ORIG \
-    -t /home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/seq_experiment/exp_histone__chip_exo__rna_seq_no_norm_5215_tracks/16bp/cleaned_sheet_all_RNA-Seq_strand.txt \
-    -f /home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_r64_gtf/fasta/GCA_000146045_2.cleaned.fasta \
-    -g /home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_r64_gtf/gtf/GCA_000146045_2.59.fixed.gtf \
-    /home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/seq_experiment/exp_histone__chip_exo__rna_seq_no_norm_5215_tracks/16bp/self_supervised_unet_small_bert_drop/params.json \
-    /home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/seq_experiment/exp_histone__chip_exo__rna_seq_no_norm_5215_tracks/16bp/self_supervised_unet_small_bert_drop/train/
+    -t ${WORK_ROOT}/seq_experiment/exp_histone__chip_exo__rna_seq_no_norm_5215_tracks/16bp/cleaned_sheet_all_RNA-Seq_strand.txt \
+    -f ${WORK_ROOT}/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_r64_gtf/fasta/GCA_000146045_2.cleaned.fasta \
+    -g ${WORK_ROOT}/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_r64_gtf/gtf/GCA_000146045_2.59.fixed.gtf \
+    ${WORK_ROOT}/seq_experiment/exp_histone__chip_exo__rna_seq_no_norm_5215_tracks/16bp/self_supervised_unet_small_bert_drop/params.json \
+    ${WORK_ROOT}/seq_experiment/exp_histone__chip_exo__rna_seq_no_norm_5215_tracks/16bp/self_supervised_unet_small_bert_drop/train/

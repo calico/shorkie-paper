@@ -3,6 +3,9 @@ import bisect
 import random
 from collections import defaultdict
 
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
+
 def load_tss_data(tss_file):
     """
     Load TSS data into a dictionary by chromosome.
@@ -225,8 +228,8 @@ def main():
     # exp_species = "strains_select"   # or "schizosaccharomycetales"
     exp_species = "schizosaccharomycetales"
 
-    directory = f"/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_{exp_species}_gtf/gtf/"
-    outfile = f"/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/motif_LM__unseen_species/2_motif_to_tss_dist/results/{exp_species}_motif_hits/tss.bed"
+    directory = f"{WORK_ROOT}/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_{exp_species}_gtf/gtf/"
+    outfile = f"{WORK_ROOT}/experiments/motif_LM__unseen_species/2_motif_to_tss_dist/results/{exp_species}_motif_hits/tss.bed"
     # Find files ending with .gtf (case sensitive; adjust if needed)
     gtf_files = glob.glob(os.path.join(directory, "*_2.59.gtf"))
     if not gtf_files:

@@ -2,9 +2,12 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
+
 # --- 1. Load and filter data ---
 # Load the GWAS data (modify the file path as needed)
-gwas_df = pd.read_csv('/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/eQTL/GWAS_combined_lgcCorr_ldPruned_noBonferroni_20221207.tab')
+gwas_df = pd.read_csv(f'{WORK_ROOT}/data/eQTL/GWAS_combined_lgcCorr_ldPruned_noBonferroni_20221207.tab')
 
 gwas_df = gwas_df[gwas_df['ld_mask'] != "masked"]
 print(gwas_df.head())

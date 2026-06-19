@@ -2,6 +2,9 @@ import h5py
 import os
 import pandas as pd
 
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
+
 def parse_motifs_html(motifs_html_file, qval_threshold):
     """
     Parse the motifs.html report to extract motif mapping.
@@ -176,16 +179,16 @@ if __name__ == "__main__":
     exp_species = "schizosaccharomycetales"
     
     if exp_species == "schizosaccharomycetales":
-        modisco_h5 = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/motif_LM__unseen_species/schizosaccharomycetales_viz_seq/unet_small_bert_drop/modisco_results_w_16384_n_1000000.h5"
-        motifs_html = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/motif_LM__unseen_species/schizosaccharomycetales_viz_seq/unet_small_bert_drop/report_w_16384_n_1000000_high_conf/motifs.html"
+        modisco_h5 = f"{WORK_ROOT}/experiments/motif_LM__unseen_species/schizosaccharomycetales_viz_seq/unet_small_bert_drop/modisco_results_w_16384_n_1000000.h5"
+        motifs_html = f"{WORK_ROOT}/experiments/motif_LM__unseen_species/schizosaccharomycetales_viz_seq/unet_small_bert_drop/report_w_16384_n_1000000_high_conf/motifs.html"
         bed_files = [
-            "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_schizosaccharomycetales_gtf_full/sequences_train.cleaned.bed"
+            f"{WORK_ROOT}/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_schizosaccharomycetales_gtf_full/sequences_train.cleaned.bed"
         ]
     elif exp_species == "strains_select":
-        modisco_h5 = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/motif_LM__unseen_species/strains_select_viz_seq/unet_small_bert_drop/modisco_results_w_16384_n_1000000.h5"
-        motifs_html = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/motif_LM__unseen_species/strains_select_viz_seq/unet_small_bert_drop/report_w_16384_n_1000000/motifs.html"
+        modisco_h5 = f"{WORK_ROOT}/experiments/motif_LM__unseen_species/strains_select_viz_seq/unet_small_bert_drop/modisco_results_w_16384_n_1000000.h5"
+        motifs_html = f"{WORK_ROOT}/experiments/motif_LM__unseen_species/strains_select_viz_seq/unet_small_bert_drop/report_w_16384_n_1000000/motifs.html"
         bed_files = [
-            "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_strains_select_gtf/sequences_train.cleaned.bed"
+            f"{WORK_ROOT}/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_strains_select_gtf/sequences_train.cleaned.bed"
         ]
         
     output_dir = f"results/{exp_species}_motif_hits"

@@ -8,13 +8,16 @@ import pysam
 import re
 import matplotlib.pyplot as plt
 from collections import defaultdict
-from yeast_helpers import make_seq_1hot
+from shorkie.helpers.yeast_helpers import make_seq_1hot
 
 # Additional imports for plotting letters
 import matplotlib as mpl
 from matplotlib.font_manager import FontProperties
 from matplotlib.text import TextPath
 from matplotlib.patches import PathPatch
+
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
 
 ##########################################
 # Helper function to plot ACGT letters   #
@@ -179,7 +182,7 @@ def main():
     options, _ = parser.parse_args()
 
     # Configuration and data loading
-    root_dir = '/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML'
+    root_dir = f'{WORK_ROOT}'
     fasta_file = f'{root_dir}/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_r64_gtf/fasta/GCA_000146045_2.cleaned.fasta'
     target_f = f"{root_dir}/seq_experiment/exp_histone__chip_exo__rna_seq_no_norm_5215_tracks/16bp/cleaned_sheet_RNA-Seq.txt"
 

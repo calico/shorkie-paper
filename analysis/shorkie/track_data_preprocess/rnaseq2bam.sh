@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source /home/mo/.bashrc
+source ${WORK_ROOT}/.bashrc # TODO: verify path
 conda activate idea_rnaseq
 
 while getopts i:r:s:d:1:2: flag
@@ -27,7 +27,7 @@ nthreads=$(( $ncores > 16 ? 16 : $ncores ))
 # -r2 /group/idea/basenji_yeast/data/IDEA/idea_rnaseq/test/YIL038C_0_S49_trimmed_R2.fastq.gz
 
 # # build index
-# /home/mo/idea_bioinformatics/bin/STAR \
+# ${WORK_ROOT}/idea_bioinformatics/bin/STAR \
 # --runThreadN 4 \
 # --runMode genomeGenerate \
 # --genomeDir /group/idea/basenji_yeast/data/references/STAR \
@@ -39,7 +39,8 @@ nthreads=$(( $ncores > 16 ? 16 : $ncores ))
 
 cd "${save_dir}"
 
-/home/mo/idea_bioinformatics/bin/STAR \
+# TODO: verify path
+${WORK_ROOT}/idea_bioinformatics/bin/STAR \
 --quantMode TranscriptomeSAM GeneCounts \
 --genomeDir /group/idea/yeast_references/STAR \
 --runThreadN $nthreads \
@@ -56,7 +57,8 @@ cd "${save_dir}"
 --alignMatesGapMax 2500
 
 # percent duplicates
-java -jar /home/mo/idea_bioinformatics/picard.jar MarkDuplicates \
+# TODO: verify path
+java -jar ${WORK_ROOT}/idea_bioinformatics/picard.jar MarkDuplicates \
 I="${id}_Aligned.sortedByCoord.out.bam" \
 O="${id}_rmdup.bam" \
 M="${id}_marked_dup_metrics.txt"
@@ -64,14 +66,14 @@ M="${id}_marked_dup_metrics.txt"
 ## Collect QC Metrics
 
 # # insert size
-# java -jar /home/mo/idea_bioinformatics/picard.jar CollectInsertSizeMetrics \
+# java -jar ${WORK_ROOT}/idea_bioinformatics/picard.jar CollectInsertSizeMetrics \
 # I="${id}_Aligned.sortedByCoord.out.bam" \
 # H="${id}_insert_size_histogram.pdf" \
 # HISTOGRAM_WIDTH=1000 \
 # O="${id}_insert_size_metrics.txt"
 
 # # gc content
-# java -jar /home/mo/idea_bioinformatics/picard.jar CollectGcBiasMetrics \
+# java -jar ${WORK_ROOT}/idea_bioinformatics/picard.jar CollectGcBiasMetrics \
 # I="${id}_Aligned.sortedByCoord.out.bam" \
 # O="${id}_gc_bias_metrics.txt" \
 # CHART="${id}_gc_bias_metrics.pdf" \

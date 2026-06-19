@@ -3,6 +3,9 @@ import os
 import sys
 import glob
 
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
+
 def get_chromosome_sizes(fasta_file):
     sizes = {}
     with open(fasta_file, 'r') as file:
@@ -32,8 +35,8 @@ def main():
     # exp_species = "strains_select"   # or "schizosaccharomycetales"
     exp_species = "schizosaccharomycetales"
 
-    directory = f"/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_{exp_species}_gtf/fasta"
-    outfile = f"/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/motif_LM__unseen_species/2_motif_to_tss_dist/results/{exp_species}_motif_hits/genome.chrom.sizes"
+    directory = f"{WORK_ROOT}/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_{exp_species}_gtf/fasta"
+    outfile = f"{WORK_ROOT}/experiments/motif_LM__unseen_species/2_motif_to_tss_dist/results/{exp_species}_motif_hits/genome.chrom.sizes"
     
     # Search for files ending with .fa or .fasta (case insensitive)
     fasta_files = glob.glob(os.path.join(directory, "*.cleaned.fasta")) + glob.glob(os.path.join(directory, "*.cleaned.fa"))

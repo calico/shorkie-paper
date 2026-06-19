@@ -3,6 +3,9 @@ import bisect
 import random
 from collections import defaultdict
 
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
+
 def load_tss_data(tss_file):
     """
     Load TSS data into a dictionary by chromosome.
@@ -226,7 +229,7 @@ if __name__ == "__main__":
     exp_species = "strains_select"   # or "schizosaccharomycetales"
     # exp_species = "schizosaccharomycetales"
 
-    root_dir = f"/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/motif_LM__unseen_species/2_motif_to_tss_dist/results/{exp_species}_motif_hits"
+    root_dir = f"{WORK_ROOT}/experiments/motif_LM__unseen_species/2_motif_to_tss_dist/results/{exp_species}_motif_hits"
     motif_bed = f"{root_dir}/tf_modisco_motif_hits.bed"  # Your motif BED file.
     tss_file = f"{root_dir}/tss.bed"                     # Your TSS file.
     genome_file = f"{root_dir}/genome.chrom.sizes"              # A two-column file: chromosome and size.

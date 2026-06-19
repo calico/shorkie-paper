@@ -9,6 +9,9 @@ from mpl_toolkits.mplot3d import Axes3D  # for 3D scatter plot
 from pandas.plotting import parallel_coordinates
 from scipy.stats import pearsonr, spearmanr
 
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
+
 ########################################
 # 1. Data Loading Functions
 ########################################
@@ -155,8 +158,8 @@ def bland_altman_plot(data1, data2, title, output_path):
 ########################################
 def main():
     # Set file paths (adjust these paths as needed)
-    root_dir = '/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/MPRA'
-    predicted_pickle_file = '/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/SUM_data_process/MPRA/results/single_measurement_stranded/viz/aggregated_MPRA_data.pkl'
+    root_dir = f'{WORK_ROOT}/data/MPRA'
+    predicted_pickle_file = f'{WORK_ROOT}/experiments/SUM_data_process/MPRA/results/single_measurement_stranded/viz/aggregated_MPRA_data.pkl'
     yeast_csv = os.path.join(root_dir, 'test_subset_ids/yeast_seqs.csv')
 
     # Load scores

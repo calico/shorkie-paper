@@ -7,7 +7,6 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --export=ALL
 #SBATCH --mail-type=end
-#SBATCH --mail-user=kuanhao.chao@gmail.com
 #SBATCH --array=0-15
 
 # Define the target transcription factors.

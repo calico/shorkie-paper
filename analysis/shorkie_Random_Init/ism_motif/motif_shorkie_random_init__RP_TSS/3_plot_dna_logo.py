@@ -15,7 +15,10 @@ import pysam
 from collections import defaultdict
 import re
 
-from yeast_helpers import *  # Assumes you have this module with functions such as make_seq_1hot
+from shorkie.helpers.yeast_helpers import *  # Assumes you have this module with functions such as make_seq_1hot
+
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
 
 ##########################################
 # Helper function to plot ACGT letters   #
@@ -171,12 +174,12 @@ def main():
     (options, args) = parser.parse_args()
 
     # Example root directory and fasta file (update as needed)
-    root_dir = '/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML'
+    root_dir = f'{WORK_ROOT}'
     fasta_file = f'{root_dir}/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_r64_gtf/fasta/GCA_000146045_2.cleaned.fasta'
     fasta_open = pysam.Fastafile(fasta_file)
 
     # Read and filter the target file
-    target_f = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/seq_experiment/exp_histone__chip_exo__rna_seq_no_norm_5215_tracks/16bp/cleaned_sheet_RNA-Seq.txt"
+    target_f = f"{WORK_ROOT}/seq_experiment/exp_histone__chip_exo__rna_seq_no_norm_5215_tracks/16bp/cleaned_sheet_RNA-Seq.txt"
     target_df = pd.read_csv(target_f, sep="\t")
     print("First few lines of target file:")
     print(target_df.head())

@@ -6,7 +6,7 @@ import os
 import pandas as pd
 import numpy as np
 
-import util
+from shorkie.data import util
 import shutil
 import pysam
 import csv

@@ -8,6 +8,9 @@ import os
 # logomaker import
 import logomaker
 
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
+
 def read_meme(filename):
 	motifs = {}
 
@@ -92,7 +95,7 @@ if __name__ == "__main__":
     exps = ['gene_exp_motif_test_RP', 'gene_exp_motif_test_TSS']
 
     for exp in exps:
-        modisco_h5py = f'/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/motif_LM_fine_tuned_RP_TSS/1_modisco_analysis/{exp}/f0c0/logSED/modisco_results_10000_500.h5'
+        modisco_h5py = f'{WORK_ROOT}/experiments/motif_LM_fine_tuned_RP_TSS/1_modisco_analysis/{exp}/f0c0/logSED/modisco_results_10000_500.h5'
         is_file = os.path.isfile(modisco_h5py)
         print("is_file: ", is_file, '; ', modisco_h5py)
 

@@ -13,6 +13,9 @@ from matplotlib.font_manager import FontProperties
 
 from modisco.visualization import viz_sequence
 
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
+
 ##########################################
 # Helper function to plot ACGT letters   #
 ##########################################
@@ -186,8 +189,8 @@ def main():
         coding_viz_len = 500
 
         # File paths (update as needed)
-        fasta_file = f'/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_{dataset}_gtf/fasta/GCA_000146045_2.cleaned.fasta.masked.dust.softmask'
-        gtf_file = f'/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_{dataset}_gtf/gtf/GCA_000146045_2.59.gtf'
+        fasta_file = f'{WORK_ROOT}/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_{dataset}_gtf/fasta/GCA_000146045_2.cleaned.fasta.masked.dust.softmask'
+        gtf_file = f'{WORK_ROOT}/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_{dataset}_gtf/gtf/GCA_000146045_2.59.gtf'
         output_dir = f'{dataset}_viz_seq_new_norm/{model_arch}/'
         os.makedirs(output_dir, exist_ok=True)
         fasta_open = pysam.Fastafile(fasta_file)
@@ -200,14 +203,14 @@ def main():
         label_list = []
 
         for target_type in ['train', 'test', 'valid']:
-            sequences_bed_file = f'/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_{dataset}_gtf/sequences_{target_type}.cleaned.bed'
-            cleaned_sequences_fasta_file = f'/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_{dataset}_gtf/extracted_fasta/sequences_{target_type}.cleaned.fasta'
+            sequences_bed_file = f'{WORK_ROOT}/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_{dataset}_gtf/sequences_{target_type}.cleaned.bed'
+            cleaned_sequences_fasta_file = f'{WORK_ROOT}/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_{dataset}_gtf/extracted_fasta/sequences_{target_type}.cleaned.fasta'
             if target_type == 'test':
-                predictions_file = f'/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/lm_experiment/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/LM_Johannes/lm_{dataset}_gtf/lm_{dataset}_gtf_{model_arch}/test_testset/preds_{target_type}.npz'
+                predictions_file = f'{WORK_ROOT}/lm_experiment/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/LM_Johannes/lm_{dataset}_gtf/lm_{dataset}_gtf_{model_arch}/test_testset/preds_{target_type}.npz'
             elif target_type == 'train':
-                predictions_file = f'/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/lm_experiment/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/LM_Johannes/lm_{dataset}_gtf/lm_{dataset}_gtf_{model_arch}/test_trainset/preds_{target_type}.npz'
+                predictions_file = f'{WORK_ROOT}/lm_experiment/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/LM_Johannes/lm_{dataset}_gtf/lm_{dataset}_gtf_{model_arch}/test_trainset/preds_{target_type}.npz'
             elif target_type == 'valid':
-                predictions_file = f'/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/lm_experiment/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/LM_Johannes/lm_{dataset}_gtf/lm_{dataset}_gtf_{model_arch}/test_validset/preds_{target_type}.npz'
+                predictions_file = f'{WORK_ROOT}/lm_experiment/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/LM_Johannes/lm_{dataset}_gtf/lm_{dataset}_gtf_{model_arch}/test_validset/preds_{target_type}.npz'
 
             print(f"\tProcessing {target_type} dataset")
             print(f"\tPredictions file: {predictions_file}")

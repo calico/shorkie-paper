@@ -18,7 +18,10 @@ import re
 
 # Import helper functions from your local module.
 # Make sure make_seq_1hot(...) is defined in yeast_helpers or otherwise accessible
-from yeast_helpers import make_seq_1hot
+from shorkie.helpers.yeast_helpers import make_seq_1hot
+
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
 
 ########################################
 # Helper functions for plotting logos  #
@@ -195,7 +198,7 @@ def main():
     (options, args) = parser.parse_args()
 
     # Root / data settings
-    root_dir = '/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML'
+    root_dir = f'{WORK_ROOT}'
     fasta_file = f'{root_dir}/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_r64_gtf/fasta/GCA_000146045_2.cleaned.fasta'
     fasta_open = pysam.Fastafile(fasta_file)
 

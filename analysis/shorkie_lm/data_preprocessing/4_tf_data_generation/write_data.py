@@ -6,10 +6,10 @@ import os
 import pandas as pd
 import numpy as np
 
-import util
+from shorkie.data import util
 import pysam
 
-from basenji.dna_io import dna_1hot, dna_1hot_index
+from baskerville.dna_io import dna_1hot, dna_1hot_index
 import tensorflow as tf
 
 '''

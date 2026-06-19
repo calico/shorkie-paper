@@ -6,14 +6,14 @@
 #SBATCH --ntasks-per-node=8
 #SBATCH --export=ALL
 #SBATCH --mail-type=END
-#SBATCH --mail-user=kuanhao.chao@gmail.com
 #SBATCH --array=0
+source "$(git rev-parse --show-toplevel)/scripts/common/env.sh"
 
 mkdir -p embeddings_LM_sequence/viz_gene_intergenic
 
 python 3_viz_clusters_LM_clustering.py \
   --embedding_pattern "./embeddings_LM_sequence/embeddings_chr*.h5" \
-  --gtf_file /home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_r64_gtf/gtf/GCA_000146045_2.59.fixed.gtf \
+  --gtf_file ${WORK_ROOT}/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_r64_gtf/gtf/GCA_000146045_2.59.fixed.gtf \
   --n_components 2 \
   --out_prefix ./embeddings_LM_sequence/viz_gene_intergenic/ \
   --n_clusters 12 \

@@ -5,6 +5,9 @@ import sys
 import os
 import pandas as pd
 
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
+
 def main(filenames, gene_name, target_gene, t0_indices_file, output_dir=None):
     """
     Process HDF5 files across folds, extract data for the target gene,
@@ -104,9 +107,9 @@ if __name__ == "__main__":
     seq_types = ["yeast_seqs", "high_exp_seqs", "low_exp_seqs", "challenging_seqs", "all_random_seqs"]
     strands = ['+', '-']
     # Path to T0 indices file
-    t0_indices_file = '/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/SUM_data_process/MPRA/results/t0_indices.tsv'
+    t0_indices_file = f'{WORK_ROOT}/experiments/SUM_data_process/MPRA/results/t0_indices.tsv'
 
-    root_dir = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/SUM_data_process/MPRA/results/single_measurement_stranded"
+    root_dir = f"{WORK_ROOT}/experiments/SUM_data_process/MPRA/results/single_measurement_stranded"
 
     for strand in strands:
         if strand == '+':
@@ -146,7 +149,7 @@ if __name__ == "__main__":
                 # Build filenames
                 filenames = []
                 for fold in folds:
-                    base = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/seq_experiment/exp_histone__chip_exo__rna_seq_no_norm_5215_tracks/16bp/self_supervised_unet_small_bert_drop/train"
+                    base = f"{WORK_ROOT}/seq_experiment/exp_histone__chip_exo__rna_seq_no_norm_5215_tracks/16bp/self_supervised_unet_small_bert_drop/train"
                     if strand == '+':
                         path = f"{base}/f{fold}c0/MPRA/{seq_type}/{gene_name}_pos/sed.h5"
                         output_dir = f"{root_dir}/all_seq_types/{seq_type}/{gene_name}_{target_gene}_pos_outputs"

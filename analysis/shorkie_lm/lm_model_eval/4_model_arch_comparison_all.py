@@ -24,6 +24,9 @@ from typing import Dict, List, Tuple, Optional
 import numpy as np
 import matplotlib.pyplot as plt
 
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
+
 
 # =========================
 # User parameters
@@ -35,7 +38,7 @@ steps: int = 64
 trim_end: int = 5
 window_size: int = 21
 
-input_dir = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/lm_experiment/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI"
+input_dir = f"{WORK_ROOT}/lm_experiment/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI"
 out_dir   = "viz/model_arch_comparison/all_datasets"
 os.makedirs(out_dir, exist_ok=True)
 

@@ -7,9 +7,9 @@
 #SBATCH --ntasks-per-node=8
 #SBATCH --export=ALL
 #SBATCH --mail-type=end
-#SBATCH --mail-user=kuanhao.chao@gmail.com
 #SBATCH --mem=32G
 #SBATCH --array=0-2
+source "$(git rev-parse --show-toplevel)/scripts/common/env.sh"
 
 # Define the model architectures
 model_archs=('unet_small_bert_drop' 'unet_small_bert_drop_retry_1' 'unet_small_bert_drop_retry_2')
@@ -20,9 +20,9 @@ model=${model_archs[$SLURM_ARRAY_TASK_ID]}
 
 current_dataset="TSS_select"  
 
-# bedfile="/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/gene_exp_ism_window/TSS_select/TSS_select_full.bed"
-bedfile="/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/gene_exp_ism_window/TSS_windows_ex_chrmt.bed"
-eval_dir="/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/motif_LM_RP_TSS/lm_saccharomycetales_gtf_${model}/eval_TSS"
+# bedfile="${WORK_ROOT}/data/gene_exp_ism_window/TSS_select/TSS_select_full.bed"
+bedfile="${WORK_ROOT}/data/gene_exp_ism_window/TSS_windows_ex_chrmt.bed"
+eval_dir="${WORK_ROOT}/experiments/motif_LM_RP_TSS/lm_saccharomycetales_gtf_${model}/eval_TSS"
 
 out_dir="./viz_motif_${current_dataset}"
 mkdir -p $out_dir/motifs_with_annotation/${model}

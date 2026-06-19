@@ -7,11 +7,14 @@ import pysam
 import tensorflow as tf
 from baskerville import seqnn
 
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
+
 # Parameters (Hardcoded based on exploration)
-MODEL_DIR = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/lm_experiment/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/LM_Johannes/lm_saccharomycetales_gtf/lm_saccharomycetales_gtf_unet_small_bert_drop/train"
+MODEL_DIR = f"{WORK_ROOT}/lm_experiment/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/LM_Johannes/lm_saccharomycetales_gtf/lm_saccharomycetales_gtf_unet_small_bert_drop/train"
 MODEL_FILE = os.path.join(MODEL_DIR, "model_best.h5")
 PARAMS_FILE = os.path.dirname(MODEL_DIR) + "/params.json" # Parent dir usually
-FASTA_FILE = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_saccharomycetales_gtf/fasta/GCA_000146045_2.cleaned.fasta.masked.dust.softmask"
+FASTA_FILE = f"{WORK_ROOT}/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_saccharomycetales_gtf/fasta/GCA_000146045_2.cleaned.fasta.masked.dust.softmask"
 OUTPUT_DIR = "inference_smt3_output"
 SPECIES_INDEX = 9 # GCA_000146045_2 index (0-based) from sorted list
 NUM_SPECIES = 165

@@ -1,6 +1,9 @@
 import numpy as np
 import os
 
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
+
 # 1. SpeciesLM Data (The Target)
 # Extracted from nb_dump.txt (compute_SMT3_gene.ipynb)
 # This is the 1003 bp sequence used in the notebook.
@@ -11,7 +14,7 @@ SPECIES_START = 690
 SPECIES_END = 986
 
 # 2. Load Shorkie_LM Data (My Output)
-SHORKIE_FILE = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/Shorkie_LM_SMT3_viz/inference_smt3_output/preds_smt3_unmasked.npz"
+SHORKIE_FILE = f"{WORK_ROOT}/experiments/Shorkie_LM_SMT3_viz/inference_smt3_output/preds_smt3_unmasked.npz"
 
 def onehot_to_seq(onehot):
     # onehot: (L, 4)

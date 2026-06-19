@@ -6,10 +6,11 @@
 #SBATCH --job-name=yeast_experiments
 #SBATCH --output=job_output_%A_%a.log
 #SBATCH --mail-type=end
-#SBATCH --mail-user=kuanhao.chao@gmail.com
 #SBATCH -A ssalzbe1_gpu
 #SBATCH --mem=16G
 #SBATCH --array=0-31  # 32 tasks: 8 folds x 4 negative sets per fold
+
+source "$(git rev-parse --show-toplevel)/scripts/common/env.sh"
 
 # Defaults
 NEG_TSV_PREFIX="results/negative_eqtls_set"
@@ -43,7 +44,7 @@ echo "VCF input file: ${vcf_file_input}"
 mkdir -p "$output_dir"
 
 # Run the command
-python ${ROOT_DIR}/baskerville-yeast/src/baskerville/scripts/hound_snpgene_fix.py \
+python ${BASKERVILLE_SCRIPTS}/hound_snpgene_fix.py \
     -f ${ROOT_DIR}/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_r64_gtf/fasta/GCA_000146045_2.cleaned.fasta.masked.dust.softmask \
     -g ${ROOT_DIR}/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_r64_gtf/gtf/GCA_000146045_2.59.fixed.gtf \
     -o "$output_dir" \

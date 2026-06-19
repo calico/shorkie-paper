@@ -108,7 +108,7 @@ def main():
     parser.add_argument("--gtf_file", required=True, help="Path to GTF file for TSS extraction")
     args = parser.parse_args()
 
-    # root = '/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML'
+    # root = '${WORK_ROOT}'
     gtf = args.gtf_file
     tss_data = parse_gtf_for_tss(gtf)
 

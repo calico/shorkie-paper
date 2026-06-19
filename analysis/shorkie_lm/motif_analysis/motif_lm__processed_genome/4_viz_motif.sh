@@ -5,7 +5,6 @@
 #SBATCH --job-name=tfmodisco
 #SBATCH --output=job_output_%A_%a.log
 #SBATCH --mail-type=END
-#SBATCH --mail-user=kuanhao.chao@gmail.com
 #SBATCH --array=0-2
 
 # Define arrays for species types and model architectures

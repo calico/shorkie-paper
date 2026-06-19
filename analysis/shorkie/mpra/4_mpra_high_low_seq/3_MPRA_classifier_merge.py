@@ -9,6 +9,9 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import roc_curve, auc, precision_recall_curve, average_precision_score
 from matplotlib.lines import Line2D
 
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
+
 #############################
 # Helper Functions
 #############################
@@ -510,7 +513,7 @@ def plot_group_roc_pr_by_tss(metrics_list, group_label, output_dir):
 
 def main():
     # Use the stranded results directory
-    output_res_base = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/SUM_data_process/MPRA/results/single_measurement_stranded/all_seq_types"
+    output_res_base = f"{WORK_ROOT}/experiments/SUM_data_process/MPRA/results/single_measurement_stranded/all_seq_types"
     
     # --- Options for Loading/Storing Metrics ---
     load_metrics = True  # Set True to load from file instead of reprocessing

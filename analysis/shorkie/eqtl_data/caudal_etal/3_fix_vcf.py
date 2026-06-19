@@ -1,6 +1,9 @@
 import pandas as pd
 import os
 
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
+
 # Mapping dictionary from chromosome names to Roman numerals
 chromosome_map = {
     'chromosome1': 'I', 'chromosome2': 'II', 'chromosome3': 'III',
@@ -11,7 +14,7 @@ chromosome_map = {
     'chromosome16': 'XVI'
 }
 
-output_dir = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/eQTL/selected_eQTL/"
+output_dir = f"{WORK_ROOT}/data/eQTL/selected_eQTL/"
 os.makedirs(output_dir, exist_ok=True)
 for distance_type in ["CIS", "TRANS"]:  
     # Define file paths

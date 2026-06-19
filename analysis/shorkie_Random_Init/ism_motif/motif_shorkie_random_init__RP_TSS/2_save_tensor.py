@@ -11,10 +11,13 @@ from matplotlib.text import TextPath
 from matplotlib.patches import PathPatch
 from matplotlib.font_manager import FontProperties
 from matplotlib.ticker import FormatStrFormatter
-from yeast_helpers import *
+from shorkie.helpers.yeast_helpers import *
 import pysam
 from collections import defaultdict
 import re
+
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
 
 #Helper function to plot ACGT letters at a given position
 def dna_letter_at(letter, x, y, yscale=1, ax=None, color=None, alpha=1.0):
@@ -271,7 +274,7 @@ def main():
     parser.add_option('--time_label', dest='time_label', default='', type='str', help='Time label [Default: %default]')
     (options,args) = parser.parse_args()
 
-    root_dir='/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML'
+    root_dir=f'{WORK_ROOT}'
     fasta_file = f'{root_dir}/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_r64_gtf/fasta/GCA_000146045_2.cleaned.fasta'
     #Initialize fasta sequence extractor
     fasta_open = pysam.Fastafile(fasta_file)

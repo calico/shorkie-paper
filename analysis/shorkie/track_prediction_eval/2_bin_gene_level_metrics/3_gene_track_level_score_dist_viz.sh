@@ -8,7 +8,6 @@
 #SBATCH --nodes=1
 #SBATCH --export=ALL
 #SBATCH --mail-type=end
-#SBATCH --mail-user=kuanhao.chao@gmail.com
 #SBATCH --array=0
 
 experiments=("gene_level_eval_rc")

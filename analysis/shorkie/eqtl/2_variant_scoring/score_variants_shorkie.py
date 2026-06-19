@@ -10,7 +10,7 @@ import tensorflow as tf
 from baskerville import seqnn
 from baskerville import gene as bgene
 from tqdm import tqdm
-from yeast_helpers_selfsupervised import *
+from shorkie.helpers.yeast_helpers import *
 
 # Ensure we can import from local directory if needed
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))

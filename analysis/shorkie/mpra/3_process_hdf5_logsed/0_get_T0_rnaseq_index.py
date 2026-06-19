@@ -10,6 +10,9 @@ and outputs original index values and row positions (0-based) either to stdout o
 import sys
 import pandas as pd
 
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
+
 def find_indices(all_file, t0_file):
     # Read sheets as strings to preserve all columns
     df_all = pd.read_csv(all_file, sep='\t', dtype=str)
@@ -45,9 +48,9 @@ def main():
     # all_file = sys.argv[1]
     # t0_file = sys.argv[2]
     # output_file = sys.argv[3] if len(sys.argv) >= 4 else None
-    all_file = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/seq_experiment/exp_histone__chip_exo__rna_seq_no_norm_5215_tracks/16bp/cleaned_sheet_all_RNA-Seq_strand.txt"
-    t0_file = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/seq_experiment/exp_histone__chip_exo__rna_seq_no_norm_5215_tracks/16bp/cleaned_sheet_RNA-Seq_T0.txt"
-    output_file = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/SUM_data_process/MPRA/results/t0_indices.tsv"
+    all_file = f"{WORK_ROOT}/seq_experiment/exp_histone__chip_exo__rna_seq_no_norm_5215_tracks/16bp/cleaned_sheet_all_RNA-Seq_strand.txt"
+    t0_file = f"{WORK_ROOT}/seq_experiment/exp_histone__chip_exo__rna_seq_no_norm_5215_tracks/16bp/cleaned_sheet_RNA-Seq_T0.txt"
+    output_file = f"{WORK_ROOT}/experiments/SUM_data_process/MPRA/results/t0_indices.tsv"
 
     res = find_indices(all_file, t0_file)
     if output_file:

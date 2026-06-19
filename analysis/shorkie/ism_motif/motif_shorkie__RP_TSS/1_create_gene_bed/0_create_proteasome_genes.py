@@ -2,6 +2,9 @@
 import sys
 import re
 
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
+
 def parse_attributes(attr_str):
     """
     Parse the GTF attribute string and return a dictionary of key/value pairs.
@@ -81,6 +84,6 @@ def main(gtf_file, output_file):
 
 if __name__ == "__main__":
     # Example usage; update paths as necessary.
-    input_gtf = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_r64_gtf/gtf/GCA_000146045_2.59.gtf"
-    output_bed = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/gene_exp_ism_window/Proteasome_genes.bed"
+    input_gtf = f"{WORK_ROOT}/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_r64_gtf/gtf/GCA_000146045_2.59.gtf"
+    output_bed = f"{WORK_ROOT}/data/gene_exp_ism_window/Proteasome_genes.bed"
     main(input_gtf, output_bed)

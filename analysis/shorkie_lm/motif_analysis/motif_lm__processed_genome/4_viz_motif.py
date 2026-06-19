@@ -9,6 +9,9 @@ import argparse
 # logomaker import
 import logomaker
 
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
+
 def read_meme(filename):
 	motifs = {}
 
@@ -101,12 +104,12 @@ if __name__ == "__main__":
 
     # Set up parameters
     pattern_groups = ['pos_patterns', 'neg_patterns']
-    modisco_h5py = f'/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/motif_LM__unseen_species/{species_type}_viz_seq/{model_arch}/modisco_results_w_16384_n_1000000.h5'
+    modisco_h5py = f'{WORK_ROOT}/experiments/motif_LM__unseen_species/{species_type}_viz_seq/{model_arch}/modisco_results_w_16384_n_1000000.h5'
     print("Processing file: ", modisco_h5py)
     if not os.path.isfile(modisco_h5py):
         print("File does not exist: ", modisco_h5py)
         
-    modisco_h5py = f'/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/motif_LM__unseen_species/{species_type}_viz_seq/{model_arch}/modisco_results_w_16384_n_1000000.h5'
+    modisco_h5py = f'{WORK_ROOT}/experiments/motif_LM__unseen_species/{species_type}_viz_seq/{model_arch}/modisco_results_w_16384_n_1000000.h5'
     is_file = os.path.isfile(modisco_h5py)
     print("is_file: ", is_file, '; ', modisco_h5py)
 
@@ -117,7 +120,7 @@ if __name__ == "__main__":
     #############################
     results = {'pattern': [], 'num_seqlets': [], 'modisco_cwm_fwd': [], 'modisco_cwm_rev': []}
     img_path_suffix = 'self_modisco_logo'
-    output_dir=f'/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/motif_LM__unseen_species/{species_type}_viz_seq/{model_arch}/viz_self_modisco/'
+    output_dir=f'{WORK_ROOT}/experiments/motif_LM__unseen_species/{species_type}_viz_seq/{model_arch}/viz_self_modisco/'
     # f'viz_self_modisco/{species_type}/{model_arch}'
 
     top_n_matches=3

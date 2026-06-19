@@ -6,10 +6,9 @@
 #SBATCH --mem 32000 # request 32Gb RAM per node
 #SBATCH -o rossi.%j.out
 #SBATCH --mail-type=end                         # send email upon: completion
-#SBATCH --mail-user=mo@calicolabs.com               # address to send status email
 
 # example use
-# sbatch --array=1-20 /home/mo/mmagzoub/yeast_sequence_models/bioinformatics/normalize_ChIPs.sh \
+# sbatch --array=1-20 ${WORK_ROOT}/mmagzoub/yeast_sequence_models/bioinformatics/normalize_ChIPs.sh \
 # /group/idea/basenji_yeast/data/rossi_et_al/bigwigs/rossi \
 # /group/idea/basenji_yeast/data/rossi_et_al/bigwigs/rossi
 
@@ -20,7 +19,7 @@ SAMPLE_SHEET="${EXP_DIR}/sample_sheet.csv"
 SEQ_DEPTH=${SAVE_DIR}/n_reads.csv
 touch $SEQ_DEPTH
 
-source /home/mo/mo_envs/cb2.bashrc
+source ${WORK_ROOT}/mo_envs/cb2.bashrc # TODO: verify path
 conda activate basenji
 
 normalize_exp () {
@@ -45,7 +44,7 @@ normalize_exp () {
     bedtools genomecov -bg -ibam ${SAMPLE_PATH}_filtered.bam -5 > ${SAMPLE_PATH}_coverage.bedgraph
     # covert to bigwig no compression
     sort -k 1,1 -k2,2n ${SAMPLE_PATH}_coverage.bedgraph > ${SAMPLE_PATH}_sort2.bedgraph
-    /home/mo/bedGraphToBigWig -unc ${SAMPLE_PATH}_sort2.bedgraph /group/idea/basenji_yeast/data/references/chrom.sizes ${SAMPLE_PATH}_coverage.bw
+    ${WORK_ROOT}/bedGraphToBigWig -unc ${SAMPLE_PATH}_sort2.bedgraph /group/idea/basenji_yeast/data/references/chrom.sizes ${SAMPLE_PATH}_coverage.bw # TODO: verify path
  
 }
 

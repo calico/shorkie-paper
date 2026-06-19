@@ -12,7 +12,10 @@ from matplotlib.font_manager import FontProperties
 import pysam
 import re
 
-from yeast_helpers import make_seq_1hot  # sequence one-hot helper
+from shorkie.helpers.yeast_helpers import make_seq_1hot  # sequence one-hot helper
+
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
 
 ##########################################
 # Helper function to plot ACGT letters   #
@@ -95,7 +98,7 @@ def main():
     parser.add_option('--plot_end',  dest='plot_end',  default=None,  type='int', help='End pos')
     opts, _ = parser.parse_args()
 
-    target_f = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/seq_experiment/exp_histone__chip_exo__rna_seq_no_norm_5215_tracks/16bp/cleaned_sheet_RNA-Seq.txt"
+    target_f = f"{WORK_ROOT}/seq_experiment/exp_histone__chip_exo__rna_seq_no_norm_5215_tracks/16bp/cleaned_sheet_RNA-Seq.txt"
 
     # load track sheet and select T0
     sheet = pd.read_csv(
@@ -119,7 +122,7 @@ def main():
     outdir = os.path.join(opts.exp_dir, 'dna_logo_example/logos/logSED/T0_average')
     os.makedirs(outdir, exist_ok=True)
 
-    root_dir="/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML"
+    root_dir=f"{WORK_ROOT}"
     fasta_path = f'{root_dir}/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_r64_gtf/fasta/GCA_000146045_2.cleaned.fasta'
 
     fasta = pysam.Fastafile(fasta_path)

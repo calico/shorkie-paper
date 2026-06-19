@@ -17,7 +17,10 @@ from baskerville import dataset
 from baskerville import gene as bgene
 from baskerville import layers
 from baskerville import seqnn
-from yeast_helpers import *
+from shorkie.helpers.yeast_helpers import *
+
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
 
 # Suppress TF log messages
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
@@ -29,7 +32,7 @@ os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 # Global paths and constants
 ###############################################################################
 
-root_dir = '/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML'
+root_dir = f'{WORK_ROOT}'
 targets_file = f'{root_dir}/seq_experiment/exp_histone__chip_exo__rna_seq_no_norm_5215_tracks/16bp/cleaned_sheet_RNA-Seq_T0.txt'
 gtf_file = f'{root_dir}/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_r64_gtf/gtf/GCA_000146045_2.59.fixed.gtf'
 fasta_file = f'{root_dir}/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_r64_gtf/fasta/GCA_000146045_2.cleaned.fasta'
@@ -735,8 +738,8 @@ def main():
 
         if options.LM_exp:
             # Example: using the same model file each time
-            params_file = f'/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/lm_experiment/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/LM_Johannes/lm_saccharomycetales_gtf/lm_saccharomycetales_gtf_unet_small_bert_drop/train/params.json'
-            model_file = f'/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/lm_experiment/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/LM_Johannes/lm_saccharomycetales_gtf/lm_saccharomycetales_gtf_unet_small_bert_drop/train/model_best.h5'
+            params_file = f'{WORK_ROOT}/lm_experiment/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/LM_Johannes/lm_saccharomycetales_gtf/lm_saccharomycetales_gtf_unet_small_bert_drop/train/params.json'
+            model_file = f'{WORK_ROOT}/lm_experiment/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/LM_Johannes/lm_saccharomycetales_gtf/lm_saccharomycetales_gtf_unet_small_bert_drop/train/model_best.h5'
         else:
             # For supervised or self_supervised
             params_file = f'{root_dir}/seq_experiment/exp_histone__chip_exo__rna_seq_no_norm_5215_tracks/16bp/{options.model_type}/train/f{rep_ix}c0/train/params.json'

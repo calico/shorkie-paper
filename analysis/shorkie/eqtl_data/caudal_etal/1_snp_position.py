@@ -2,8 +2,11 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os
 
-gwas_input = '/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/eQTL/GWAS_combined_lgcCorr_ldPruned_noBonferroni_20221207.tab'
-output_dir = '/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/eQTL/GWAS/'
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
+
+gwas_input = f'{WORK_ROOT}/data/eQTL/GWAS_combined_lgcCorr_ldPruned_noBonferroni_20221207.tab'
+output_dir = f'{WORK_ROOT}/data/eQTL/GWAS/'
 gwas_output = f'{output_dir}GWAS_combined_lgcCorr_ldPruned_noBonferroni_20221207_cleaned.tab'
 gwas_CIS_output = f'{output_dir}GWAS_combined_lgcCorr_ldPruned_noBonferroni_20221207_cleaned_CIS.tab'
 gwas_TRANS_output = f'{output_dir}GWAS_combined_lgcCorr_ldPruned_noBonferroni_20221207_cleaned_TRANS.tab'

@@ -8,11 +8,11 @@
 #SBATCH --nodes=1
 #SBATCH --export=ALL
 #SBATCH --mail-type=end
-#SBATCH --mail-user=kuanhao.chao@gmail.com
 #SBATCH --array=0-21
+source "$(git rev-parse --show-toplevel)/scripts/common/env.sh"
 
 # Define datasets and times to plot
-bed_file_root='/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/gene_exp_ism_window/'
+bed_file_root='${WORK_ROOT}/data/gene_exp_ism_window/'
 
 
 # target_tf=SWI4
@@ -30,5 +30,5 @@ python 0_timepoint_viz_coverage.py \
     --target_tf ${target_tf}_ \
     --bed ${bed_file} \
     --exp_type ${exp_type} \
-    --libsize_file /home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/library_sizes_full.csv \
-    --gtf /home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_r64_gtf/gtf/GCF_000146045.2_R64_genomic.fix.gtf
+    --libsize_file ${WORK_ROOT}/data/library_sizes_full.csv \
+    --gtf ${WORK_ROOT}/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_r64_gtf/gtf/GCF_000146045.2_R64_genomic.fix.gtf

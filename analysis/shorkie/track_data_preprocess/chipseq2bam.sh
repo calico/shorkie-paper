@@ -22,12 +22,13 @@ done
 cd "${save_dir}"
 
 # 1) align
-/home/mo/bwa-0.7.17/bwa mem -t 10 -v 0 -M "${bwa_index}" "${fastq_dir}/${id}_1.fastq" "${fastq_dir}/${id}_2.fastq" > "${id}_align.bwa"
+${WORK_ROOT}/bwa-0.7.17/bwa mem -t 10 -v 0 -M "${bwa_index}" "${fastq_dir}/${id}_1.fastq" "${fastq_dir}/${id}_2.fastq" > "${id}_align.bwa" # TODO: verify path
 samtools sort -o "${id}_sort.bam" "${id}_align.bwa"
 # 2) remove multi-mappers
 samtools view -h "${id}_sort.bam" | grep -v -e 'XA:Z:' | samtools view -b > "${id}_rmmultimap.bam"
 # 3) remove pcr duplicates
-java -jar /home/mo/idea_bioinformatics/picard.jar MarkDuplicates \
+# TODO: verify path
+java -jar ${WORK_ROOT}/idea_bioinformatics/picard.jar MarkDuplicates \
 --ASSUME_SORT_ORDER coordinate \
 --REMOVE_DUPLICATES \
 -I "${id}_rmmultimap.bam" \

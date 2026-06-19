@@ -7,7 +7,6 @@
 #SBATCH --ntasks-per-node=8
 #SBATCH --export=ALL
 #SBATCH --mail-type=end
-#SBATCH --mail-user=kuanhao.chao@gmail.com
 #SBATCH --array=0-31
 
 echo $SLURM_ARRAY_TASK_ID

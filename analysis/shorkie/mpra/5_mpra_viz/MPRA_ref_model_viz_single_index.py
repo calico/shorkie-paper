@@ -5,11 +5,14 @@ import os
 from scipy.stats import pearsonr, spearmanr
 from matplotlib import pyplot as plt
 
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
+
 ######################################
 # Directories
 ######################################
-root_dir = '/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/MPRA/'
-BASE_OUTPUT_DIR = '/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/SUM_data_process/MPRA/results/single_measurement_stranded/viz'
+root_dir = f'{WORK_ROOT}/data/MPRA/'
+BASE_OUTPUT_DIR = f'{WORK_ROOT}/experiments/SUM_data_process/MPRA/results/single_measurement_stranded/viz'
 
 ######################################
 # 1. Load Ground Truth and CSV Data  
@@ -76,7 +79,7 @@ csv_indices_dict = {
 ######################################
 # Assume the reference model output file has the same format as the ground truth file.
 
-ref_filename = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/random-promoter-dream-challenge-2022/data/DREAM-RNN_output.txt"
+ref_filename = f"{WORK_ROOT}/data/random-promoter-dream-challenge-2022/data/DREAM-RNN_output.txt"
 with open(ref_filename) as f:
     reader = csv.reader(f, delimiter="\t")
     ref_lines = list(reader)

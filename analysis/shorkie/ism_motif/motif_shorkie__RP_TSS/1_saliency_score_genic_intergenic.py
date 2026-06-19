@@ -22,7 +22,10 @@ from scipy.stats import mannwhitneyu, ks_2samp
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import cross_val_score
 
-from yeast_helpers import make_seq_1hot
+from shorkie.helpers.yeast_helpers import make_seq_1hot
+
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
 
 def parse_args():
     usage = "usage: %prog [options]"
@@ -114,9 +117,9 @@ def main():
 
     # locate files
 
-    bed_dir = os.path.join(f"/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/gene_exp_ism_window/{opts.target_exp}_chunk/")
+    bed_dir = os.path.join(f"{WORK_ROOT}/data/gene_exp_ism_window/{opts.target_exp}_chunk/")
     # list all bed files in the directory
-    score_dir = os.path.join(f"/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/SUM_data_process/motif_shorkie_RP_TSS/gene_exp_motif_test_{opts.target_exp}/f0c0/")
+    score_dir = os.path.join(f"{WORK_ROOT}/experiments/SUM_data_process/motif_shorkie_RP_TSS/gene_exp_motif_test_{opts.target_exp}/f0c0/")
 
 
     bed_files = sorted([os.path.join(bed_dir,f)

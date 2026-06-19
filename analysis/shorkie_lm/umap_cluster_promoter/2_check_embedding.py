@@ -3,6 +3,9 @@ import numpy as np
 import pandas as pd
 import pyranges as pr
 
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
+
 ##############################
 # 1) Load Metadata from H5
 ##############################
@@ -21,7 +24,7 @@ print(f"Metadata shape: {meta_df.shape}")
 ##############################
 # 2) Load GTF and Extract Biotype
 ##############################
-gtf_path = "/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_r64_gtf/gtf/GCA_000146045_2.59.fixed.gtf"
+gtf_path = f"{WORK_ROOT}/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_r64_gtf/gtf/GCA_000146045_2.59.fixed.gtf"
 gtf_pr = pr.read_gtf(gtf_path)
 gtf_df = gtf_pr.as_df()
 

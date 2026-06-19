@@ -7,7 +7,6 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --export=ALL
 #SBATCH --mail-type=end
-#SBATCH --mail-user=kuanhao.chao@gmail.com
 #SBATCH --array=0-7
 
 # # Define the arrays for experiment directories, target TFs, time points, and scores.

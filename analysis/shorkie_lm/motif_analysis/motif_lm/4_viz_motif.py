@@ -8,6 +8,9 @@ import os
 # logomaker import
 import logomaker
 
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
+
 def read_meme(filename):
 	motifs = {}
 
@@ -92,7 +95,7 @@ if __name__ == "__main__":
     model_archs = ['unet_small_bert_drop', 'unet_small_bert_drop_retry_1', 'unet_small_bert_drop_retry_2']#, 'averaged_models/unet_small', 'averaged_models/unet_small_bert_aux_drop']
 
     for model_arch in model_archs:
-        modisco_h5py = f'/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/motif_LM/saccharomycetales_viz_seq/{model_arch}/modisco_results_w16384_n100000.h5'
+        modisco_h5py = f'{WORK_ROOT}/experiments/motif_LM/saccharomycetales_viz_seq/{model_arch}/modisco_results_w16384_n100000.h5'
         is_file = os.path.isfile(modisco_h5py)
         print("is_file: ", is_file, '; ', modisco_h5py)
 

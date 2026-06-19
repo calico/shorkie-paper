@@ -103,5 +103,5 @@ stats_out.close()
 targets_file = out_dir + '/targets.txt'
 targets_out = open(targets_file, 'w')
 print("\tidentifier\tfile\tclip\tclip_soft\tscale\tsum_stat\tstrand_pair\tdescription", file=targets_out)
-print("0\tRNA-MISSI.1\t/home/jlinder/tillage/datasets/yeast/rna/RNA-MISSI.1/coverage.w5\t1\t1\t1.0\tsum_sqrt\t0\tRNA:missing", file=targets_out)
+print("0\tRNA-MISSI.1\tRNA-MISSI.1/coverage.w5\t1\t1\t1.0\tsum_sqrt\t0\tRNA:missing", file=targets_out)
 targets_out.close()

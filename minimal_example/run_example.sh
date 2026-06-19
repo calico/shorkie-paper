@@ -7,13 +7,14 @@
 #SBATCH --output=/home/kchao10/scr4_ssalzbe1/khchao/shorkie-paper/minimal_example/logs/run_example.out
 #SBATCH --error=/home/kchao10/scr4_ssalzbe1/khchao/shorkie-paper/minimal_example/logs/run_example.err
 #SBATCH --mail-type=end
-#SBATCH --mail-user=kuanhao.chao@gmail.com
 #SBATCH -A ssalzbe1_gpu
 #SBATCH --mem=64G
 
+source "$(git rev-parse --show-toplevel)/scripts/common/env.sh"
+
 SCRIPT_DIR=/home/kchao10/scr4_ssalzbe1/khchao/shorkie-paper/minimal_example
-MODEL_DIR=/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/seq_experiment/exp_histone__chip_exo__rna_seq_no_norm_5215_tracks/16bp/self_supervised_unet_small_bert_drop
-DATA=/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_r64_gtf
+MODEL_DIR=${WORK_ROOT}/seq_experiment/exp_histone__chip_exo__rna_seq_no_norm_5215_tracks/16bp/self_supervised_unet_small_bert_drop
+DATA=${WORK_ROOT}/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_r64_gtf
 
 mkdir -p $SCRIPT_DIR/logs
 

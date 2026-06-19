@@ -10,12 +10,15 @@ from collections import OrderedDict
 from scipy.stats import pearsonr, spearmanr
 from matplotlib import pyplot as plt
 
+from shorkie import config
+WORK_ROOT = str(config.path("work_root"))
+
 #########################################
 # Global Directories and Flags
 #########################################
 # Use the stranded results directory
-BASE_INPUT_DIR = '/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/SUM_data_process/MPRA/results/single_measurement_stranded'
-BASE_OUTPUT_DIR = '/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/experiments/SUM_data_process/MPRA/results/single_measurement_stranded/viz'
+BASE_INPUT_DIR = f'{WORK_ROOT}/experiments/SUM_data_process/MPRA/results/single_measurement_stranded'
+BASE_OUTPUT_DIR = f'{WORK_ROOT}/experiments/SUM_data_process/MPRA/results/single_measurement_stranded/viz'
 
 os.makedirs(BASE_OUTPUT_DIR, exist_ok=True)
 
@@ -38,7 +41,7 @@ def get_seq_type_label(seq_type):
 #########################################
 # 1. Load Ground Truth and CSV Data
 #########################################
-root_dir = '/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/data/MPRA/'
+root_dir = f'{WORK_ROOT}/data/MPRA/'
 
 # Read test data and corresponding expressions.
 filename = os.path.join(root_dir, 'filtered_test_data_with_MAUDE_expression.txt')

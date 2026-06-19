@@ -6,10 +6,9 @@
 #SBATCH --mem 8000 # request 16Gb RAM per node
 #SBATCH -o MACS.%j.out
 #SBATCH --mail-type=end                         # send email upon: completion
-#SBATCH --mail-user=mo@calicolabs.com               # address to send status email
 
 # example use
-# sbatch --array=1-20 /home/mo/mmagzoub/yeast_sequence_models/bioinformatics/run_macs.sh \
+# sbatch --array=1-20 ${WORK_ROOT}/mmagzoub/yeast_sequence_models/bioinformatics/run_macs.sh \
 # /group/idea/basenji_yeast/data/rossi_et_al/bigwigs/rossi 
 
 # example pipeline
@@ -41,19 +40,19 @@
 # awk -v OFS="\t" ' {if($4<0)$4=0}1 ' FHL1_sort_logFE.bedgraph > FHL1_pos_logFE.bedgraph
 # awk -v OFS="\t" ' {print $1, $2, $3, 1} ' FHL1_peaks.narrowPeak > FHL1_peaks.bedgraph
 # bedtools merge -i FHL1_peaks.bedgraph -d 512 -c 4 -o sum > FHL1_peaks_merge.bedgraph
-# # bedops --chop 512 /home/mo/mmagzoub/yeast_sequence_models/basenji_exp/TF_20220922/data_short/sort_sequences.bed > bin_sequences.bed
+# # bedops --chop 512 ${WORK_ROOT}/mmagzoub/yeast_sequence_models/basenji_exp/TF_20220922/data_short/sort_sequences.bed > bin_sequences.bed
 # # bedtools makewindows -g /group/idea/basenji_yeast/data/references/chrom.sizes -w 512 > chrom_bins.bed
-# bedtools intersect -loj -c -a /home/mo/mmagzoub/yeast_sequence_models/bioinformatics/bin_sequences.bed  -b FHL1_peaks_merge.bedgraph > FHL1_bins.bedgraph
+# bedtools intersect -loj -c -a ${WORK_ROOT}/mmagzoub/yeast_sequence_models/bioinformatics/bin_sequences.bed  -b FHL1_peaks_merge.bedgraph > FHL1_bins.bedgraph
 # bedtools unionbedg -i FHL1_pos_logFE.bedgraph FHL1_peaks_merge.bedgraph -filler 0 > FHL1_join.bedgraph
 # awk -v OFS="\t" ' {if($5==0)$4=0}1 ' FHL1_join.bedgraph |  awk -v OFS="\t" ' {print $1, $2, $3, $4} ' > FHL1_peaks_logFE.bedgraph
-# /home/mo/bedGraphToBigWig -unc FHL1_peaks_logFE.bedgraph /group/idea/basenji_yeast/data/references/chrom.sizes FHL1_peaks_logFE.bw
+# ${WORK_ROOT}/bedGraphToBigWig -unc FHL1_peaks_logFE.bedgraph /group/idea/basenji_yeast/data/references/chrom.sizes FHL1_peaks_logFE.bw
 
 EXP_DIR=$1
 SAMPLE_SHEET="${EXP_DIR}/${SLURM_ARRAY_TASK_ID}_sheet.csv"
 
 NEG_CNTRL=/group/idea/basenji_yeast/data/rossi_et_al/bigwigs/negative_control/NOTAG/NOTAG_filtered.bam
 
-source /home/mo/mo_envs/cb2.bashrc
+source ${WORK_ROOT}/mo_envs/cb2.bashrc # TODO: verify path
 conda activate macs
 
 macs_bigwig () {
@@ -96,7 +95,8 @@ macs_bigwig () {
     awk -v OFS="\t" ' {if($4<0)$4=0}1 ' "${SAMPLE_DIR}/${SAMPLE_NAME}_sort_logFE.bedgraph" > "${SAMPLE_DIR}/${SAMPLE_NAME}_pos_logFE.bedgraph"
     
     # begraph to bigwig
-    /home/mo/bedGraphToBigWig -unc \
+    # TODO: verify path
+    ${WORK_ROOT}/bedGraphToBigWig -unc \
     "${SAMPLE_DIR}/${SAMPLE_NAME}_pos_logFE.bedgraph" \
     /group/idea/basenji_yeast/data/references/chrom.sizes \
     "${SAMPLE_DIR}/${SAMPLE_NAME}_pos_logFE.bw"
@@ -106,11 +106,12 @@ macs_bigwig () {
         # intersect tfrecord sequence with log fold changes peaks
         awk -v OFS="\t" ' {print $1, $2, $3, 1} ' "${SAMPLE_DIR}/${SAMPLE_NAME}_peaks.narrowPeak" > "${SAMPLE_DIR}/${SAMPLE_NAME}_peaks.bedgraph"
         bedtools merge -i "${SAMPLE_DIR}/${SAMPLE_NAME}_peaks.bedgraph" -d 512 -c 4 -o sum > "${SAMPLE_DIR}/${SAMPLE_NAME}_peaks_merge.bedgraph"
-        bedtools intersect -loj -c -a /home/mo/mmagzoub/yeast_sequence_models/bioinformatics/bin_sequences.bed  -b "${SAMPLE_DIR}/${SAMPLE_NAME}_peaks_merge.bedgraph" > "${SAMPLE_DIR}/${SAMPLE_NAME}_bins.bedgraph"
+        bedtools intersect -loj -c -a ${WORK_ROOT}/mmagzoub/yeast_sequence_models/bioinformatics/bin_sequences.bed  -b "${SAMPLE_DIR}/${SAMPLE_NAME}_peaks_merge.bedgraph" > "${SAMPLE_DIR}/${SAMPLE_NAME}_bins.bedgraph" # TODO: verify path
         bedtools unionbedg -i "${SAMPLE_DIR}/${SAMPLE_NAME}_pos_logFE.bedgraph" "${SAMPLE_DIR}/${SAMPLE_NAME}_peaks_merge.bedgraph" -filler 0 > "${SAMPLE_DIR}/${SAMPLE_NAME}_join.bedgraph"
         awk -v OFS="\t" ' {if($5==0)$4=0}1 ' "${SAMPLE_DIR}/${SAMPLE_NAME}_join.bedgraph" |  awk -v OFS="\t" ' {print $1, $2, $3, $4} ' > "${SAMPLE_DIR}/${SAMPLE_NAME}_peaks_logFE.bedgraph"
         # begraph to bigwig
-        /home/mo/bedGraphToBigWig -unc \
+        # TODO: verify path
+        ${WORK_ROOT}/bedGraphToBigWig -unc \
         "${SAMPLE_DIR}/${SAMPLE_NAME}_peaks_logFE.bedgraph" \
         /group/idea/basenji_yeast/data/references/chrom.sizes \
         "${SAMPLE_DIR}/${SAMPLE_NAME}_peaks_logFE.bw"
