@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from shorkie import config
 
 import os
 import numpy as np
@@ -177,7 +178,7 @@ def plot_ranking_1x4(data_dict, data_types, metric, outdir):
 def main():
     usage = "usage: %prog [options]"
     parser = OptionParser(usage)
-    parser.add_option("--root_dir", dest="root_dir", default="../../..", type="str",
+    parser.add_option("--root_dir", dest="root_dir", default=str(config.path("work_root")), type="str",
                       help="Root directory pointing to Yeast_ML")
     parser.add_option("--out_dir", dest="out_dir", default="results", type="str",
                       help="Output directory prefix")

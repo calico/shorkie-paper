@@ -1,3 +1,4 @@
+from shorkie import config
 import os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -38,7 +39,7 @@ def get_model_params(log_file):
 
 def main():
     parser = argparse.ArgumentParser(description="Compare model variants (subplot)")
-    parser.add_argument("--root_dir", default="../../../Yeast_ML", help="Root directory for Yeast_ML data")
+    parser.add_argument("--root_dir", default=str(config.path("work_root")), help="Root directory for Yeast_ML data")
     parser.add_argument("--out_dir", default="./results", help="Output directory")
     args = parser.parse_args()
 

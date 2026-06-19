@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from shorkie import config
 import os
 import pandas as pd
 import torch
@@ -215,16 +216,16 @@ def main():
         if model == "DREAM_Atten":
             # DREAM-Atten
             MODEL_NAME = "DREAM_Atten"
-            MODEL_LOG_DIR = "../data/MPRA/prixfixe_model_weights/0_0_2_0"
+            MODEL_LOG_DIR = f"{config.path('datasets.mpra')}/prixfixe_model_weights/0_0_2_0"
         elif model == "DREAM_CNN":
             # DREAM-CNN
             MODEL_NAME = "DREAM_CNN"
-            MODEL_LOG_DIR = "../data/MPRA/prixfixe_model_weights/0_1_0_0"
+            MODEL_LOG_DIR = f"{config.path('datasets.mpra')}/prixfixe_model_weights/0_1_0_0"
 
         elif model == "DREAM_RNN":
             # DREAM-RNN
             MODEL_NAME = "DREAM_RNN"
-            MODEL_LOG_DIR = "../data/MPRA/prixfixe_model_weights/0_1_1_0"
+            MODEL_LOG_DIR = f"{config.path('datasets.mpra')}/prixfixe_model_weights/0_1_1_0"
         
         input_sequences_file = "results/output_pos_sequences.tsv"  # generated from previous step
         output_file = f"results/{MODEL_NAME}/final_pos_predictions.tsv"

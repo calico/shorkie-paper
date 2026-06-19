@@ -1,3 +1,4 @@
+from shorkie import config
 from optparse import OptionParser
 import os
 import glob
@@ -216,7 +217,7 @@ def main():
     parser = OptionParser()
     parser.add_option('--model_arch', dest='model_arch', default='unet_small_bert_drop', type='str',
                       help='Model architecture[Default: %default]')
-    parser.add_option('--root_dir', dest='root_dir', default='../../../Yeast_ML', type='str',
+    parser.add_option('--root_dir', dest='root_dir', default=str(config.path("work_root")), type='str',
                       help='Root directory for Yeast_ML data')
     parser.add_option('--out_dir', dest='out_dir', default='./results', type='str',
                       help='Output directory')

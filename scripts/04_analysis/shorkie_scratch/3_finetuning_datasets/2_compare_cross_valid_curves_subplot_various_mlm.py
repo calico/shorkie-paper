@@ -1,3 +1,4 @@
+from shorkie import config
 from optparse import OptionParser
 import os
 import numpy as np
@@ -26,7 +27,7 @@ def _moving_average(x, window_size=1, trim_end=0):
 def main():
     usage = 'usage: %prog [options] arg'
     parser = OptionParser(usage)
-    parser.add_option('--root_dir', dest='root_dir', default='../../../Yeast_ML', type='str',
+    parser.add_option('--root_dir', dest='root_dir', default=str(config.path("work_root")), type='str',
                       help='Root directory for Yeast_ML data')
     parser.add_option('--out_dir', dest='out_dir', default='./results', type='str',
                       help='Output directory')

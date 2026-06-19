@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from shorkie import config
 """
 Refactored Step 2 script that:
 1) Reads the transcript overlaps from Step 1 (0_transcript_fold_overlaps.csv).
@@ -372,7 +373,7 @@ def main():
                       help="Time group to evaluate: e.g. T0, T5, T10, etc.")
     parser.add_option("--root_dir",
                       dest="root_dir",
-                      default="../../..",
+                      default=str(config.path("work_root")),
                       help="Root directory pointing to Yeast_ML paths")
     parser.add_option("--out_dir",
                       dest="out_dir",

@@ -1,3 +1,4 @@
+from shorkie import config
 from optparse import OptionParser
 import os
 import glob
@@ -40,7 +41,7 @@ def parse_all_metrics(log_file, prefix="Epoch "):
 
 def main():
     parser = OptionParser()
-    parser.add_option('--root_dir', dest='root_dir', default='../../../Yeast_ML', type='str',
+    parser.add_option('--root_dir', dest='root_dir', default=str(config.path("work_root")), type='str',
                       help='Root directory for Yeast_ML data')
     parser.add_option('--out_dir', dest='out_dir', default='./results', type='str',
                       help='Output directory')

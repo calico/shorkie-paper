@@ -1,3 +1,4 @@
+from shorkie import config
 import argparse
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -86,7 +87,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Visualize genes in a genomic region using GTF data.")
     parser.add_argument("--region", help="Genomic region (e.g., chr1:1000-5000)", required=True)
     parser.add_argument("--output", help="Output image file (e.g., plot.png)", default="gene_plot.png")
-    parser.add_argument("--root_dir", help="Root directory for Yeast_ML", default="../../..")
+    parser.add_argument("--root_dir", help="Root directory for Yeast_ML", default=str(config.path("work_root")))
     args = parser.parse_args()
 
     root_dir = args.root_dir

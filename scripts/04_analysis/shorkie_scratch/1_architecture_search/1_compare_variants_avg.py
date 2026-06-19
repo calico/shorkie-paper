@@ -1,3 +1,4 @@
+from shorkie import config
 import os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -161,7 +162,7 @@ def plot_multi_model_metric(
 
 def main():
     parser = argparse.ArgumentParser(description="Compare model variants (average)")
-    parser.add_argument("--root_dir", default="../../../Yeast_ML", help="Root directory for Yeast_ML data")
+    parser.add_argument("--root_dir", default=str(config.path("work_root")), help="Root directory for Yeast_ML data")
     parser.add_argument("--out_dir", default="./results", help="Output directory")
     args = parser.parse_args()
 

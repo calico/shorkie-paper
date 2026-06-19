@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from shorkie import config
 import os
 import pandas as pd
 from collections import defaultdict
@@ -32,7 +33,7 @@ import argparse
 
 def main():
     parser = argparse.ArgumentParser(description="Check multi-exon transcript overlaps in sequence folds.")
-    parser.add_argument("--root_dir", default="../../..", help="Root directory pointing to Yeast_ML")
+    parser.add_argument("--root_dir", default=str(config.path("work_root")), help="Root directory pointing to Yeast_ML")
     args = parser.parse_args()
     
     # File paths (update these paths as needed)

@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from shorkie import config
 import os
 import numpy as np
 import pandas as pd
@@ -360,7 +361,7 @@ def main():
                       help="Model architecture name to be used for reading files.")
     parser.add_option("--experiment", dest="experiment", default=None, type="str",
                       help="Experiment type (e.g. exp_histone__chip_exo__rna_seq_no_norm_5215_tracks).")
-    parser.add_option("--root_dir", dest="root_dir", default="../../..", type="str",
+    parser.add_option("--root_dir", dest="root_dir", default=str(config.path("work_root")), type="str",
                       help="Root directory pointing to Yeast_ML")
     parser.add_option("--out_dir", dest="out_dir", default="results", type="str",
                       help="Output directory prefix")

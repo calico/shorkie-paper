@@ -1,8 +1,9 @@
+from shorkie import config
 import argparse
 import pandas as pd
 
 parser = argparse.ArgumentParser(description="Check sequence overlaps in sequence folds.")
-parser.add_argument("--root_dir", default="../../..", help="Root directory pointing to Yeast_ML")
+parser.add_argument("--root_dir", default=str(config.path("work_root")), help="Root directory pointing to Yeast_ML")
 args = parser.parse_args()
 
 # Load the data into a pandas DataFrame
