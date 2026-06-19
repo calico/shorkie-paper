@@ -1,4 +1,5 @@
 """Visualization helpers.
 
-Populated in Phase 1 (e.g. the coverage loader ``load_cov.py``).
+``load_cov`` — BigWig/HDF5 coverage reader (``CovFace``), ``read_coverage`` and
+``seq_norm``.
 """

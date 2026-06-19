@@ -6,13 +6,23 @@ Usage:
   python run_shorkie_variant.py --model_dir /path/to/model_dir
   python run_shorkie_variant.py --model_dir /path/to/model_dir --chrom chrXI --pos 128987 --ref A --alt G --gene YKL152C
 
-All genomic resource paths default to the Salzberg cluster paths.
+The model-loading, sequence-building and logSED helpers now live in the
+installable package (``shorkie.models.ensemble``); this script is a thin CLI
+showcase around them. Install the package with ``pip install -e .`` from the
+repo root, or rely on the src/ fallback below.
 """
 import os, sys, json, argparse
 import numpy as np
 import pysam
-import tensorflow as tf
-from baskerville import seqnn, dna
+
+# Use the shared package implementation; fall back to repo src/ if not installed.
+try:
+    from shorkie.models.ensemble import load_ensemble, make_input, predict, logSED
+except ImportError:
+    import pathlib
+    sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / "src"))
+    from shorkie.models.ensemble import load_ensemble, make_input, predict, logSED
+
 from baskerville import gene as bgene
 
 # ── Default paths (Salzberg cluster) ────────────────────────────────────────
@@ -45,69 +55,6 @@ def parse_args():
     p.add_argument("--fasta_file",   default=DEFAULT_FASTA)
     p.add_argument("--seq_len",      type=int, default=16384)
     return p.parse_args()
-
-
-# ── Sequence helpers ─────────────────────────────────────────────────────────
-
-def fetch_1hot(fasta, chrom, start, end, seq_len):
-    """Fetch DNA window, one-hot encode, pad with N if needed."""
-    seq = ("N" * -start + fasta.fetch(chrom, 0, end)) if start < 0 \
-          else fasta.fetch(chrom, start, end)
-    seq = seq.ljust(seq_len, "N")
-    return dna.dna_1hot(seq).astype("float32")
-
-
-def make_input(fasta, chrom, start, end, seq_len=16384):
-    """
-    Build model input tensor (seq_len, 170):
-      channels 0-3:    DNA one-hot (A/C/G/T)
-      channels 4-169:  species identity (zeros = S. cerevisiae, except col 114 = 1)
-    """
-    seq_len_actual = end - start
-    pad = (seq_len - seq_len_actual) // 2
-    x = fetch_1hot(fasta, chrom, start - pad, end + pad, seq_len)
-    x = tf.Variable(tf.concat([x, tf.zeros((seq_len, 166), dtype=tf.float32)], axis=-1))
-    x[:, 114].assign(tf.ones(seq_len))          # S. cerevisiae species channel
-    return x
-
-
-# ── Model loading ────────────────────────────────────────────────────────────
-
-def load_ensemble(model_dir, params_file, target_index, num_folds):
-    with open(params_file) as f:
-        params = json.load(f)
-    params["model"]["num_features"] = 165 + 5   # species + DNA channels
-
-    models = []
-    for fold in range(num_folds):
-        path = os.path.join(model_dir, "train", f"f{fold}c0", "train", "model_best.h5")
-        print(f"  Loading fold {fold}: {path}")
-        m = seqnn.SeqNN(params["model"])
-        m.restore(path, trunk=False, by_name=False)
-        m.build_slice(target_index)
-        m.build_ensemble(True, [0])
-        models.append(m)
-    return models
-
-
-def predict(models, x):
-    """Average predictions across all fold models."""
-    preds = [m(x[None, ...])[: , None, ...].astype("float32") for m in models]
-    return np.mean(preds, axis=0)   # shape: (1, 1, seq_bins, num_tracks)
-
-
-# ── logSED ───────────────────────────────────────────────────────────────────
-
-def logSED(y_ref, y_alt, gene_slice):
-    """
-    logSED (aggregated) = log2(Σ_alt + 1) - log2(Σ_ref + 1)
-    summed over output bins overlapping the gene body, averaged across tracks.
-    """
-    cov_ref = np.mean(y_ref, axis=(0, 1, 3))   # (seq_bins,)
-    cov_alt = np.mean(y_alt, axis=(0, 1, 3))
-    s_ref = cov_ref[gene_slice].sum()
-    s_alt = cov_alt[gene_slice].sum()
-    return float(np.log2(s_alt + 1) - np.log2(s_ref + 1))
 
 
 # ── Main ─────────────────────────────────────────────────────────────────────
@@ -166,6 +113,7 @@ def main():
         alt_ix = {"A": 0, "C": 1, "G": 2, "T": 3}[args.alt.upper()]
         x_alt  = np.copy(x_ref.numpy())
         x_alt[ci, :4] = 0.; x_alt[ci, alt_ix] = 1.
+        import tensorflow as tf
         x_alt  = tf.constant(x_alt)
     else:
         print(f"WARNING: Variant {pos} is outside the 16kb window [{start}, {end}) for gene {args.gene}.", file=sys.stderr)

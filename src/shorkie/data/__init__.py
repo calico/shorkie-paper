@@ -1,5 +1,6 @@
-"""Dataset-build helpers (BED generation, parallel I/O, FASTA utilities).
+"""Dataset-build helpers.
 
-Populated in Phase 1 by consolidating the 3 copies of ``util.py`` and the
-2 copies of ``bed_helper.py``.
+``util`` — parallel / SLURM / Condor job helpers (was 3 copies of ``util.py``).
+``bed_helper`` — BED interval + exon-mask + sequence-window generation
+(was 2 copies of ``bed_helper.py``).
 """

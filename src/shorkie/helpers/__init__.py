@@ -1,4 +1,5 @@
-"""Sequence / coverage / plotting helpers.
+"""Sequence / coverage / gradient / plotting helpers.
 
-Populated in Phase 1 by consolidating the 9 copies of ``yeast_helpers.py``.
+The consolidated former ``yeast_helpers.py`` (was 9 copies). Import as
+``from shorkie.helpers.yeast_helpers import make_seq_1hot, process_sequence, ...``.
 """
