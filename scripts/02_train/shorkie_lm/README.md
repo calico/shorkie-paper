@@ -1,8 +1,15 @@
-# Model Training
+# Shorkie_LM — language-model pretraining
 
-The script 'train.sh' contains the command used to train the published Borzoi model ensemble.
+`train.sh` contains the command used to pretrain the published **Shorkie_LM** masked
+DNA language model (the `--restore` checkpoint that `Shorkie_finetuned` starts from).
+See [`../README.md`](../README.md) for how the three variants relate.
 
-Notes:
+*Notes:*
 
-- Model training is done through the script 'hound_train.py' from the [baskerville-yeast](https://github.com/calico/baskerville-yeast.git) repository.
-- Training parameters are specified in a .json file that is supplied to the script. The published model's .json can be found [here](gs://calico-khc-transfer/shorkie_models/Shorkie_LM/ ).
+- Training runs through `hound_train.py` from the
+  [baskerville-yeast](https://github.com/calico/baskerville-yeast) submodule
+  (single fold; `loss=mlm`, `mask_rate=0.15`, `use_bert=true`).
+- Trains on the 165_Saccharomycetales corpus (`datasets.lm_train_dir`); GPU required.
+- The published weights + `params.json` are released at `gs://seqnn-share/shorkie_lm/`
+  and catalogued in `data/manifest.json` (fetch with `data/download.sh --models lm`).
+- Run `bash train.sh --dry-run` to print the exact resolved command.

@@ -51,6 +51,9 @@ models:
 datasets:
   supervised_root: ${seq_experiment_root}/exp_histone__chip_exo__rna_seq_no_norm_5215_tracks/16bp
   targets_sheet:   ${datasets.supervised_root}/cleaned_sheet.txt
+  # 8-fold supervised TFRecord dir (hound_data.py output) — the positional data
+  # arg consumed by westminster_train_folds.py for the finetuned + scratch models.
+  supervised_data: ${datasets.supervised_root}/data
   bigwigs:         ${data_root}/bigwigs
   mpra:            ${data_root}/MPRA
   eqtl:            ${data_root}/eQTL
@@ -58,6 +61,11 @@ datasets:
   # Chromosome-holdout split subdir under lm_corpus_root holding the 4 tier dirs
   # (data_{r64,strains,saccharomycetales,fungi_1385}_gtf/) + per-tier species CSVs.
   lm_corpus_split_root: ${datasets.lm_corpus_root}/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI
+  # The 165_Saccharomycetales tier dir (tfrecords/ + statistics.json) the LM trains on
+  # — hound_train.py's --eval_dir and positional data arg. This is the released-corpus
+  # layout; the original training read from an internal seqnn/ensembl_fungi_59_3 staging
+  # path that no longer exists.
+  lm_train_dir: ${datasets.lm_corpus_split_root}/data_saccharomycetales_gtf
 
 # --- External code (in-repo git submodules) ---
 external:

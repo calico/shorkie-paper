@@ -1,22 +1,22 @@
 #!/bin/bash
 
-#SBATCH --job-name=shorkie_finetuned
+#SBATCH --job-name=shorkie_scratch
 #SBATCH -N 1
 #SBATCH --time=72:00:00
 #SBATCH --partition=a100
 #SBATCH --gres=gpu:1
 #SBATCH -A ssalzbe1_gpu
 #SBATCH --mem=20g
-#SBATCH -o shorkie_finetuned.%j.out
+#SBATCH -o shorkie_scratch.%j.out
 #SBATCH --mail-type=start,end
 
-# Shorkie_finetuned: 8-fold supervised ensemble, fine-tuned FROM the Shorkie_LM
-# checkpoint (westminster_train_folds.py --restore). The ONLY differences vs
-# Shorkie_scratch are this --restore flag and a few params.json[train] fields
-# (see scripts/02_train/README.md).
+# Shorkie_scratch: 8-fold supervised ensemble trained FROM RANDOM INIT (ablation
+# baseline; no LM pretraining). Identical data + architecture to Shorkie_finetuned;
+# the ONLY differences are the absence of --restore here (random lecun_normal init)
+# and a few params.json[train] fields (see scripts/02_train/README.md).
 #
 # Submit with `sbatch make_model.sh`, or run portably (no scheduler) via
-#   scripts/common/submit.sh --profile gpu scripts/02_train/shorkie_finetuned/make_model.sh
+#   scripts/common/submit.sh --profile gpu scripts/02_train/shorkie_scratch/make_model.sh
 # Add --dry-run to print the fully-resolved command without launching.
 set -euo pipefail
 
@@ -28,15 +28,14 @@ cfg() { python -c "import sys; from shorkie import config; print(config.get(sys.
 DRY_RUN=0
 [[ "${1:-}" == "--dry-run" ]] && DRY_RUN=1
 
-RESTORE="$(cfg models.shorkie_lm_checkpoint)"   # Shorkie_LM model_best.h5 (the --restore target)
 EVAL_DIR="$(cfg datasets.lm_corpus_split_root)"
 DATA_DIR="$(cfg datasets.supervised_data)"      # 8-fold supervised TFRecords
 
+# NOTE: no --restore (vs shorkie_finetuned) -> weights start from random lecun_normal init.
 CMD=(python "${WESTMINSTER_SCRIPTS}/westminster_train_folds.py"
   --restart
   -f 8
   -e yeast_ml
-  --restore "$RESTORE"
   --eval_dir "${EVAL_DIR}/"
   -o train
   -q a100
