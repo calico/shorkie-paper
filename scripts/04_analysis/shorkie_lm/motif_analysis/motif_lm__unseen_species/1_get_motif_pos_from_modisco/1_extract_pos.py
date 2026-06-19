@@ -52,8 +52,6 @@ def extract_seqlet_positions(h5_filepath):
                         
                         # Check for an optional quality/score dataset
                         scores = None
-                        # print("seqlets_group.keys(): ", seqlets_group.keys())
-                        # print("seqlets_group['contrib_scores']: ", seqlets_group['contrib_scores'])
                         if "score" in seqlets_group:
                             scores = seqlets_group["score"][:]
                         
@@ -80,22 +78,22 @@ def map_seqlet_to_genome(seqlet, bed_entries):
     Genome coordinate = BED start + seqlet offset.
     
     Returns:
-         (chrom, genome_start, genome_end, strand)
+         (chrom, genome_start, genome_end, strand, species_id)
     """
     ex_idx = seqlet["example_idx"]
     # Look up the corresponding BED entry by example_idx
     try:
-        chrom, bed_start, bed_end, label, identifier = bed_entries[ex_idx]
+        chrom, bed_start, bed_end, label, species_id = bed_entries[ex_idx]
     except IndexError:
         raise ValueError(f"Example index {ex_idx} not found in BED entries.")
     
     # Map seqlet relative coordinates to genome coordinates.
-    # (If your sequences were extracted exactly from [bed_start, bed_end), then adding the offset is correct.)
     genome_start = bed_start + seqlet["start"]
     genome_end   = bed_start + seqlet["end"]
-    # If the seqlet was reverse complemented, you may wish to mark it as coming from the negative strand.
+
     strand = "-" if seqlet["is_revcomp"] else "+"
-    return chrom, genome_start, genome_end, strand
+
+    return chrom, genome_start, genome_end, strand, species_id
 
 def map_all_seqlets(h5_filepath, bed_files):
     """
@@ -107,78 +105,67 @@ def map_all_seqlets(h5_filepath, bed_files):
       - pattern_name (e.g., 'pattern_0', 'pattern_1', etc.)
       - seqlet_index (the index of the seqlet within the pattern)
       - example_idx (index in the BED file list)
+      - species_id
       - chrom, genome_start, genome_end, strand
+      - score
     """
     # Read and combine the BED files
     bed_entries = read_bed_files(bed_files)
     print(f"Loaded {len(bed_entries)} BED entries from {len(bed_files)} files.")
     # Extract seqlet positions from the modisco results file
     seqlet_results = extract_seqlet_positions(h5_filepath)
-    # print(f"Extracted seqlet positions for {len(seqlet_results)} pattern types.")
     
     hits = []
     for pattern_type, patterns in seqlet_results.items():
         for pattern_name, seqlets in patterns.items():
             for i, seqlet in enumerate(seqlets):
-                chrom, genome_start, genome_end, strand = map_seqlet_to_genome(seqlet, bed_entries)
+                chrom, genome_start, genome_end, strand, species_id = map_seqlet_to_genome(seqlet, bed_entries)
                 hit = {
                     "pattern_type": pattern_type,
                     "pattern_name": pattern_name,
                     "seqlet_index": i,
                     "example_idx": seqlet["example_idx"],
+                    "species_id": species_id,       # <-- Include species ID
                     "chrom": chrom,
                     "genome_start": genome_start,
                     "genome_end": genome_end,
                     "strand": strand,
-                    "score": seqlet.get("score", None)  # Include hit quality if available
+                    "score": seqlet.get("score", None)  # Include score if available
                 }
                 hits.append(hit)
     return hits
 
 if __name__ == "__main__":
-    # Paths to your modisco results file and the BED files in the same order
-    # modisco_h5 = "${WORK_ROOT}/experiments/motif_LM/saccharomycetales_viz_seq_v1/unet_small_bert_drop/modisco_results.h5"
+    exp_dataset = "schizosaccharomycetales"
+    # exp_dataset = "strains_select"
 
-    # modisco_h5 = "${WORK_ROOT}/experiments/motif_LM/saccharomycetales_viz_seq/unet_small_bert_drop/modisco_results_w500_n5000.h5"
-
-    # modisco_h5 = "${WORK_ROOT}/experiments/motif_LM/saccharomycetales_viz_seq/unet_small_bert_drop/modisco_results_w500_n20000.h5"
-
-    # modisco_h5 = "${WORK_ROOT}/experiments/motif_LM/saccharomycetales_viz_seq/unet_small_bert_drop/modisco_results_w2000_n5000.h5"
-
-    # modisco_h5 = "${WORK_ROOT}/experiments/motif_LM/saccharomycetales_viz_seq/unet_small_bert_drop/modisco_results_w2000_n20000.h5"
-
-    # modisco_h5 = "${WORK_ROOT}/experiments/motif_LM/saccharomycetales_viz_seq/unet_small_bert_drop/modisco_results_w16384_n20000.h5"
-    # modisco_h5 = "${WORK_ROOT}/experiments/motif_LM/saccharomycetales_viz_seq/unet_small_bert_drop_retry_1/modisco_results_w16384_n20000.h5"
-    modisco_h5 = f"{WORK_ROOT}/experiments/motif_LM/saccharomycetales_viz_seq/unet_small_bert_drop_retry_2/modisco_results_w16384_n100000.h5"
-
-    # modisco_h5 = "${WORK_ROOT}/experiments/motif_LM/saccharomycetales_viz_seq/unet_small_bert_drop/modisco_results_w16384_n5000.h5"
-    
-    bed_files = [
-        f"{WORK_ROOT}/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_saccharomycetales_gtf/sequences_train_r64.cleaned.bed",
-        f"{WORK_ROOT}/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_r64_gtf/sequences_test.cleaned.bed",
-        f"{WORK_ROOT}/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_saccharomycetales_gtf/sequences_valid.cleaned.bed"
-    ]
+    if exp_dataset == "schizosaccharomycetales":
+        # Paths to your modisco results file and the BED file
+        modisco_h5 = f"{WORK_ROOT}/experiments/motif_LM__unseen_species/schizosaccharomycetales_viz_seq/unet_small_bert_drop/modisco_results_w_16384_n_1000000.h5"
+        bed_files = [
+            f"{WORK_ROOT}/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_schizosaccharomycetales_gtf_full/sequences_train.cleaned.bed"
+        ]
+    elif exp_dataset == "strains_select":
+        modisco_h5 = f"{WORK_ROOT}/experiments/motif_LM__unseen_species/strains_select_viz_seq/unet_small_bert_drop/modisco_results_w_16384_n_1000000.h5"
+        bed_files = [
+            f"{WORK_ROOT}/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_strains_select_gtf/sequences_train.cleaned.bed"
+        ]
     
     # Map all seqlets to genome coordinates
     hits = map_all_seqlets(modisco_h5, bed_files)
     
-    # For example, print out the first 10 mapped hits
+    # Show a subset of mapped hits, or just summary
     print("Mapped Motif Hits on Yeast Genome:")
-    print("Length of hits: ", len(hits))    
-    count = 0
-    max_example_idx = 0
-    example_idx_set = set()
+    print("Number of hits:", len(hits))    
+    # Get a dictionary of example_idx counts
+    example_idx_counts = {}
+    max_example_id = 0
     for hit in hits:
-    # for hit in hits[:10]:
-        print(f"{hit['chrom']}:{hit['genome_start']}-{hit['genome_end']} "
+        print(f"{hit['species_id']} | {hit['chrom']}:{hit['genome_start']}-{hit['genome_end']} "
               f"(strand {hit['strand']}) | {hit['pattern_type']}/{hit['pattern_name']} "
-              f"example_idx={hit['example_idx']} seqlet_index={hit['seqlet_index']} score={hit.get('score', None)}")
-        
-        count += 1
-        if hit['example_idx'] > max_example_idx:
-            max_example_idx = hit['example_idx']
-        example_idx_set.add(hit['example_idx'])
-    print("Count: ", count)
-    print("Max example_idx: ", max_example_idx)
-    if example_idx_set:
-        print("Max example_idx: ", max(example_idx_set))
+              f"example_idx={hit['example_idx']} seqlet_index={hit['seqlet_index']} "
+              f"score={hit.get('score', None)}")
+        example_idx_counts[hit['example_idx']] = example_idx_counts.get(hit['example_idx'], 0) + 1
+        max_example_id = max(max_example_id, hit['example_idx'])
+    print(f"Max example index: {max_example_id}")
+    # print("Example index counts:", example_idx_counts)

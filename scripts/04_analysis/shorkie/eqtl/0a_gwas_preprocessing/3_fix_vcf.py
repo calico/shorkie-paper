@@ -29,26 +29,26 @@ def main():
         
         if not os.path.exists(intersected_tsv_file):
             continue
-    # Open the VCF file and read the headers
-    with open(intersected_tsv_file, 'r') as file:
-        headers = []
-        for line in file:
-            if line.startswith("##"):
-                headers.append(line.strip())
-            elif line.startswith("#CHROM"):
-                break
+        # Open the VCF file and read the headers
+        with open(intersected_tsv_file, 'r') as file:
+            headers = []
+            for line in file:
+                if line.startswith("##"):
+                    headers.append(line.strip())
+                elif line.startswith("#CHROM"):
+                    break
 
-    # Read the VCF file, skipping the metadata lines (lines starting with '##')
-    vcf_df = pd.read_csv(intersected_tsv_file, sep='\t', comment='#', header=None)
-    # Assuming the VCF columns are in standard order
-    vcf_df.columns = [
-        '#CHROM', 'POS', 'ID', 'REF', 'ALT', 'QUAL', 'FILTER', 'INFO', 'FORMAT'
-    ] + [f'SAMPLE{i+1}' for i in range(vcf_df.shape[1] - 9)]
+        # Read the VCF file, skipping the metadata lines (lines starting with '##')
+        vcf_df = pd.read_csv(intersected_tsv_file, sep='\t', comment='#', header=None)
+        # Assuming the VCF columns are in standard order
+        vcf_df.columns = [
+            '#CHROM', 'POS', 'ID', 'REF', 'ALT', 'QUAL', 'FILTER', 'INFO', 'FORMAT'
+        ] + [f'SAMPLE{i+1}' for i in range(vcf_df.shape[1] - 9)]
 
-    # Map the column values using the dictionary
-    vcf_df['#CHROM'] = vcf_df['#CHROM'].map(chromosome_map)
-    # print("vcf_df['#CHROM']: ", vcf_df['#CHROM'])    
-    vcf_df.sort_values(by=['#CHROM', 'POS'], inplace=True)
+        # Map the column values using the dictionary
+        vcf_df['#CHROM'] = vcf_df['#CHROM'].map(chromosome_map)
+        # print("vcf_df['#CHROM']: ", vcf_df['#CHROM'])    
+        vcf_df.sort_values(by=['#CHROM', 'POS'], inplace=True)
 
         # Save the modified and sorted VCF file with headers
         with open(output_vcf_file, 'w') as file:

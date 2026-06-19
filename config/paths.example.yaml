@@ -18,6 +18,12 @@ release_root: ./data_local
 # Small reference files committed in this repo.
 reference_dir: ${repo_root}/data/R64_annotations
 
+# External motif-database directory (MEME/YeTFaSCo yeast set: merged_meme.meme,
+# merged_meme_high_conf.meme, 3UTR_prob.meme, …). Used by the modisco `report`
+# steps in the motif-analysis pipelines to annotate discovered motifs. Not
+# committed (external download/build) — override for your machine.
+motif_db_dir: /home/kchao10/tools/motif_databases/YEAST
+
 # --- Sub-roots of the work dir (preserve the existing tree structure) ---
 data_root:           ${work_root}/data
 seq_experiment_root: ${work_root}/seq_experiment

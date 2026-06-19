@@ -78,34 +78,34 @@ def main():
             print(f"File not found: {eqtl_file}, skipping {distance_type}")
             continue
 
-    # Read the eQTL data
-    eqtl_df = pd.read_csv(eqtl_file, sep='\t')
-    # Ensure Chr and ChrPos in eQTL DataFrame are of the correct type
-    eqtl_df["ChrPos"] = pd.to_numeric(eqtl_df["ChrPos"],
-            errors='coerce').fillna(0).astype("int64") 
-    eqtl_df["Chr"] = "chromosome" + eqtl_df["Chr"].astype(str)
-    eqtl_df["Chr"] = eqtl_df["Chr"].astype(str)
-    print("eQTL DataFrame:")
+        # Read the eQTL data
+        eqtl_df = pd.read_csv(eqtl_file, sep='\t')
+        # Ensure Chr and ChrPos in eQTL DataFrame are of the correct type
+        eqtl_df["ChrPos"] = pd.to_numeric(eqtl_df["ChrPos"],
+                errors='coerce').fillna(0).astype("int64") 
+        eqtl_df["Chr"] = "chromosome" + eqtl_df["Chr"].astype(str)
+        eqtl_df["Chr"] = eqtl_df["Chr"].astype(str)
+        print("eQTL DataFrame:")
 
-    print("\tlen(eqtl_df): ", len(eqtl_df))   
+        print("\tlen(eqtl_df): ", len(eqtl_df))   
 
-    # Write intersected and unique data to VCF files
-    intersected_tsv_file = f"{output_dir}intersected_data_{distance_type}.tsv"
-    only_eqtl_tsv_file = f"{output_dir}only_eqtl_data_{distance_type}.tsv"
+        # Write intersected and unique data to VCF files
+        intersected_tsv_file = f"{output_dir}intersected_data_{distance_type}.tsv"
+        only_eqtl_tsv_file = f"{output_dir}only_eqtl_data_{distance_type}.tsv"
 
-    # Intersect GVCF DataFrame with eQTL DataFrame on Chr and ChrPos
-    merged_df = pd.merge(eqtl_df, gvcf_df, how="inner", on=["Chr", "ChrPos"])
-    print("Intersected DataFrame (shared between eQTL and GVCF):")
-    print(merged_df.head()) 
-    print("\tlen(merged_df):", len(merged_df))
-    merged_df.to_csv(intersected_tsv_file, sep='\t', index=False)
+        # Intersect GVCF DataFrame with eQTL DataFrame on Chr and ChrPos
+        merged_df = pd.merge(eqtl_df, gvcf_df, how="inner", on=["Chr", "ChrPos"])
+        print("Intersected DataFrame (shared between eQTL and GVCF):")
+        print(merged_df.head()) 
+        print("\tlen(merged_df):", len(merged_df))
+        merged_df.to_csv(intersected_tsv_file, sep='\t', index=False)
 
-    # Find entries only in eQTL DataFrame
-    only_eqtl_df = eqtl_df.merge(gvcf_df, on=["Chr", "ChrPos"], how="left", indicator=True) 
-    only_eqtl_df = only_eqtl_df[only_eqtl_df["_merge"]== "left_only"].drop(columns="_merge") 
-    print("Entries only in eQTL DataFrame (not in GVCF):")
-    print(only_eqtl_df.head())
-    only_eqtl_df.to_csv(only_eqtl_tsv_file, sep='\t', index=False)
+        # Find entries only in eQTL DataFrame
+        only_eqtl_df = eqtl_df.merge(gvcf_df, on=["Chr", "ChrPos"], how="left", indicator=True) 
+        only_eqtl_df = only_eqtl_df[only_eqtl_df["_merge"]== "left_only"].drop(columns="_merge") 
+        print("Entries only in eQTL DataFrame (not in GVCF):")
+        print(only_eqtl_df.head())
+        only_eqtl_df.to_csv(only_eqtl_tsv_file, sep='\t', index=False)
 
         # Write intersected and unique data to VCF files
         intersected_vcf_file = os.path.join(output_dir, f"intersected_data_{distance_type}.vcf")
