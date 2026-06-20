@@ -1,0 +1,6 @@
+panel,metric,reported,reproduced,delta,rtol,atol,verdict
+3C,RNAseq_bin_median_R[Shorkie],0.78,0.7763,-0.0037000000000000366,0.03,0.0,PASS
+3C,"RNAseq_bin_median_R[Random_Init,plain]",0.67,0.6664,-0.0036000000000000476,0.04,0.0,PASS
+3C,direction:Shorkie>Random(bin),1.0,1.0,0.0,0.02,0.0,PASS
+3E,direction:Shorkie>Random(gene),1.0,1.0,0.0,0.02,0.0,PASS
+3G,direction:frac_genes_Shorkie>Random>0.5,1.0,1.0,0.0,0.02,0.0,PASS

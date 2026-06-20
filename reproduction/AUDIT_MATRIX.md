@@ -47,16 +47,16 @@ Package: [`figure_03/`](figure_03/)
 
 | Panel | Claim | Type | Generating script (repo) | Input + config key | GPU | Notebook | Data on disk | Status |
 |---|---|---|---|---|---|---|---|---|
-| A | Shorkie arch (U-Net + 8 transformer blocks + heads) | schem | none (params in `02_train/shorkie_finetuned/params.json`) | `models.shorkie_finetuned` | no | none | n/a | ⬚ |
-| B | β-estradiol induction experimental schematic | schem | none | `datasets.bigwigs` | no | none | n/a | ⬚ |
-| C | Bin-level Pearson R distribution by track type (Shorkie vs Random_Init) | comp | `03_eval/supervised/track_prediction_eval/2_bin_gene_level_metrics/1_bin_level_freq_viz.py` | per-fold `eval/acc.txt` → `results.train_logs` | no | none | present (f0–7) | ⬚ |
-| D | Scatter bin-level R (Random_Init x vs Shorkie y) | comp | `…/2_bin_gene_level_metrics/3_gene_level_score_dist_viz.py` (track level) | `eval/acc.txt` → `results.train_logs` | no | `fig09`(partial) | present | ⬚ |
-| E | Scatter gene-level R | comp | `…/2_bin_gene_level_metrics/3_gene_level_score_dist_viz.py` (gene) | `gene_level_eval_rc/.../gene_acc.txt` → `results.train_logs` | no | `fig09` | present | ⬚ |
-| F | Scatter qnorm mean-centered gene-level R | comp | `…/3_gene_level_score_dist_viz.py` (pearsonr_norm) | `gene_acc.txt` → `results.train_logs` | no | `fig09` | present | ⬚ |
-| G | Gene-by-gene track-level R | comp | `…/2_bin_gene_level_metrics/4_track_level_score_diff_viz.py` | `gene_acc.txt` → `results.train_logs` | no | none | present | ⬚ |
-| H | Coverage chrVII:362,180–366,023 (RPL7A): obs vs Shorkie vs Random_Init | gpu | `…/3_viz_rnaseq_tracks/2_yeast_rna_seq_models.py` | ensemble + bigwig → `models.shorkie_finetuned`,`datasets.bigwigs`,`genome.*` | yes | `fig08` | partial | ⬚ |
-| I | Coverage chrIV:305,657–310,505 (RPS16B,RPL13A) | gpu | same | same | yes | `fig08` | partial | ⬚ |
-| J | Coverage chrVII:495,374–499,965 (EFM5) | gpu | same | same | yes | `fig08` | partial | ⬚ |
+| A | Shorkie arch (U-Net + 8 transformer blocks + heads) | schem | none (params in `02_train/shorkie_finetuned/params.json`) | `models.shorkie_finetuned` | no | none | n/a | ✅ |
+| B | β-estradiol induction experimental schematic | schem | none | `datasets.bigwigs` | no | none | n/a | ⚠️ schem |
+| C | Bin-level Pearson R distribution by track type (Shorkie vs Random_Init) | comp | `03_eval/supervised/track_prediction_eval/2_bin_gene_level_metrics/1_bin_level_freq_viz.py` | per-fold `eval/acc.txt` → `results.train_logs` | no | none | present (f0–7) | ✅ |
+| D | Scatter bin-level R (Random_Init x vs Shorkie y) | comp | `…/2_bin_gene_level_metrics/3_gene_level_score_dist_viz.py` (track level) | `eval/acc.txt` → `results.train_logs` | no | `fig09`(partial) | present | ✅ |
+| E | Scatter gene-level R | comp | `…/2_bin_gene_level_metrics/3_gene_level_score_dist_viz.py` (gene) | `gene_level_eval_rc/.../gene_acc.txt` → `results.train_logs` | no | `fig09` | present | ✅ |
+| F | Scatter qnorm mean-centered gene-level R | comp | `…/3_gene_level_score_dist_viz.py` (pearsonr_norm) | `gene_acc.txt` → `results.train_logs` | no | `fig09` | present | ✅ |
+| G | Gene-by-gene track-level R | comp | `…/2_bin_gene_level_metrics/4_track_level_score_diff_viz.py` | `gene_acc.txt` → `results.train_logs` | no | none | present | ✅ |
+| H | Coverage chrVII:362,180–366,023 (RPL7A): obs vs Shorkie vs Random_Init | gpu | `…/3_viz_rnaseq_tracks/2_yeast_rna_seq_models.py` | ensemble + bigwig → `models.shorkie_finetuned`,`datasets.bigwigs`,`genome.*` | yes | `fig08` | partial | ⚠️ GPU |
+| I | Coverage chrIV:305,657–310,505 (RPS16B,RPL13A) | gpu | same | same | yes | `fig08` | partial | ⚠️ GPU |
+| J | Coverage chrVII:495,374–499,965 (EFM5) | gpu | same | same | yes | `fig08` | partial | ⚠️ GPU |
 
 Anchors: bin-R 0.78 vs 0.67; gene-R 0.88 vs 0.74; Shorkie>Random_Init in 87.8% of genes.
 
