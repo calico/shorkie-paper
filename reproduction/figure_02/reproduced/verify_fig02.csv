@@ -1,0 +1,4 @@
+panel,metric,reported,reproduced,delta,rtol,atol,verdict
+2C,n_TFMoDISco_motifs(>=6),6.0,6.0,0.0,0.0,0.0,PASS
+2D,TF_hits_closer_to_TSS_than_bg,1.0,1.0,0.0,0.0,0.0,PASS
+2E,feature_classes_present,5.0,5.0,0.0,0.0,0.0,PASS
