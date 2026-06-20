@@ -227,3 +227,11 @@ data_local/
 *.fai
 # ...but keep the committed small reference files under data/
 !data/R64_annotations/**
+# Manuscript PDFs: large local reference (~370 MB). The reproduction/ layer is
+# self-contained via its committed published/*.png renders. Un-ignore if you want
+# the figure PDFs in-repo (e.g. !paper/Figures/**).
+paper/
+# Heavy reproduction intermediates (recomputed by reproduction/**/panels/*.sh);
+# small text outputs (.coords/.tab/.nwk) and rendered PNGs are kept.
+reproduction/**/*.delta
+reproduction/**/reproduced/**/*.fasta
