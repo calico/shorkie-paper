@@ -1,0 +1,61 @@
+panel,metric,reported,reproduced,delta,rtol,atol,verdict
+7E,AUROC[Shorkie]==paperFig [Caudal et al.],0.564,0.564,0.0,0.02,0.01,PASS
+7E,AUPRC[Shorkie]==paperFig [Caudal et al.],0.585,0.585,0.0,0.02,0.01,PASS
+7E,AUROC[Shorkie_LM]==paperFig [Caudal et al.],0.513,0.513,0.0,0.02,0.01,PASS
+7E,AUPRC[Shorkie_LM]==paperFig [Caudal et al.],0.532,0.532,0.0,0.02,0.01,PASS
+7E,AUROC[Shorkie_Random_Init]==paperFig [Caudal et al.],0.541,0.541,0.0,0.02,0.01,PASS
+7E,AUPRC[Shorkie_Random_Init]==paperFig [Caudal et al.],0.551,0.551,0.0,0.02,0.01,PASS
+7E,AUROC[DREAM-Atten]==paperFig [Caudal et al.],0.526,0.526,0.0,0.02,0.01,PASS
+7E,AUPRC[DREAM-Atten]==paperFig [Caudal et al.],0.536,0.536,0.0,0.02,0.01,PASS
+7E,AUROC[DREAM-CNN]==paperFig [Caudal et al.],0.529,0.529,0.0,0.02,0.01,PASS
+7E,AUPRC[DREAM-CNN]==paperFig [Caudal et al.],0.537,0.537,0.0,0.02,0.01,PASS
+7E,AUROC[DREAM-RNN]==paperFig [Caudal et al.],0.525,0.525,0.0,0.02,0.01,PASS
+7E,AUPRC[DREAM-RNN]==paperFig [Caudal et al.],0.538,0.538,0.0,0.02,0.01,PASS
+7F,AUROC[Shorkie]==paperFig [Kita et al.],0.65,0.65,0.0,0.02,0.01,PASS
+7F,AUPRC[Shorkie]==paperFig [Kita et al.],0.643,0.643,0.0,0.02,0.01,PASS
+7F,AUROC[Shorkie_LM]==paperFig [Kita et al.],0.523,0.523,0.0,0.02,0.01,PASS
+7F,AUPRC[Shorkie_LM]==paperFig [Kita et al.],0.555,0.555,0.0,0.02,0.01,PASS
+7F,AUROC[Shorkie_Random_Init]==paperFig [Kita et al.],0.641,0.641,0.0,0.02,0.01,PASS
+7F,AUPRC[Shorkie_Random_Init]==paperFig [Kita et al.],0.614,0.614,0.0,0.02,0.01,PASS
+7F,AUROC[DREAM-Atten]==paperFig [Kita et al.],0.534,0.534,0.0,0.02,0.01,PASS
+7F,AUPRC[DREAM-Atten]==paperFig [Kita et al.],0.568,0.568,0.0,0.02,0.01,PASS
+7F,AUROC[DREAM-CNN]==paperFig [Kita et al.],0.539,0.539,0.0,0.02,0.01,PASS
+7F,AUPRC[DREAM-CNN]==paperFig [Kita et al.],0.567,0.567,0.0,0.02,0.01,PASS
+7F,AUROC[DREAM-RNN]==paperFig [Kita et al.],0.533,0.533,0.0,0.02,0.01,PASS
+7F,AUPRC[DREAM-RNN]==paperFig [Kita et al.],0.564,0.564,0.0,0.02,0.01,PASS
+7G,AUROC[Shorkie]==paperFig [Renganaath et al.],0.536,0.536,0.0,0.02,0.01,PASS
+7G,AUPRC[Shorkie]==paperFig [Renganaath et al.],0.555,0.555,0.0,0.02,0.01,PASS
+7G,AUROC[Shorkie_LM]==paperFig [Renganaath et al.],0.491,0.491,0.0,0.02,0.01,PASS
+7G,AUPRC[Shorkie_LM]==paperFig [Renganaath et al.],0.503,0.503,0.0,0.02,0.01,PASS
+7G,AUROC[Shorkie_Random_Init]==paperFig [Renganaath et al.],0.409,0.409,0.0,0.02,0.01,PASS
+7G,AUPRC[Shorkie_Random_Init]==paperFig [Renganaath et al.],0.444,0.444,0.0,0.02,0.01,PASS
+7G,AUROC[DREAM-Atten]==paperFig [Renganaath et al.],0.582,0.582,0.0,0.02,0.01,PASS
+7G,AUPRC[DREAM-Atten]==paperFig [Renganaath et al.],0.589,0.589,0.0,0.02,0.01,PASS
+7G,AUROC[DREAM-CNN]==paperFig [Renganaath et al.],0.593,0.593,0.0,0.02,0.01,PASS
+7G,AUPRC[DREAM-CNN]==paperFig [Renganaath et al.],0.594,0.594,0.0,0.02,0.01,PASS
+7G,AUROC[DREAM-RNN]==paperFig [Renganaath et al.],0.585,0.585,0.0,0.02,0.01,PASS
+7G,AUPRC[DREAM-RNN]==paperFig [Renganaath et al.],0.593,0.593,0.0,0.02,0.01,PASS
+7E,AUROC Shorkie>Shorkie_Random_Init [Caudal et al.],0.5411,0.5639,0.02279999999999993,0.02,0.0,PASS
+7E,AUPRC Shorkie>Shorkie_Random_Init [Caudal et al.],0.5512,0.5846,0.033399999999999985,0.02,0.0,PASS
+7E,AUROC Shorkie>Shorkie_LM [Caudal et al.],0.5126,0.5639,0.05130000000000001,0.02,0.0,PASS
+7E,AUPRC Shorkie>Shorkie_LM [Caudal et al.],0.5319,0.5846,0.05269999999999997,0.02,0.0,PASS
+7F,AUROC Shorkie>Shorkie_Random_Init [Kita et al.],0.6408,0.6502,0.009399999999999964,0.02,0.0,PASS
+7F,AUPRC Shorkie>Shorkie_Random_Init [Kita et al.],0.6138,0.6432,0.02939999999999998,0.02,0.0,PASS
+7F,AUROC Shorkie>Shorkie_LM [Kita et al.],0.5227,0.6502,0.12749999999999995,0.02,0.0,PASS
+7F,AUPRC Shorkie>Shorkie_LM [Kita et al.],0.555,0.6432,0.08819999999999995,0.02,0.0,PASS
+7G,AUROC Shorkie>Shorkie_Random_Init [Renganaath et al.],0.4093,0.5363,0.127,0.02,0.0,PASS
+7G,AUPRC Shorkie>Shorkie_Random_Init [Renganaath et al.],0.4437,0.5553,0.11160000000000003,0.02,0.0,PASS
+7G,AUROC Shorkie>Shorkie_LM [Renganaath et al.],0.4914,0.5363,0.044899999999999995,0.02,0.0,PASS
+7G,AUPRC Shorkie>Shorkie_LM [Renganaath et al.],0.5033,0.5553,0.052000000000000046,0.02,0.0,PASS
+7E,AUROC Shorkie>best-DREAM [Caudal et al.],0.5289,0.5639,0.03499999999999992,0.02,0.0,PASS
+7E,AUPRC Shorkie>best-DREAM [Caudal et al.],0.538,0.5846,0.046599999999999975,0.02,0.0,PASS
+7F,AUROC Shorkie>best-DREAM [Kita et al.],0.5393,0.6502,0.1109,0.02,0.0,PASS
+7F,AUPRC Shorkie>best-DREAM [Kita et al.],0.5677,0.6432,0.07550000000000001,0.02,0.0,PASS
+7H,"frac bins Shorkie>=DREAM-RNN AUROC [Caudal et al., n=5]",1.0,1.0,0.0,0.02,0.0,PASS
+7H,"frac bins Shorkie>=DREAM-RNN AUPRC [Caudal et al., n=5]",1.0,1.0,0.0,0.02,0.0,PASS
+7I,"frac bins Shorkie>=DREAM-RNN AUROC [Kita et al., n=4]",1.0,1.0,0.0,0.02,0.0,PASS
+7I,"frac bins Shorkie>=DREAM-RNN AUPRC [Kita et al., n=4]",1.0,1.0,0.0,0.02,0.0,PASS
+7A,OMA1 SNP logSED<0 (alt reduces expr),0.0,-0.2198,-0.2198,0.02,0.0,PASS
+7J,OMA1 ISM localization (peak/median >= 3x),3.0,5.1,2.0999999999999996,0.02,0.0,PASS
+7B,LAP3 SNP logSED>0 (alt increases expr),0.0,0.2344,0.2344,0.02,0.0,PASS
+7O,LAP3 ISM localization (peak/median >= 3x),3.0,4.91,1.9100000000000001,0.02,0.0,PASS

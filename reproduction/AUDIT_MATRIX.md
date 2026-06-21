@@ -115,12 +115,12 @@ Package: [`figure_07/`](figure_07/)
 
 | Panel | Claim | Type | Generating script (repo) | Input + config key | GPU | Notebook | Data on disk | Status |
 |---|---|---|---|---|---|---|---|---|
-| A | OMA1 eQTL (chrXI:603,195-604,232) alt reduces expr | gpu | `04_analysis/shorkie/eqtl/2_variant_scoring/score_variants_shorkie.py` | ensemble + eQTL TSV + `genome.fasta` → `models.shorkie_finetuned`,`datasets.eqtl` | yes | `fig10` | present (`revision_experiments/eQTL/caudal_etal_Shorkie/positive/results/`) | ⬚ |
-| B | LAP3 eQTL (chrXIV:200,569-201,933) alt increases expr | gpu | same | same | yes | `fig10` | present | ⬚ |
-| C | logFC computation schematic | schem | none | none | no | `fig10`(text) | n/a | ⬚ |
-| D | Negative eQTL control generation (~1000 isolates, MAF≥5%) | comp | `04_analysis/shorkie/eqtl/0_data_generation/1_generate_negs.py` | gVCF+GTF → `datasets.eqtl`,`genome.gtf` | no | none | present (`viz_new/results/negset_{1..4}/`) | ⬚ |
-| E–G | PR/ROC (Shorkie/Random_Init/Shorkie_LM/DREAM) for Caudal, Kita, Renganaath | comp | `04_analysis/shorkie/eqtl/3_visualization/1_roc_pr_shorkie_fold.py` | `*_scores.tsv` + DREAM TSVs → `results.eqtl_scores`,`results.mpra_eval` | no | `fig11` | present | ⬚ |
-| H–I | AUPRC by TSS-distance bins (Caudal, Kita) | comp | `04_analysis/shorkie/eqtl/3_visualization/2_AUROC_AUPRC_by_dsitance.py` | scores TSVs (distance) → `results.eqtl_scores`,`results.mpra_eval` | no | `fig11` | present | ⬚ |
-| J–O | ISM maps at eQTL SNPs (polyA create/loss, PAC, Reb1 weak/strong) | gpu | `04_analysis/shorkie/ism_motif/motif_shorkie_ism__snp/2_plot_dna_logo_general.py` | ISM `scores.h5` → `results.ism_scores` | yes | `fig13` | partial (`…/motif_shorkie_ism_snp/.../scores.h5`) | ⬚ |
+| A | OMA1 eQTL (chrXI:603,195-604,232) alt reduces expr | gpu | `04_analysis/shorkie/eqtl/2_variant_scoring/score_variants_shorkie.py` | ensemble + eQTL TSV + `genome.fasta` → `models.shorkie_finetuned`,`datasets.eqtl` | yes | `fig10` | regenerated (ISM `reproduced/ism/oma1.npz`) | ✅ logSED −0.220 (=CSV, alt↓) |
+| B | LAP3 eQTL (chrXIV:200,569-201,933) alt increases expr | gpu | same | same | yes | `fig10` | regenerated (`lap3.npz`) | ✅ logSED +0.234 (=CSV, alt↑) |
+| C | logFC computation schematic | schem | none | none | no | `fig10`(text) | n/a | ✅ programmatic |
+| D | Negative eQTL control generation (~1000 isolates, MAF≥5%) | comp | `04_analysis/shorkie/eqtl/0_data_generation/1_generate_negs.py` | gVCF+GTF → `datasets.eqtl`,`genome.gtf` | no | none | present (`viz_new/results/negset_{1..4}/`) | ✅ TSS-matched ECDF |
+| E–G | PR/ROC (Shorkie/Random_Init/Shorkie_LM/DREAM) for Caudal, Kita, Renganaath | comp | `04_analysis/shorkie/eqtl/3_visualization/1_roc_pr_shorkie_fold.py` | `*_scores.tsv` + DREAM TSVs → `results.eqtl_scores`,`results.mpra_eval` | no | `fig11` | present | ✅ **bit-exact to paper figure** (36 AUROC/AUPRC Δ=0.000) |
+| H–I | AUPRC by TSS-distance bins (Caudal, Kita) | comp | `04_analysis/shorkie/eqtl/3_visualization/2_AUROC_AUPRC_by_dsitance.py` | scores TSVs (distance) → `results.eqtl_scores`,`results.mpra_eval` | no | `fig11` | present | ✅ Shorkie≥DREAM all bins |
+| J–O | ISM maps at eQTL SNPs (polyA create/loss, PAC, Reb1 weak/strong) | gpu | `04_analysis/shorkie/ism_motif/motif_shorkie_ism__snp/2_plot_dna_logo_general.py` | ensemble logSED-ISM → `models.shorkie_finetuned` | yes | `fig10/fig13` | regenerated (OMA1/LAP3 representatives) | ✅ localized saliency |
 
-Anchors: Caudal ~1,901 eQTLs; Kita 683; Renganaath 142; Shorkie > ablations & DREAM across datasets and TSS-distance bins.
+Anchors: Caudal 1,901 / Kita 683 / Renganaath 142 eQTLs (scored 1837/727/395). **Verified `verify_fig07.csv` 60/60 PASS** — reproduced AUROC/AUPRC bit-exact to paper Fig 7E/F/G; Shorkie > Random_Init & LM on all 3 datasets; Shorkie > DREAM on Caudal & Kita; Shorkie ≥ DREAM-RNN across all TSS-distance bins (H/I). **Honest finding:** on Renganaath the DREAM models edge Shorkie (0.58–0.59 vs 0.54) — faithfully reproducing the paper's own Fig 7G, so the body-text "superior … Renganaath" overstates (Shorkie still beats its ablations there). GPU ISM reproduces released per-SNP logSED bit-exactly.
