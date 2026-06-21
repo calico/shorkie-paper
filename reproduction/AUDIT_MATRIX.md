@@ -96,15 +96,17 @@ Package: [`figure_06/`](figure_06/)
 
 | Panel | Claim | Type | Generating script (repo) | Input + config key | GPU | Notebook | Data on disk | Status |
 |---|---|---|---|---|---|---|---|---|
-| A | MPRA insertion schematic (100–200 bp upstream, 10 bp steps) | schem | none | none | no | none | n/a | ⬚ |
-| B | AUROC high vs low expr × insertion site (3 quantile groups) | comp | `04_analysis/shorkie/mpra/4_mpra_high_low_seq/5_MPRA_classifier_avg.py` | NPZ → `results.mpra_viz` | no | `fig12` | partial | ⬚ |
-| C | AUPRC same | comp | same | `results.mpra_viz` | no | `fig12` | partial | ⬚ |
-| D | Shorkie logSED vs measured (native; r=0.644, ρ=0.660) | comp | `04_analysis/shorkie/mpra/5_mpra_viz/MPRA_scatter_regression_single.py` | NPZ + `data/MPRA/filtered_test_data_with_MAUDE_expression.txt` → `results.mpra_viz`,`datasets.mpra` | no | `fig12` | present | ⬚ |
-| E | Same, challenging sequences | comp | same | `results.mpra_viz` | no | `fig12` | partial | ⬚ |
-| F | SNV variant set (ref vs alt) | comp | `04_analysis/shorkie/eqtl/2_variant_scoring/` + `ism_motif/motif_shorkie_ism__snp/` | `results.eqtl_scores`/`results.mpra_eval` | no | none | partial | ⬚ |
-| G | Motif perturbations (dual-seq) | comp | `04_analysis/shorkie/eqtl/2_variant_scoring/` | `results.eqtl_scores` | no | none | partial | ⬚ |
-| H | Motif tiling constructs | comp | `04_analysis/shorkie/eqtl/2_variant_scoring/` | `results.eqtl_scores` | no | none | partial | ⬚ |
-| I | Endogenous RNA-seq coverage (Shorkie vs DREAM-RNN) — domain specificity | heavy/gpu | `mpra/2_hound_mpra_run/` + `MPRA_RNASeq/8_Shorkie_scatter_plot_bigwig.py` | `datasets.bigwigs` | yes | none | present | ⬚ |
+| A | MPRA insertion schematic (100–200 bp upstream, 10 bp steps) | schem | none (programmatic) | none | no | none | n/a | ✅ |
+| B | AUROC high vs low expr × insertion site (3 quantile groups) | comp | `scores_avg/7_MPRA_classifier_avg.py` | NPZ → `results.mpra_viz` | no | `fig12` | present (high/low) | ✅ mean **0.9988**>0.95 |
+| C | AUPRC same | comp | same | `results.mpra_viz` | no | `fig12` | present | ✅ mean **0.9988**>0.95 |
+| D | Shorkie logSED vs measured (native; r=0.644, ρ=0.660) | comp | `scores_avg/8_MPRA_avg.py` | NPZ + `data/MPRA/filtered_test_data_with_MAUDE_expression.txt` → `results.mpra_viz`,`datasets.mpra` | no | `fig12` | present | ✅ R=**0.644** (manuscript ~0.70 — see README) |
+| E | Same, challenging sequences | comp | same | `results.mpra_viz` | no | `fig12` | **NPZ absent** | ⚠️ gap (challenging/random NPZ not released) |
+| F | SNV variant set (ref vs alt) | comp | `eQTL_MPRA_models_ISM/0_ref_alt_score_difference.py` | `datasets.mpra` (input CSVs present) | yes | none | input only | ⚠️ gap (GPU scoring; anchor 0.54) |
+| G | Motif perturbations (dual-seq) | comp | same | `datasets.mpra` | yes | none | input only | ⚠️ gap (GPU; anchor 0.82) |
+| H | Motif tiling constructs | comp | same | `datasets.mpra` | yes | none | input only | ⚠️ gap (GPU; anchor 0.56) |
+| I | Endogenous RNA-seq coverage (Shorkie vs DREAM-RNN) — domain specificity | comp | `MPRA_RNASeq/` | DREAM preds + density viz → `results.mpra_viz` | no | none | present | ✅ predictions+density rendered |
+
+**Status: Figure 6 ✅ CPU panels reproduced + verified** (`reproduce_figure_06.ipynb`, `verify_fig06.csv` **7/7 PASS**): A schematic, B/C AUROC&AUPRC **0.9988**>0.95, D native R **0.644** (matches fig12; manuscript ~0.70 documented), I Shorkie-vs-DREAM coverage. **Documented gaps:** E (challenging/random NPZ not released), F/G/H (dual-seq ref−alt need GPU scoring — inputs present, anchors 0.54/0.82/0.56 recorded).
 
 ---
 
