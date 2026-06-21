@@ -110,10 +110,10 @@ results:
   modisco_lm:     ${experiments_root}/motif_LM/saccharomycetales_viz_seq
   # Cross-species LM tfmodisco: <key>/<tier>_viz_seq/<arch>/modisco_results_w_16384_n_1000000.h5  (.../motif_lm__unseen_species/)
   modisco_unseen: ${experiments_root}/motif_LM__unseen_species
-  # Shorkie ISM tfmodisco: <key>/<exp>/f0c0/logSED/modisco_results_10000_500.h5  (.../ism_motif/motif_shorkie__RP_TSS/2_modisco_analysis/)
-  modisco_ism:    ${experiments_root}/motif_LM_fine_tuned_RP_TSS/1_modisco_analysis
-  # Shorkie ISM score .h5 (RP/TSS genes)  (.../ism_motif/motif_shorkie__RP_TSS/)
-  ism_scores:     ${experiments_root}/motif_LM_fine_tuned_RP_TSS
+  # Shorkie ISM tfmodisco: <key>/gene_exp_motif_test_{RP,TSS}/f0c0/logSED/modisco_results_10000_500.h5
+  modisco_ism:    ${experiments_root}/SUM_data_process/motifs/motif_shorkie_RP_TSS/1_modisco_analysis
+  # Shorkie/Random_Init ISM score .h5 (RP/RRB/SS genes): <key>/motif_{shorkie,random_init}_RP_TSS/gene_exp_motif_test_{RP,RRB_targets,SS}/f0c0/part*/scores.h5
+  ism_scores:     ${experiments_root}/SUM_data_process/motifs
   # Promoter LM embeddings (embeddings_LM_sequence/embeddings_chr*.h5) + UMAP coords  (.../UMAP_cluster_promoter/)
   umap:           ${experiments_root}/UMAP_cluster_promoter
   # Precomputed attention tensors — optional; fig06 instead recomputes from models.shorkie_lm  (.../attention_map/)

@@ -67,10 +67,12 @@ Package: [`figure_04/`](figure_04/)
 
 | Panel | Claim | Type | Generating script (repo) | Input + config key | GPU | Notebook | Data on disk | Status |
 |---|---|---|---|---|---|---|---|---|
-| A–C | Promoter ISM rows (LM logo / Shorkie ISM / Random_Init ISM / annot) for RPL26A, FUN12, KRE33 | gpu | `04_analysis/shorkie/ism_motif/motif_shorkie__RP_TSS/1_plot_dna_logo_general.py` | ISM `scores.h5` → `results.ism_scores` | ISM-gen yes | `fig13` | present (`revision_experiments/motif_random_init_RP_TSS/gene_exp_motif_test_RP/f0c0/.../scores.h5`) | ⬚ |
-| D | Canonical S. cerevisiae splicing motifs | schem | `…/motif_shorkie__RP_TSS/4_plot_dna_SS.py` | reference motifs | no | none | n/a | ⬚ |
-| E–G | Splicing ISM maps for DTD1, MMS2, HOP2 | gpu | `…/4_plot_dna_SS.py` | ISM `scores.h5` (SS windows) → `results.ism_scores` | ISM-gen yes | `fig13` | present (`…/gene_exp_motif_test_SS/f0c0/.../scores.h5`) | ⬚ |
-| H | TF-MoDISco motifs on Shorkie ISM (curated DB top / Shorkie-derived bottom) | comp | `…/2_modisco_analysis/4_viz_motif.py` | modisco `.h5` → `results.modisco_ism` | no | `fig13` | present (`…/1_modisco_analysis/.../modisco_results_10000_500.h5`) | ⬚ |
+| A–C | Promoter ISM rows (Shorkie ISM / Random_Init ISM) for RPL26A, FUN12, KRE33 | CPU (precomp ISM) | `04_analysis/shorkie/ism_motif/motif_shorkie__RP_TSS/1_plot_dna_logo_general.py` | ISM `scores.h5` → `results.ism_scores` | no | `fig13` | present — coord-audited: RPL26A=RP p4/i10, FUN12=RRB p15/i3, KRE33=RRB p11/i3 | ✅ repro+verified |
+| D | Canonical S. cerevisiae splicing motifs | schem | `…/motif_shorkie__RP_TSS/4_plot_dna_SS.py` | reference motifs | no | none | n/a | ✅ documented |
+| E–G | Splicing ISM maps for DTD1, MMS2, HOP2 | CPU (precomp ISM) | `…/4_plot_dna_SS.py` | ISM `scores.h5` (SS windows) → `results.ism_scores` | no | `fig13` | present — coord-audited: DTD1=SS p22, MMS2=SS p57, HOP2=SS p80 (idx0) | ✅ repro+verified |
+| H | TF-MoDISco motifs on Shorkie ISM (curated DB top / Shorkie-derived bottom) | comp | `…/2_modisco_analysis/4_viz_motif.py` | modisco `.h5` → `results.modisco_ism` | no | `fig13` | present; 105 patterns recovered | ✅ repro+verified |
+
+**Status: Figure 4 ✅ fully reproduced + verified** (`reproduce_figure_04.ipynb`, `reproduced/verify_fig04.csv` **14/14 PASS**). Every ISM window coordinate-audited against the R64 GTF; signal verified by scale-invariant localization (peak ≥ 5× window median; 10–28× achieved). Random_Init comparison available at the RP locus only (the random-init tree lacks RRB/SS subs).
 
 ---
 

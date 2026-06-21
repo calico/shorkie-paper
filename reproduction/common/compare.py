@@ -18,10 +18,11 @@ import math
 class Check:
     panel: str          # e.g. "1G"
     metric: str         # e.g. "perplexity_gene_165_Saccharomycetales"
-    reported: float     # value stated in the manuscript
+    reported: float     # value stated in the manuscript (or the threshold, for ge/gt/le modes)
     reproduced: float   # value we recomputed
-    rtol: float = 0.02  # relative tolerance (2% default)
-    atol: float = 0.0   # absolute tolerance
+    rtol: float = 0.02  # relative tolerance (2% default; approx mode only)
+    atol: float = 0.0   # absolute tolerance (approx; also slack for ge/le)
+    mode: str = "approx"  # "approx" (|Δ|<=tol) | "ge" (>= reported) | "gt" | "le" (<= reported)
 
     @property
     def delta(self) -> float:
@@ -33,21 +34,27 @@ class Check:
             return "MISSING"
         if any(map(lambda v: v is not None and math.isnan(v), [self.reported, self.reproduced])):
             return "MISSING"
+        if self.mode == "ge":
+            return "PASS" if self.reproduced >= self.reported - self.atol else "FAIL"
+        if self.mode == "gt":
+            return "PASS" if self.reproduced > self.reported else "FAIL"
+        if self.mode == "le":
+            return "PASS" if self.reproduced <= self.reported + self.atol else "FAIL"
         tol = self.atol + self.rtol * abs(self.reported)
         return "PASS" if abs(self.delta) <= tol else "FAIL"
 
 
 def write_verdicts(checks: list[Check], out_csv: Path) -> Path:
     out_csv.parent.mkdir(parents=True, exist_ok=True)
+    fields = ["panel", "metric", "reported", "reproduced", "delta", "rtol", "atol", "verdict"]
     rows = []
     for c in checks:
-        d = asdict(c)
+        d = {k: getattr(c, k) for k in ("panel", "metric", "reported", "reproduced", "rtol", "atol")}
         d["delta"] = c.delta
         d["verdict"] = c.verdict
         rows.append(d)
     with open(out_csv, "w", newline="") as f:
-        w = csv.DictWriter(f, fieldnames=["panel", "metric", "reported",
-                                          "reproduced", "delta", "rtol", "atol", "verdict"])
+        w = csv.DictWriter(f, fieldnames=fields)
         w.writeheader()
         w.writerows(rows)
     n_pass = sum(1 for c in checks if c.verdict == "PASS")
