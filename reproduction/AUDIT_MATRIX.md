@@ -76,19 +76,18 @@ Package: [`figure_04/`](figure_04/)
 
 ---
 
-## Figure 5 — Time-course stress-responsive TF induction  ⚠️ NO existing notebook (largest gap)
-Package: [`figure_05/`](figure_05/)
+## Figure 5 — Time-course stress-responsive TF induction
+Package: [`figure_05/`](figure_05/) — **built this pass** (was the largest gap; no prior topic notebook). All panels **CPU** (precomputed ISM).
 
-| Panel | Claim | Type | Generating script (repo) | Input + config key | GPU | Notebook | Data on disk | Status |
-|---|---|---|---|---|---|---|---|---|
-| A | MSN2@ATG42 (chrII:515,214-714) ISM logos × 7 time points | comp/gpu | `04_analysis/shorkie/ism_motif/motif_shorkie__RP_TSS/3_timepoint_analysis/0_timepoint_viz_scores_h5.py` | `…/2_timepoint_analysis/gene_exp_motif_test_MSN2_targets/f0c0/part*/scores.h5` (`results.ism_scores`) | ISM-gen yes | none | present (T0–T90) | ⬚ |
-| B | MSN2 exp vs predicted fold-change/time | comp | `…/3_timepoint_analysis/1_timepoint_viz_scores_h5_diff.py` | same scores.h5 | no | none | present | ⬚ |
-| C | MSN2 pairwise Euclidean-dist heatmap | comp | `…/3_timepoint_analysis/2_timepoint_viz_scores_h5_pairwise.py` | same scores.h5 | no | none | present | ⬚ |
-| D | MSN2 ΔT TF-MoDISco motifs | comp | `…/3_timepoint_analysis/modisco_analysis/4_viz_motif.py` | `…/modisco_results_10000_500_diff.h5` (7 T) | no | none | present | ⬚ |
-| E | MSN2 normalized Pearson-R boxplot/time | comp | `…/3_timepoint_analysis/0_timepoint_viz_scores_h5.py` | scores.h5 | no | none | present | ⬚ |
-| F–J | MSN4@TSL1 (chrXIII:70,173-673), analogous to A–E | comp/gpu | same scripts (MSN4 targets) | `…/gene_exp_motif_test_MSN4_targets/...` | ISM-gen yes | none | present | ⬚ |
+| Panel | Claim (verified caption) | Generating script (repo) | Input + config key | Status |
+|---|---|---|---|---|
+| A/F | Shorkie ISM logos × 7 timepoints (MSN2@ATG42 / MSN4@TSL1) | `…/3_timepoint_analysis/1_timepoint_viz_scores_h5_diff.py` | `gene_exp_motif_test_{MSN2,MSN4}_targets/.../scores.h5` (`results.ism_scores`) | ✅ 5F (TSL1) reproduced; ⚠️ 5A (ATG42) **not in released MSN2 set** → representative shown |
+| B/G | exp vs predicted fold-change at the locus / time | `motif_shorkie_time_series/1_time_track_metrics_viz.py` | `gene_target_preds/f0c0/RNA-Seq/*.tsv` | ✅ re-run (global ΔlogFC R 0.4949/0.3992 exact) |
+| C/H | pairwise Euclidean-distance heatmap of ISM logos | `…/3_timepoint_analysis/2_timepoint_viz_scores_h5_pairwise.py` | same scores.h5 | ✅ 5H (TSL1) monotone divergence; 5C representative |
+| D/I | ΔT TF-MoDISco motifs | `…/2_timepoint_analysis/modisco_analysis` | `modisco_results_10000_500_diff.h5` (per T) | ✅ rendered (20 / 10 patterns) |
+| E/J | **normalized Pearson R boxplot across all genes / time** | `1_time_track_metrics_viz.py` (`pearsonr_norm`) | same TSVs | ✅ **median 0.591 / 0.618 ∈ [0.55,0.65]** |
 
-Anchors: MSN2 genome-wide R 0.55–0.65; MSN4 0.45–0.70.
+**Status: Figure 5 ✅ reproduced + verified** (`reproduce_figure_05.ipynb`, `verify_fig05.csv` **8/8 PASS**). Headline anchor (normalized R 0.55–0.65) reproduced exactly. Honest gap: the per-locus ATG42 (chrII:515,214–515,714) ISM `scores.h5` is not in the released artifacts (5A/5C shown via a representative MSN2 target); MSN4@TSL1 reproduced at the exact published locus.
 
 ---
 
