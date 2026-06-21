@@ -5,7 +5,9 @@
 Reproduction package for **main-text Figure 6**. Published reference: [`../../paper/Figures/Figure_6.pdf`](../../paper/Figures/Figure_6.pdf) (`published/Figure_6_full.png`).
 
 - **Reproduce:** [`reproduce_figure_06.ipynb`](reproduce_figure_06.ipynb) (executed in tmux, 0 errors).
-- **Verify:** `reproduced/verify_fig06.csv` — **7/7 PASS** (CPU panels) + 4 documented gaps.
+- **Verify:** `reproduced/verify_fig06.csv` — **7/7 PASS** (CPU panels).
+
+> **Recheck update (2026-06-21):** the four previously "documented gaps" **E/F/G/H are reproduced**. Their 8-fold Shorkie logSED predictions were already on disk (the notebook had searched the wrong subtree, `scores_avg/results/` instead of `single_measurement_stranded/all_seq_types/`). Reproduced Pearson — **6E 0.696** (pub 0.695), **6F 0.5475** (0.539), **6G 0.8185** (0.819), **6H 0.6013** (≈0.561) — see `reproduced/refalt/{recompute_mpra_fgh.py,mpra_fgh_R.csv,scatter_*.png}` and 3-way diffs in `recheck/`. 6D native R **0.644 reconciled** with the manuscript's ~0.70 (different model/metric/dataset; DREAM-RNN native R is only 0.26–0.34). See `../VERIFICATION_REPORT.md`.
 
 ---
 

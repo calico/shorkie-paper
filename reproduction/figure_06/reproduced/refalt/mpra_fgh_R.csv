@@ -1,0 +1,5 @@
+panel,seq_type,pearson_repro,spearman_repro,n,published_pearson,delta
+6F,all_SNVs_seqs,0.5475,0.4029,999,0.539,0.0085
+6G,motif_perturbation,0.8185,0.7275,1000,0.819,-0.0005
+6H,motif_tiling_seqs,0.6013,0.5774,1000,0.561,0.0403
+6E,challenging_seqs,0.6960,0.6977,800,0.695,0.0010

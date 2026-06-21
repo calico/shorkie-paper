@@ -1,0 +1,17 @@
+tree,model,column,RNAseq_pooled_median,RNAseq_perfold_median_then_mean,n_genes_pooled
+ORIGINAL,Shorkie,pearsonr,0.9178,0.9179,6515
+ORIGINAL,Shorkie,pearsonr_gene,0.7712,0.7702,3958
+ORIGINAL,Shorkie,pearsonr_norm,0.5162,0.5163,6525
+ORIGINAL,Shorkie,pearsonr_gene_norm,0.2316,0.2328,6222
+ORIGINAL,Random_Init,pearsonr,0.9136,0.9135,6515
+ORIGINAL,Random_Init,pearsonr_gene,0.6273,0.6298,3958
+ORIGINAL,Random_Init,pearsonr_norm,0.4676,0.4678,6526
+ORIGINAL,Random_Init,pearsonr_gene_norm,0.2298,0.2298,6222
+ALT,Shorkie,pearsonr,0.9255,0.9254,6515
+ALT,Shorkie,pearsonr_gene,0.7825,0.7822,3960
+ALT,Shorkie,pearsonr_norm,0.5456,0.5450,6526
+ALT,Shorkie,pearsonr_gene_norm,0.2616,0.2648,6222
+ALT,Random_Init,pearsonr,0.9070,0.9071,6515
+ALT,Random_Init,pearsonr_gene,0.5436,0.5400,3960
+ALT,Random_Init,pearsonr_norm,0.4373,0.4342,6526
+ALT,Random_Init,pearsonr_gene_norm,0.1999,0.1982,6222

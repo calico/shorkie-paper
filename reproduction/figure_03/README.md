@@ -47,4 +47,6 @@ Figure 3 establishes that LM-pretrained **Shorkie** beats the from-scratch **Sho
 
 The qualitative claim (**LM pretraining improves coverage prediction; Shorkie > Random_Init**) is robustly reproduced; the exact gene-level magnitudes depend on the original analysis's gene-filtering/checkpoint and are documented rather than forced.
 
+> **Recheck update (2026-06-21):** 3E gene-R magnitude is now resolved — panel **3E = 0.88 reproduces to 0.8799** (median over genes of the per-gene-mean `pearsonr` pooled across all 4 track groups × 8 folds; the "0.84" above was a narrower glob). Panels **3H–J coverage are reproduced**: a first run flat-lined the Random_Init track to `ln 2 ≈ 0.693` (a cross-architecture Keras weight-restore collision — the 170-feature Shorkie loaded first corrupts the 4-feature Random_Init restore in the same process), fixed by loading **one model per process** (`panels/run_coverage.py`). Result: R(Shorkie,obs) 0.96–0.99, R(Random_Init,obs) 0.85–0.97 at the held-out fold per locus. See `../VERIFICATION_REPORT.md`.
+
 **Changes to legacy scripts:** none edited; the script's `supervised_…_variants/learning_rate_0.0005` Random_Init path is used as-is, with the plain baseline additionally computed because it matches the published 0.67 bin anchor.

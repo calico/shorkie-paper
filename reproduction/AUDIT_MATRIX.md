@@ -54,11 +54,13 @@ Package: [`figure_03/`](figure_03/)
 | E | Scatter gene-level R | comp | `…/2_bin_gene_level_metrics/3_gene_level_score_dist_viz.py` (gene) | `gene_level_eval_rc/.../gene_acc.txt` → `results.train_logs` | no | `fig09` | present | ✅ |
 | F | Scatter qnorm mean-centered gene-level R | comp | `…/3_gene_level_score_dist_viz.py` (pearsonr_norm) | `gene_acc.txt` → `results.train_logs` | no | `fig09` | present | ✅ |
 | G | Gene-by-gene track-level R | comp | `…/2_bin_gene_level_metrics/4_track_level_score_diff_viz.py` | `gene_acc.txt` → `results.train_logs` | no | none | present | ✅ |
-| H | Coverage chrVII:362,180–366,023 (RPL7A): obs vs Shorkie vs Random_Init | gpu | `…/3_viz_rnaseq_tracks/2_yeast_rna_seq_models.py` | ensemble + bigwig → `models.shorkie_finetuned`,`datasets.bigwigs`,`genome.*` | yes | `fig08` | partial | ⚠️ GPU |
-| I | Coverage chrIV:305,657–310,505 (RPS16B,RPL13A) | gpu | same | same | yes | `fig08` | partial | ⚠️ GPU |
-| J | Coverage chrVII:495,374–499,965 (EFM5) | gpu | same | same | yes | `fig08` | partial | ⚠️ GPU |
+| H | Coverage chrVII:362,180–366,023 (RPL7A): obs vs Shorkie vs Random_Init | gpu | `…/3_viz_rnaseq_tracks/2_yeast_rna_seq_models.py` → `figure_03/panels/run_coverage.py` | ensemble + bigwig → `models.shorkie_finetuned`,`datasets.bigwigs`,`genome.*` | yes | `fig08` | reproduced (fold 3) | ✅ R(Shorkie,obs)=0.99 / R(Rand,obs)=0.97 |
+| I | Coverage chrIV:305,657–310,505 (RPS16B,RPL13A) | gpu | same | same | yes | `fig08` | reproduced (fold 3) | ✅ R=0.96 / 0.96 |
+| J | Coverage chrVII:495,374–499,965 (EFM5) | gpu | same | same | yes | `fig08` | reproduced (fold 6) | ✅ R=0.98 / 0.85 |
 
 Anchors: bin-R 0.78 vs 0.67; gene-R 0.88 vs 0.74; Shorkie>Random_Init in 87.8% of genes.
+
+**Recheck update (2026-06-21):** 3E gene-R **0.88 reproduced to 0.8799** (all-groups `pearsonr` median; the earlier "0.84" was a narrower-glob artifact). 3H–J coverage **reproduced** after fixing a cross-architecture Keras weight-restore collision that had flat-lined the Random_Init model to the softplus floor (one-model-per-process fix). See `VERIFICATION_REPORT.md`.
 
 ---
 
@@ -100,13 +102,15 @@ Package: [`figure_06/`](figure_06/)
 | B | AUROC high vs low expr × insertion site (3 quantile groups) | comp | `scores_avg/7_MPRA_classifier_avg.py` | NPZ → `results.mpra_viz` | no | `fig12` | present (high/low) | ✅ mean **0.9988**>0.95 |
 | C | AUPRC same | comp | same | `results.mpra_viz` | no | `fig12` | present | ✅ mean **0.9988**>0.95 |
 | D | Shorkie logSED vs measured (native; r=0.644, ρ=0.660) | comp | `scores_avg/8_MPRA_avg.py` | NPZ + `data/MPRA/filtered_test_data_with_MAUDE_expression.txt` → `results.mpra_viz`,`datasets.mpra` | no | `fig12` | present | ✅ R=**0.644** (manuscript ~0.70 — see README) |
-| E | Same, challenging sequences | comp | same | `results.mpra_viz` | no | `fig12` | **NPZ absent** | ⚠️ gap (challenging/random NPZ not released) |
-| F | SNV variant set (ref vs alt) | comp | `eQTL_MPRA_models_ISM/0_ref_alt_score_difference.py` | `datasets.mpra` (input CSVs present) | yes | none | input only | ⚠️ gap (GPU scoring; anchor 0.54) |
-| G | Motif perturbations (dual-seq) | comp | same | `datasets.mpra` | yes | none | input only | ⚠️ gap (GPU; anchor 0.82) |
-| H | Motif tiling constructs | comp | same | `datasets.mpra` | yes | none | input only | ⚠️ gap (GPU; anchor 0.56) |
+| E | Same, challenging sequences | comp | `MPRA_scatter_regression_single.py` → `figure_06/.../refalt/recompute_mpra_fgh.py` | on-disk Shorkie logSED NPZ | no | none | **present** (`single_measurement_stranded/all_seq_types/`) | ✅ Pearson **0.696** (=0.695) |
+| F | SNV variant set (ref vs alt) | comp | `MPRA_scatter_regression_dual_trim.py` → `refalt/recompute_mpra_fgh.py` | on-disk Shorkie logSED NPZ | no | none | **present** | ✅ Pearson **0.5475** (=0.539) |
+| G | Motif perturbations (dual-seq) | comp | same | NPZ present | no | none | **present** | ✅ Pearson **0.8185** (=0.819) |
+| H | Motif tiling constructs | comp | same | NPZ present | no | none | **present** | ✅ Pearson **0.6013** (≈0.561) |
 | I | Endogenous RNA-seq coverage (Shorkie vs DREAM-RNN) — domain specificity | comp | `MPRA_RNASeq/` | DREAM preds + density viz → `results.mpra_viz` | no | none | present | ✅ predictions+density rendered |
 
-**Status: Figure 6 ✅ CPU panels reproduced + verified** (`reproduce_figure_06.ipynb`, `verify_fig06.csv` **7/7 PASS**): A schematic, B/C AUROC&AUPRC **0.9988**>0.95, D native R **0.644** (matches fig12; manuscript ~0.70 documented), I Shorkie-vs-DREAM coverage. **Documented gaps:** E (challenging/random NPZ not released), F/G/H (dual-seq ref−alt need GPU scoring — inputs present, anchors 0.54/0.82/0.56 recorded).
+**Status: Figure 6 ✅ CPU panels reproduced + verified** (`reproduce_figure_06.ipynb`, `verify_fig06.csv` **7/7 PASS**): A schematic, B/C AUROC&AUPRC **0.9988**>0.95, D native R **0.644**, I Shorkie-vs-DREAM coverage.
+
+**Recheck update (2026-06-21):** the four prior "gaps" **E/F/G/H are reproduced** from already-on-disk 8-fold Shorkie logSED NPZ (the notebook had searched the wrong subtree) — Pearson 0.696 / 0.547 / 0.819 / 0.601 vs published 0.695 / 0.539 / 0.819 / 0.561, with 3-way diffs vs the original script's rendered scatter. 6D native R **0.644 reconciled** with the manuscript's ~0.70 (different model/metric/dataset: DREAM-RNN native R is only 0.26–0.34). See `VERIFICATION_REPORT.md` + `figure_06/reproduced/refalt/`.
 
 ---
 
