@@ -22,7 +22,7 @@ are aligned on a shared **genomic** x-axis so the LM / ISM / Random / Reference-
 tracks line up despite the ~120 bp LM-vs-ISM window offset for FUN12/KRE33.
 """
 from __future__ import annotations
-import os, re, json
+import os, re, json, shutil
 from pathlib import Path
 from functools import lru_cache
 
@@ -49,7 +49,7 @@ RD.mkdir(parents=True, exist_ok=True)
 ISM_ROOT = Path(config.path("results.ism_scores"))            # .../SUM_data_process/motifs
 MODISCO_ROOT = Path(config.path("results.modisco_ism"))       # .../motif_shorkie_RP_TSS/1_modisco_analysis
 LM_ROOT = EXP / "motif_LM_RP_TSS"
-MOTIF_DB_DIR = Path(config.path("motif_db_dir"))              # /home/kchao10/tools/motif_databases/YEAST
+MOTIF_DB_DIR = Path(config.path("motif_db_dir"))             # external yeast motif DB (config key: motif_db_dir)
 MEME_HIGH_CONF = MOTIF_DB_DIR / "merged_meme_high_conf.meme"
 MOTIF_DB_ASSETS = EXP / "motif_DB"                            # cached GTATGT/TACTAAC/PAC_motif/... PNG+pfm
 GTF = str(config.path("genome.gtf"))
@@ -57,6 +57,24 @@ FASTA = str(config.path("genome.fasta"))
 TARGETS = str(config.path("datasets.targets_sheet"))
 LM_ARCH = "unet_small_bert_drop"                              # base LM replicate used by the figure
 BED_DIR = WORK / "data" / "gene_exp_ism_window"
+
+# ---- TomTom (MEME suite) binary, resolved like the upstream pipeline ----------------
+# (scripts/.../1_map_modisco_pattern_to_meme_db.py uses shutil.which("tomtom")). Prefer
+# the optional tools.tomtom_bin config key, else fall back to `tomtom` on PATH. Only
+# run_tomtom.py needs this (to regenerate tomtom_RP_matches.tsv); the committed TSV +
+# cached report/motifs.html let panel H reproduce without MEME installed.
+def _resolve_tomtom():
+    cfg = config.get("tools.tomtom_bin")
+    if cfg:
+        p = Path(os.path.expanduser(str(cfg)))
+        if p.exists():
+            return str(p)
+        w = shutil.which(str(cfg))
+        if w:
+            return w
+    return shutil.which("tomtom")                            # None if MEME not installed
+
+TOMTOM_BIN = _resolve_tomtom()
 
 # ---- fasta + chrom remap (scores.h5 use chrI..; GTF uses bare Roman I..) -----------
 _fa = pysam.Fastafile(FASTA)

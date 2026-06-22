@@ -33,6 +33,11 @@ tools:
   repeatmasker_lib: /home/khc/bin/RepeatMasker/Libraries/RepeatMasker.lib
   rmrb_lib:         /home/khc/tools/RMRB/Libraries/RMRBSeqs.fasta
   dashing2_bin:     /home/khc/bin/dashing2
+  # TomTom (MEME suite) executable for motif->TF matching (figure_04 panel H +
+  # the motif_lm__RP_TSS pipeline). Defaults to `tomtom` on PATH (mirrors the
+  # upstream --tomtom_exec); set an absolute path if MEME is installed off-PATH
+  # (e.g. ~/tools/meme/bin/tomtom).
+  tomtom_bin:       tomtom
 
 # --- Sub-roots of the work dir (preserve the existing tree structure) ---
 data_root:           ${work_root}/data

@@ -50,7 +50,7 @@ The gene → `(tree, sub, part, idx)` mapping was **not trusted as hardcoded**. 
 
 ## Phase 3 — Verification
 
-**`reproduced/verify_fig04.csv`: 14/14 PASS.** Figure 4 is qualitative (saliency maps + motif logos), so each panel is verified two ways:
+**`reproduced/verify_fig04.csv`: 19/19 PASS.** Figure 4 is qualitative (saliency maps + motif logos), so each panel is verified two ways (the deep recheck added the panel-completeness checks — "Shorkie LM row rendered" for A/B/C, panel-H TomTom-matched-TF count, panel-D reconstruction rendered):
 
 1. **Coordinate-overlap (correctness):** every panel's ISM window provably overlaps its R64 gene — 6/6 PASS. This is the strong check: it proves the reproduced panel shows the *claimed* gene.
 2. **Localized ISM signal (scale-invariant):** the Shorkie saliency peak exceeds **5× the window median** per-site saliency (a concentrated motif, not diffuse noise). Measured localization ratios:
@@ -75,3 +75,26 @@ The gene → `(tree, sub, part, idx)` mapping was **not trusted as hardcoded**. 
 | HOP2 absolute signal | Low (0.004) but **sharply localized** — the figure's claim (Shorkie maps the splice donor) holds; the magnitude is simply smaller than DTD1/MMS2. |
 
 **Changes to legacy scripts:** none edited. The verification helper `reproduction/common/compare.py` gained a backward-compatible `mode` field (`ge`/`gt`/`le`) so threshold checks (localization ≥ 5×, motif count ≥ 6) read cleanly; existing figures are unaffected.
+
+---
+
+## Scripts & regeneration
+
+All builders live in [`recheck/`](recheck/) and import shared recipes from `fig4_common.py`
+(ISM/LM saliency, DB-motif IC logos, gene models) and the TF pairings from `match_tfs.py`. They are
+CPU-only and resolve every path through `shorkie.config` — no hardcoded machine paths. Build order:
+
+1. `run_tomtom.py` *(optional — needs the MEME `tomtom` binary on `PATH` or via the `tools.tomtom_bin`
+   config key)* — regenerates `tomtom_RP_matches.tsv` (MoDISco pattern → yeast-TF matches). **Already
+   committed**, so the rest runs without MEME installed.
+2. `build_4ABC.py`, `build_4D.py`, `build_4EFG.py`, `build_4H.py` — render the panel PNGs into
+   `reproduced/` and write the per-panel metric CSVs.
+3. `build_verify_fig04.py` — recomputes the checks → `reproduced/verify_fig04.csv`.
+4. `make_sidebyside_fig04.py` — published-vs-reproduced comparison PNGs (verification aid).
+
+The notebook [`reproduce_figure_04.ipynb`](reproduce_figure_04.ipynb) simply invokes builders 2–3 in order.
+
+**Committed vs regenerable.** Committed: the builders + `fig4_common.py` / `match_tfs.py`, the reproduced
+PNGs, `verify_fig04.csv`, and `tomtom_RP_matches.tsv` (so panel H reproduces without MEME). Gitignored
+caches, regenerated on demand: `lm_cache_*.npz` (LM per-row slices), `_modisco_RP_query.meme` +
+`_tomtom_RP/` (TomTom intermediates), and `__pycache__/`.

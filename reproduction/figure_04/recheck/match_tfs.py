@@ -4,9 +4,9 @@
 The original pipeline matches MoDISco patterns to a yeast motif database with TomTom
 (run inside the modisco *report*, whose `motifs.html` lists match0/qval0/...). This
 module is the source of truth for the pattern<->TF mapping. It prefers a freshly-run
-TomTom (meme_suite env, written to recheck/tomtom_<tag>.tsv) and falls back to parsing
-the cached `report/motifs.html` — both are TomTom-derived, so the pairing matches the
-published figure either way.
+TomTom (written to recheck/tomtom_RP_matches.tsv by run_tomtom.py) and falls back to
+parsing the cached `report/motifs.html` — both are TomTom-derived, so the pairing matches
+the published figure either way.
 """
 from __future__ import annotations
 import os, re, warnings
@@ -18,8 +18,6 @@ import h5py
 warnings.filterwarnings("ignore")
 
 import fig4_common as F
-
-TOMTOM = Path("/home/kchao10/miniconda3/envs/meme_suite/bin/tomtom")
 
 # modisco_results -> its cached report/motifs.html
 def report_html(modisco_h5: Path) -> Path:

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""Run TomTom (MEME 5.5.7, built from source) to match Shorkie RP TF-MoDISco patterns
-to the yeast motif database, reproducing the original pipeline's matching
+"""Run TomTom (MEME suite; binary resolved via tools.tomtom_bin / PATH) to match Shorkie
+RP TF-MoDISco patterns to the yeast motif database, reproducing the original pipeline's matching
 (scripts/.../motif_lm__RP_TSS/1_map_modisco_pattern_to_meme_db.py).
 
 For each MoDISco pos/neg pattern: take its PPM ('sequence'), trim by the CWM
@@ -17,7 +17,6 @@ import h5py
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import fig4_common as F
 
-TOMTOM = Path.home() / "tools" / "meme" / "bin" / "tomtom"
 DB = str(F.MEME_HIGH_CONF)
 OUTDIR = F.RECHECK / "_tomtom_RP"
 
@@ -57,13 +56,13 @@ def write_query(meme_path):
 
 
 def main():
-    if not TOMTOM.exists():
-        print("tomtom not found at", TOMTOM); sys.exit(1)
+    if F.TOMTOM_BIN is None:
+        print("tomtom not found on PATH; set tools.tomtom_bin in config/paths.yaml"); sys.exit(1)
     OUTDIR.mkdir(parents=True, exist_ok=True)
     qmeme = F.RECHECK / "_modisco_RP_query.meme"
     tags = write_query(qmeme)
     print(f"wrote {len(tags)} query motifs -> {qmeme}")
-    cmd = [str(TOMTOM), "-no-ssc", "-oc", str(OUTDIR), "-verbosity", "1",
+    cmd = [F.TOMTOM_BIN, "-no-ssc", "-oc", str(OUTDIR), "-verbosity", "1",
            "-min-overlap", "5", "-dist", "pearson", "-evalue", "-thresh", "10.0",
            str(qmeme), DB]
     print("running:", " ".join(cmd))
