@@ -47,6 +47,7 @@ def _scatter(ax, x, y, color, label, pear, spear, xlabel, ylabel, title):
     ax.set_title(title, fontsize=10)
     ax.legend(fontsize=8, loc="upper left")
     ax.grid(True)
+    ax.set_box_aspect(1)  # square subplots, matching the published figure
 
 
 def main():
