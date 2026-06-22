@@ -35,7 +35,7 @@ Figure 1 has **7 panels (A–G)** spanning every difficulty tier. The scientific
 | Dot plot | Species / strain | Accession | Tier dir | On disk |
 |---|---|---|---|---|
 | species (self) | *S. cerevisiae* R64-1.1 | GCA_000146045.2 | data_r64_gtf | ✅ |
-| strain | *S. cerevisiae* YPF136 | (strain; → representative if not located) | data_strains_gtf | ⚠️ representative |
+| strain | *S. cerevisiae* **YJM195** | GCA_000975585.2 | data_strains_gtf | ✅ exact (deep-recheck fix) |
 | order | *Nakaseomyces glabratus* CBS138 | GCA_000002545.2 | data_saccharomycetales_gtf | ✅ |
 | order | *Candida albicans* SC5314 | GCA_000182965.3 | data_saccharomycetales_gtf | ✅ |
 | kingdom | *Neurospora crassa* OR74A | GCA_000182925.2 | data_fungi_1385_gtf | ✅ |
@@ -78,7 +78,7 @@ Tooling installed for the full recompute: `mash` v2.3 (fresh `mash_env`, symlink
 - **1G** gene / intergenic perplexity: R64 3.7561/3.7386 · 80_Strains 3.7342/3.7225 · 165_Sacc **3.5488**/3.6360 · 1342 3.6043/3.6851 — identical to the on-disk `.out` anchors. 165_Saccharomycetales lowest → the paper's "sweet spot" claim holds.
 
 **Visual — reproduced vs published** (`published/Figure_1_full.png`, rendered from `paper/Figures/Figure_1.pdf`):
-- **1C** dot plots reproduce the homology spectrum exactly — aligned-fraction vs R64: species ≈1.00 → strain ≈1.04 → *N. glabratus* 0.017 → *C. albicans* 0.003 → *N. crassa* ≈0 → *S. pombe* 0.001 (clean diagonal degrading to sparse points, matching the panel).
+- **1C** dot plots reproduce the homology spectrum exactly — aligned-fraction vs R64: species ≈1.19 (self) → strain ≈1.18 (**YJM195**, near-continuous synteny) → *N. glabratus* 0.017 → *C. albicans* 0.003 → *N. crassa* 0.0003 → *S. pombe* 0.001 (clean diagonal degrading to sparse points, matching the panel). Coords re-run from the FASTAs are **byte-identical**.
 - **1D** mash: 80_Strains distances 0–0.008 (near-identical), 165_Saccharomycetales 0→1 — matching the published sorted-bar distributions.
 - **1B** circular tree highlights the Saccharomycetales clade (green) with R64 starred — same nested-dataset structure as the published (iTOL-styled) panel.
 - **1A / 1E** reproduced programmatically (architecture block-stack from `params.json`; one-hot + region-loss-weight worked example) — conceptual/structural match to the hand-drawn schematics.
@@ -87,9 +87,19 @@ Tooling installed for the full recompute: `mash` v2.3 (fresh `mash_env`, symlink
 | Panel | Discrepancy | Cause | Impact |
 |---|---|---|---|
 | 1A, 1E | reproduced as programmatic schematic, not the publication's illustrator art | panels are hand-drawn diagrams | conceptual match only (expected for schematics) |
-| 1B | tree has 987 leaves vs 1361 input taxids; Saccharomycetales = 111 tips highlighted by dataset taxid (not by NCBI lineage string) | NCBI merged/retired some taxids; NCBI's 2023 taxonomy split "Saccharomycetales" into several orders so the lineage string undercounts; final figure additionally iTOL-styled | topology + highlighted clade faithful; cosmetic styling differs |
-| 1C | strain panel uses *S. cerevisiae* YJM1078 (GCA_000975645.3) as the representative in place of the published "YPF136" | YPF136 not located in the committed corpus | strain-level diagonal is near-identical regardless; claim unaffected |
-| 1F | parser fix vs legacy `3_dataset_comparison.py` | legacy `split(':',1)` mis-reads the `train.out` format (grabs `steps` as valid_loss) | corrected `valid_loss:` regex → exact match (Δ=0) |
+| 1B | tree has 987 leaves vs 1361 input taxids; Saccharomycetales = 111 tips highlighted by dataset taxid (not by NCBI lineage string) | NCBI merged/retired some taxids; NCBI's 2023 taxonomy split "Saccharomycetales" into several orders so the lineage string undercounts; final figure additionally iTOL-styled | topology + highlighted clade faithful (newick byte-identical on re-run); cosmetic styling differs |
+| 1C | **RESOLVED** — strain panel now uses *S. cerevisiae* **YJM195** (GCA_000975585.2), the genome the published figure actually shows ("TGT: … YJM195"; manuscript "YJM195 at Mash ≈ 0.01"). Earlier notes wrongly said the published strain was "YPF136" and the repro used YJM1078 — both incorrect | YJM195 **is** in the 80_Strains corpus; fixed `run_mummer.sh` + notebook | now an **exact representative match** (coords byte-identical on re-run); see `recheck/DISCREPANCIES.md` |
+| 1F | x-axis = `n_epochs × 64` → 165_Sacc reaches ~320k (= published ~300k); a prior "stops ~250k" note was a crop mis-read. Parser fix vs legacy `3_dataset_comparison.py` retained | legacy `split(':',1)` mis-reads the `train.out` format (grabs `steps` as valid_loss) | corrected `valid_loss:` regex → exact match (Δ=0); panel restyled to published (dashed) |
+| 1G | **provenance closed** — exact perplexities appear only in the figure, not the manuscript text | published bar heights pixel-fit to the reproduced values: R²=0.999998, max resid 0.0002 ppl | reproduced numbers **are** the published bars; see `recheck/DISCREPANCIES.md` |
 | 1C/1D | input genomes read from `datasets.lm_corpus_split_root` instead of the legacy `corpus_build_data_root` | legacy build root absent on this machine | none (same FASTAs) |
 
-**Verdict: Figure 1 fully reproduced.** Computational panels (F, G) numerically exact (12/12); heavy-external panels (B, C, D) recomputed from genomes with the published trends reproduced; schematics (A, E) reproduced programmatically.
+**Verdict: Figure 1 fully reproduced.** Computational panels (F, G) numerically exact (12/12, Δ=0); heavy-external panels (B, C, D) recomputed from genomes (byte-identical on re-run) with the published trends reproduced; schematics (A, E) reproduced programmatically.
+
+### Deep recheck (`recheck/`)
+A second, stricter pass verified every result against the **published** figure and corrected two stale errors. Highlights — full detail in [`recheck/DISCREPANCIES.md`](recheck/DISCREPANCIES.md):
+- **12/12 numbers independently recomputed** from the raw `train.out` / perplexity `.out` (`recompute_fig01.py`), Δ=0; 1F tied to the published legend.
+- **1G provenance closed:** the published bar heights pixel-fit the reproduced perplexities (R²=0.999998, max resid 0.0002 ppl; `measure_panelG.py` → `panelG_barheight_fit.csv`).
+- **1C strain rep corrected** YJM1078/"YPF136" → **YJM195** (GCA_000975585.2; the genome the published panel shows) → exact match; stale YJM1078 coords removed.
+- **Determinism:** mash tables + all MUMmer coords + the ete4 newick re-run **byte-identical** (`diff_heavy_panels.py` → `determinism_fig01.csv`).
+- **1F x-axis** confirmed (`n_epochs×64` → 165_Sacc ~320k = published ~300k); panels 1F/1G restyled to match (`restyle_panels_FG.py`).
+- Per-panel `recheck/panel_{B,C,D,F,G}_sidebyside.png` + `recheck/Figure_1_published_vs_reproduced.png` give clean [published | reproduced] composites.

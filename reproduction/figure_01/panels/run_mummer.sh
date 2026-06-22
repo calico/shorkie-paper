@@ -31,7 +31,7 @@ REF="$LCS/data_r64_gtf/fasta/GCA_000146045_2.cleaned.fasta"
 # Representative target per dataset: "label|tier_dir|accession_basename"
 TARGETS=(
   "R64-1.1 (species)|data_r64_gtf|GCA_000146045_2"
-  "YJM1078 (strain, repr.)|data_strains_gtf|GCA_000975645_3"
+  "YJM195 (strain)|data_strains_gtf|GCA_000975585_2"
   "N. glabratus CBS138 (order)|data_saccharomycetales_gtf|GCA_000002545_2"
   "C. albicans SC5314 (order)|data_saccharomycetales_gtf|GCA_000182965_3"
   "N. crassa OR74A (kingdom)|data_fungi_1385_gtf|GCA_000182925_2"

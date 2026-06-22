@@ -1,0 +1,11 @@
+panel,artifact,status,detail
+1D,saccharomycetales_dist.tab,BYTE_IDENTICAL,
+1D,strains_dist.tab,BYTE_IDENTICAL,
+1C,GCA_000146045_2.coords [R64-1-1 self (species)],BYTE_IDENTICAL,
+1C,GCA_000975585_2.coords [YJM195 (strain) — corrected rep; replaces YJM1078],NEW,no committed version (added this recheck)
+1C,GCA_000002545_2.coords [N. glabratus CBS138 (order)],BYTE_IDENTICAL,
+1C,GCA_000182965_3.coords [C. albicans SC5314 (order)],BYTE_IDENTICAL,
+1C,GCA_000182925_2.coords [N. crassa OR74A (kingdom)],BYTE_IDENTICAL,
+1C,GCA_000002945_2.coords [S. pombe 972h (kingdom)],BYTE_IDENTICAL,
+1B,species_tree.nwk,BYTE_IDENTICAL,987 leaves
+1B,taxids.txt,INPUT,1361 input taxon IDs (1341_Fungal superset)
