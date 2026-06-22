@@ -97,10 +97,13 @@ def main():
     df_agg["track_type_detailed"] = df_agg["track_type"].apply(detailed)
 
     plt.figure(figsize=(9.2, 6.4))
+    # NOTE: no `cut` argument — use the seaborn default (cut=2), exactly as the
+    # source-of-truth plot_box_violin(). cut=0 truncated each KDE at the data
+    # min/max, giving the flat "cut-off" tails (worst for ChIP-MNase, n=20).
     sns.violinplot(
         data=df_agg, x="track_type_detailed", y=metric, hue="training_type",
         hue_order=["Shorkie", "Shorkie_Random_Init"], split=True, inner="quart",
-        palette=PALETTE, order=order_detailed, cut=0,
+        palette=PALETTE, order=order_detailed,
     )
     plt.title(f"{label} Distribution by Track Type (Violin)", fontsize=16)
     plt.xlabel("Track Type", fontsize=14)

@@ -38,9 +38,11 @@ LOCI = [
     ("rps16b_rpl13a", "chrIV:305,657-310,505 (RNA-Seq tracks); fold 3"),
     ("efm5",          "chrVII:495,374-499,965 (RNA-Seq tracks); fold 6"),
 ]
-ROWS = [("cov_obs",  "Experiment Ground Truth (Avg)", "tab:purple"),
-        ("cov_self", "Fine-tuned model (Avg)",        "tab:orange"),
-        ("cov_ri",   "Scratch-trained (Avg)",         "tab:blue")]
+# Colours exactly as the published plot_3_coverage (yeast_helpers.py): observed
+# "purple" (#800080, NOT tab:purple), fine-tuned #ff7f0e, scratch #1f77b4.
+ROWS = [("cov_obs",  "Experiment Ground Truth (Avg)", "purple"),
+        ("cov_self", "Fine-tuned model (Avg)",        "#ff7f0e"),
+        ("cov_ri",   "Scratch-trained (Avg)",         "#1f77b4")]
 PANEL = {"rpl7a": "3H", "rps16b_rpl13a": "3I", "efm5": "3J"}
 
 
@@ -98,8 +100,9 @@ def draw_gene_track(ax, chrom, lo, hi):
 
 
 def main():
-    fig, axes = plt.subplots(4, 3, figsize=(16, 8),
-                             gridspec_kw=dict(height_ratios=[0.55, 1, 1, 1]),
+    # wide-and-short rows to match the published panel aspect (~4-5:1 per row)
+    fig, axes = plt.subplots(4, 3, figsize=(16.5, 5.4),
+                             gridspec_kw=dict(height_ratios=[0.5, 1, 1, 1]),
                              sharex="col")
     checks = []
     for j, (name, title) in enumerate(LOCI):
@@ -110,7 +113,9 @@ def main():
         obs = d["cov_obs"]
         lo, hi = win  # crop display to the published window
         m = (x >= lo) & (x <= hi)
-        ymax = max(float(np.nanmax(d[k][m])) for k, _, _ in ROWS) * 1.08
+        # shared per-column y-scale, autoscaled to the data (matches plot_3_coverage's
+        # sharey=True + matplotlib autoscale; no forced *1.08).
+        col_max = max(float(np.nanmax(d[k][m])) for k, _, _ in ROWS)
 
         # gene-annotation track (row 0)
         exons = draw_gene_track(axes[0, j], chrom, lo, hi)
@@ -120,12 +125,16 @@ def main():
 
         for i, (key, lbl, col) in enumerate(ROWS):
             ax = axes[i + 1, j]
-            ax.fill_between(x[m], 0, d[key][m], color=col, alpha=0.85, linewidth=0)
-            ax.set_ylim(0, ymax); ax.set_xlim(lo, hi)
+            # bars (width=stride → contiguous), exactly as the published plot_3_coverage
+            ax.bar(x[m], d[key][m], width=stride, color=col, alpha=0.9,
+                   linewidth=0, align="edge")
+            ax.set_ylim(0, col_max * 1.05); ax.set_xlim(lo, hi)
             for b in bnds:
                 ax.axvline(b, color="0.4", ls="--", lw=0.6, alpha=0.7, zorder=0)
-            if j == 0:
-                ax.set_ylabel(lbl, fontsize=8)
+            # published style: hide top/right/left spines, keep numeric y-ticks,
+            # no per-row text label (a single colour legend sits on top).
+            for sp in ("top", "right", "left"):
+                ax.spines[sp].set_visible(False)
             if i + 1 == 3:
                 ax.set_xlabel(f"{chrom} position (bp)", fontsize=9)
             ax.ticklabel_format(axis="x", style="plain", useOffset=False)

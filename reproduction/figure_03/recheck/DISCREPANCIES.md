@@ -33,6 +33,9 @@ recompute), as in the published panel.
   use lr=5e-4.
 - **Reproduced medians (Shorkie / Random):** RNA-Seq 0.776/0.703, 1000-strain 0.629/0.579,
   ChIP-MNase 0.446/0.424, ChIP-exo 0.356/0.315 — **exact match** to the published violin (8/8).
+- **Style fix (violin tails):** the builder originally passed `cut=0`, which truncates each violin's KDE
+  at the data min/max → flat "cut-off" ends (most visible for ChIP-MNase, n=20). Removed it to use the
+  seaborn default `cut=2` (smooth tapered tails), exactly as `plot_box_violin` (which sets no `cut`).
 
 ## Panel 3D — bin-level R scatter  → matches
 `1_bin_level_freq_viz.py::scatter_all_groups_scatter`: top-level bin `acc.txt`, RNA-Seq + 1000-strain,
@@ -82,6 +85,13 @@ restore; `panels/run_coverage.py`) and cached.
   plus dashed vertical lines at exon/intron boundaries; display cropped to the published window;
   per-column shared y-scale.
 - **Reproduced Pearson R vs observed:** 3H 0.992/0.969, 3I 0.960/0.958, 3J 0.975/0.847 (Shorkie/Random) — 6/6 PASS.
+- **Style fix (scale + bars):** re-rendered to match the published `plot_3_coverage`
+  (`src/shorkie/helpers/yeast_helpers.py:1406`) exactly — `ax.bar(width=stride, alpha=0.9)` instead of
+  `fill_between`; colours `"purple"` (obs, =#800080, not `tab:purple`) / `#ff7f0e` (fine-tuned) /
+  `#1f77b4` (scratch); per-column **autoscaled** shared y (dropped the forced `*1.08`); top/right/left
+  spines hidden with numeric y-ticks kept; per-row text labels removed (single top colour legend);
+  wide-short row aspect. (User accepts the missing-exonic-coverage difference; only the bar scale + style
+  must match.)
 
 ---
 
