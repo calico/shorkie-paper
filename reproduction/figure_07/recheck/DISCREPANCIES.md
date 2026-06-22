@@ -33,6 +33,27 @@ A second pass tightened three panel groups to the published rendering exactly:
   `verify_fig7JO.csv` confirms **18/18 PASS** (region, SNP, ref/alt allele, motif, ISM-recomputed for
   all 6 loci). DREAM-RNN ISM is confirmed on disk for 4/6 loci (K, O genuinely absent).
 
+## Refinement pass 2 (height + per-subplot limits + DREAM alignment)
+- **A/B "not scaled" (height/aspect).** Reading the published A/B at 300+ dpi: each subplot **auto-scales
+  to its own data** (A Signal 0–~10.5 from Ref/Alt, GT 0–~13 from observed — *independent*, not shared),
+  and the panels are **wide-and-short** (helper `figsize≈(16,4)` for the two coverage subplots). The prior
+  build was too tall (`figsize=(12.5,5.4)`), which vertically stretched the coverage ("scaled"). Fixed:
+  `figsize=(16,4.8)` with thin gene track (≈9:1 coverage aspect, matching published); Signal auto-scales
+  to `max(cov_ref,cov_alt)` with `vlines(x,0,max_sig)` + SNP star at `0.075*max_sig`; GT auto-scales to its
+  own observed max — independent scales, as published.
+- **E/F/G per-subplot check.** Cropped all six published subplots (300+ dpi) and confirmed each uses
+  identical limits — **PR x 0–1, y 0.45–1.05; ROC x 0–1, y 0–1** (no per-subplot deviation), matching the
+  uniform limits `build_7EFG_roc_pr.py` already enforces.
+- **J–O DREAM-RNN ISM shift — fixed.** The DREAM MPRA ISM window is **110 bp** with `left_pad=17`,
+  `right_pad=13` (`2_plot_DNA_logo.py`), so the 80 bp core is `pos[17:97)` and the **SNP is at `pos=57`**
+  (verified: `orig_base@57` == the ref allele for all loci; M shows `GTTACCC`). The prior build centered
+  DREAM on `(min+max)//2 = 54` and cropped ±40 → a ~3 bp shift. Fixed by porting the exact recipe
+  (delta-matrix → negate → global mean-normalize → ref-base-average) and cropping the `[17:97)` core
+  (SNP at index 40), and by setting the Shorkie window to `[ci-40:ci+40)` (80 bp, SNP at index 40) so the
+  two are the same width and SNP-aligned; a light-blue SNP highlight is drawn at the column. After the
+  fix, Shorkie and DREAM motif peaks coincide (J 39/40, L 38/36, M 44/41, N 34/35 — within model noise,
+  no systematic offset). K & O still have no DREAM ISM on disk.
+
 ---
 
 ## Per-panel findings

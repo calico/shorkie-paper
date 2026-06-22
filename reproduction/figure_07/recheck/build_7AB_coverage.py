@@ -122,18 +122,24 @@ def build_one(name, panel, label, gtf_df):
     chrom_roman = chrom[3:] if chrom.startswith("chr") else chrom
     genes = genes_in_window(gtf_df, chrom_roman, g0_bp, g1_bp)
 
-    fig, axes = plt.subplots(3, 1, figsize=(12.5, 5.4), sharex=True,
-                             gridspec_kw={"height_ratios": [3, 3, 1.1]})
+    # Published A/B are wide-and-short (helper figsize ~16x4 for the two coverage subplots) and each
+    # subplot auto-scales to ITS OWN data (Signal -> Ref/Alt max; GT -> observed max), so the coverage
+    # is not vertically stretched. Match that aspect + independent scaling.
+    fig, axes = plt.subplots(3, 1, figsize=(16, 4.8), sharex=True,
+                             gridspec_kw={"height_ratios": [3, 3, 1.0]})
     gene = str(z["gene"])
+    max_sig = float(max(cov_ref[b_lo:b_hi].max(), cov_alt[b_lo:b_hi].max()))
+    max_gt = float(obs[b_lo:b_hi].max())
     # (1) Signal: Ref (blue) + Alt (orange) overlaid bars (width=1.0, alpha=0.7) — published style
     ax = axes[0]
     ax.bar(xb, cov_ref[b_lo:b_hi], width=1.0, color="tab:blue", alpha=0.7, lw=0)
     ax.bar(xb, cov_alt[b_lo:b_hi], width=1.0, color="tab:orange", alpha=0.7, lw=0)
-    ax.set_ylabel("Signal", fontsize=10); ax.set_ylim(bottom=0)
+    ax.set_ylabel("Signal", fontsize=10)
     for xv, c, ls in [(center_bin, "black", ":"), (gene_start_bin, "red", "--"),
                       (gene_end_bin, "red", "--")]:
-        ax.axvline(xv, color=c, ls=ls, lw=1.0, alpha=0.8)
-    ax.plot([snp_bin], [0], marker="*", ms=15, color="black", clip_on=False)
+        ax.vlines(xv, 0, max_sig, color=c, ls=ls, lw=1.0, alpha=0.8)
+    ax.plot([snp_bin], [0.075 * max_sig], marker="*", ms=15, color="black", clip_on=False)
+    ax.set_ylim(0, max_sig * 1.05)
     ax.set_title(f"{panel}  {label}  {chrom}:{snp_pos} {snp_ref}>{snp_alt}  (logSED={logsed:+.3f})",
                  fontsize=11)
     # unified legend (published: Center / gene Start / gene End / SNP / Ref / Alt / Ground Truth)
@@ -145,10 +151,10 @@ def build_one(name, panel, label, gtf_df):
                Patch(color="tab:orange", alpha=0.7, label=f"Alt ({snp_ref}>{snp_alt})"),
                Patch(color="tab:green", alpha=0.7, label="Ground Truth")]
     ax.legend(handles=handles, loc="upper left", bbox_to_anchor=(1.005, 1.0), fontsize=8, frameon=False)
-    # (2) GT Signal (green) bars
+    # (2) GT Signal (green) bars — independent auto-scale to the observed max (published style)
     ax = axes[1]
     ax.bar(xb, obs[b_lo:b_hi], width=1.0, color="tab:green", alpha=0.7, lw=0)
-    ax.set_ylabel("GT Signal", fontsize=10); ax.set_ylim(bottom=0)
+    ax.set_ylabel("GT Signal", fontsize=10); ax.set_ylim(0, max_gt * 1.05)
     ax.axvline(snp_bin, color="black", ls=":", lw=0.8, alpha=0.6)
     # (3) gene track
     ax = axes[2]

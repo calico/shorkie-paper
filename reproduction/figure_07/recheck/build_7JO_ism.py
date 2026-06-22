@@ -87,10 +87,13 @@ def dna_letter_at(letter, x, y, yscale, ax):
     ax.add_artist(PathPatch(_LETTERS[letter], lw=0, fc=_COLORS[letter], transform=t))
 
 
-def plot_logo(ax, imp, x_labels=None):
+def plot_logo(ax, imp, highlight=None):
     """Exact published recipe (yeast_helpers_selfsupervised.plot_seq_scores): per position
-    draw the argmax-|.| base scaled by the row-sum (single letter, from y=0)."""
+    draw the argmax-|.| base scaled by the row-sum (single letter, from y=0). `highlight` draws
+    the light-blue SNP span at that column index (matching plot_seq_scores' highlight_idx)."""
     L = imp.shape[0]
+    if highlight is not None and 0 <= highlight < L:
+        ax.axvspan(highlight, highlight + 1, facecolor="lightblue", alpha=0.3, zorder=0)
     for p in range(L):
         base = int(np.argmax(np.abs(imp[p])))
         h = float(imp[p].sum())
@@ -124,15 +127,24 @@ def shorkie_logos(L, fa):
     seq = fa.fetch(L["chrom"], start, start + wt.shape[0]).upper()
     ci = cp - start - 1
     ref_base = seq[ci]
-    lo, hi = ci - WIN_HALF, ci + WIN_HALF + 1
+    lo, hi = ci - WIN_HALF, ci + WIN_HALF      # 80 bp [ci-40, ci+40); SNP (ci) at index 40
     imp_ref = wt[lo:hi]
     imp_alt = mut[lo:hi]
     maxabs = float(np.max(np.abs(imp_ref.sum(axis=1))))
     return imp_ref, imp_alt, ref_base, alt, maxabs
 
 
+DREAM_SEQ_LEN = 110          # DREAM MPRA ISM input length
+DREAM_LEFT_PAD = 17          # 80bp ISM core is pos[17:97); SNP at 17 + 80//2 = 57
+DREAM_CORE = 80
+
+
 def dream_logos(L):
-    """ref-average per-base saliency (W,4) from the cached DREAM-RNN ISM TSVs; None if absent."""
+    """Exact DREAM-RNN ISM recipe (eQTL_MPRA_models_ISM/2_plot_DNA_logo.py):
+    build the (110,4) delta-matrix (ref base = 0), negate it, subtract the GLOBAL mean, then form
+    the ref-base-average matrix (each position's ref base = mean of its 3 substitution values).
+    Crop the 80bp ISM core pos[17:97) so the SNP (pos 57) lands at index 40 — aligned to Shorkie.
+    Returns (ref_logo, alt_logo) each (80,4), or None for a locus absent from the released TSV."""
     out = {}
     for which, fn in [("ref", "ism_ref_results.tsv"), ("alt", "ism_alt_results.tsv")]:
         df = pd.read_csv(f"{DREAM_DIR}/{fn}", sep="\t")
@@ -140,19 +152,24 @@ def dream_logos(L):
         if len(sub) == 0:
             out[which] = None
             continue
-        pmin, pmax = int(sub["pos"].min()), int(sub["pos"].max())
-        center = (pmin + pmax) // 2
-        W = 2 * WIN_HALF + 1
-        imp = np.zeros((W, 4), dtype="float32")
+        mat = np.zeros((DREAM_SEQ_LEN, 4), dtype=float)
+        orig = ["N"] * DREAM_SEQ_LEN
         for _, r in sub.iterrows():
-            wpos = int(r["pos"]) - (center - WIN_HALF)
-            if 0 <= wpos < W:
-                ob = str(r["orig_base"])
-                if ob in NTI:
-                    imp[wpos, NTI[ob]] += -float(r["delta"])  # negate: positive = important
-        # average over the 3 substitutions per position
-        imp /= 3.0
-        out[which] = imp
+            p = int(r["pos"]); orig[p] = str(r["orig_base"])
+            mb = str(r["mut_base"])
+            if mb in NTI:
+                mat[p, NTI[mb]] = float(r["delta"])
+        for p, b in enumerate(orig):
+            if b in NTI:
+                mat[p, NTI[b]] = 0.0            # enforce 0 at the reference base
+        mat = -mat                              # DREAM convention: positive = important
+        mat_norm = mat - mat.mean()             # global mean subtraction
+        ref_mat = np.zeros_like(mat_norm)
+        for p, b in enumerate(orig):
+            if b in NTI:
+                ri = NTI[b]
+                ref_mat[p, ri] = np.mean(np.delete(mat_norm[p, :], ri))  # ref-base average
+        out[which] = ref_mat[DREAM_LEFT_PAD:DREAM_LEFT_PAD + DREAM_CORE]  # 80bp core, SNP at idx 40
     return out["ref"], out["alt"]
 
 
@@ -214,14 +231,14 @@ def main():
         d_ref, d_alt = dream_logos(L)
 
         add_refdb(axs[0], L)
-        plot_logo(axs[1], imp_ref)
-        plot_logo(axs[2], imp_alt)
+        plot_logo(axs[1], imp_ref, highlight=WIN_HALF)   # SNP at index 40 in the 80bp window
+        plot_logo(axs[2], imp_alt, highlight=WIN_HALF)
         for ax, d in [(axs[3], d_ref), (axs[4], d_alt)]:
             if d is None:
                 ax.text(0.5, 0.5, "DREAM-RNN ISM not on disk", ha="center", va="center",
                         fontsize=7, color="gray"); ax.set_xticks([]); ax.set_yticks([])
             else:
-                plot_logo(ax, d)
+                plot_logo(ax, d, highlight=WIN_HALF)
         coverage_track(axs[5], L)
 
         for ax, lab in zip(axs, ROW_LABELS):
