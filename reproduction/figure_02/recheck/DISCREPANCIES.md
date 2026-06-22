@@ -13,12 +13,52 @@ published specifics. This recheck reproduces each panel to the published content
 two Shorkie rows are reproduced exactly (the iterative method run **on GPU** this
 recheck), with the external SpeciesLM row's alignment documented as a genuine limit.
 
-Recheck artifacts (this directory): `build_2C_grid.py`, `build_2D_tss.py`,
-`build_2E_tsne.py`, `build_2A_logos.py`, `build_2B_matrix.py`, `build_verify_fig02.py`,
+Recheck artifacts (this directory): `build_2C_grid.py`, `build_2C_logos.py`, `build_2D_tss.py`,
+`build_2E_tsne.py`, `render_2E.py`, `build_2A_logos.py`, `build_2B_matrix.py`, `build_verify_fig02.py`,
 `make_sidebyside_fig02.py`; `../panels/run_iterative_smt3.{py,sbatch}` (GPU);
 CSVs (`fig2C_qval_grid`, `fig2C_presence_grid`, `fig2D_enrichment`, `fig2E_separation`,
 `fig2A_consistency`, `fig2B_ppm`, `recheck_checks_fig02`); `panel_{A..E}_sidebyside.png`
 + `Figure_2_published_vs_reproduced.png`.
+
+---
+
+## Visual-exactness refinement (second pass — figures matched to the published appearance)
+
+The first deep-recheck pass verified the DATA but drew some panels in non-published forms. This pass
+re-renders them to look like the published figure (same DNA logos, regions, colours, styles). Skip 2B
+per the user.
+
+- **2A — real conservation DNA letter logos.** Replicates the upstream scripts' own `plot_dna_logo`
+  (conservation = 2−entropy; per-position letter heights = p·conservation) with the **published colour
+  scheme (A green, C blue, G orange, T red)**, three stacked rows. **Shorkie LM** row = SMT3 (YDR510W)
+  gene-averaged 512 bp-upstream PWM, plot[204:500] (the `2_viz_dna_pwm_shorkie_lm.py` region) — recovers
+  the true promoter at 95.7% and shows the **poly(dA:dT), Cbf1/Tye7 E-box (CACGTG), Reb1** motifs
+  (annotated). **Shorkie 15% iterative** row = same method on the GPU iterative reconstruction (corr
+  0.58 to unmasked). **SpeciesLM** row = the external model's released `all_prbs.npy`, plot[97:207]
+  (the `1_viz_dna_logo_specieslm_fungi.py` region) — rendered with the same `plot_dna_logo`. *Residual:*
+  the external SpeciesLM's `all_prbs` **cannot be position-aligned** to the Shorkie window — its argmax
+  agrees with the SMT3 genomic sequence at only ~0.26–0.36 across all tested mappings (first-500,
+  last-500, 2 bp-downsampled, fwd/rc), so the three rows are each shown over their own script's region
+  (the genomic alignment of the external row to the Shorkie rows is not reconstructable without
+  re-running the SpeciesLM model).
+- **2C — the de-novo TF-MoDISco CWM-logo grid** (was a q-value heatmap). `build_2C_logos.py` renders,
+  for each (tier × motif) cell marked present, the **CWM logo** of the best-TOMTOM-matching modisco
+  pattern (from the per-tier `.h5`), "—" for absent; 5′SS/branch matched by consensus. **53/66 cells
+  filled**, reproducing the published logo-grid layout + the conservation decline. The q-value heatmap
+  is kept as `recheck/Figure_2C_qval_heatmap.png`.
+- **2D — the 3 published TF histograms, exact style.** Abf1.1 / Rap1.1 / Reb1p in the published
+  rendering (green **True** / salmon **Background**, flipped distance, dashed TSS line, xlim ±2500,
+  "Distance Distribution for … (True: n=.., Background: n=..)" titles). Counts match the published panel
+  exactly: **Abf1.1 n=745, Rap1.1 n=644, Reb1p[CCGGGTAA] n=821**. *Residual:* the published 2D also
+  shows three genic features (start codon ATG, 5′SS donor, branch point) from a separate
+  modisco-pattern-indexed analysis (`0_motif_genomic_region_ratio/.../motif_<k>_tss_stats.txt`) with
+  the authors' **manual** motif→feature labelling and hit-filtering; the auto-identified raw modisco
+  hits (5′SS pattern_36 n=3077; branch pattern_21 n=12859) do not match the curated published counts
+  (603 / 779), and ATG is not a clean modisco PWM — these are recorded in `fig2D_enrichment.csv` but not
+  plotted (not exactly reproducible from the released artifacts).
+- **2E — published class palette.** Re-rendered from the full-16-chr cache with Promoter=blue,
+  Protein-coding=green (the two large clusters), Intergenic=orange, tRNA=red, Transposable=purple,
+  matching the published scatter; silhouette 0.079 unchanged.
 
 ---
 

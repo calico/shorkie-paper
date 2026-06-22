@@ -41,6 +41,15 @@ Executed `reproduce_figure_02.ipynb` (8/8 cells, 0 errors, 5 embedded figures). 
 
 **`reproduced/verify_fig02.csv`: 16/16 PASS** (deep recheck — tightened from the original 3 qualitative checks). 2A ×3 · 2B ×2 · 2C ×5 · 2D ×3 · 2E ×3. See [`recheck/DISCREPANCIES.md`](recheck/DISCREPANCIES.md).
 
+### Visual-exactness refinement (second pass)
+The panels were then re-rendered to match the published *appearance* (same DNA logos, regions, colours, styles; 2B skipped per request):
+- **2A — real conservation DNA letter logos** (A green / C blue / G orange / T red), replicating the upstream `plot_dna_logo`: Shorkie LM (SMT3 gene-averaged upstream, plot[204:500], motifs poly(dA:dT)/Cbf1/Tye7/Reb1 annotated, 95.7% recon), Shorkie 15% iterative, and the external SpeciesLM (`all_prbs[97:207]`). The external SpeciesLM row **cannot be position-aligned** to the Shorkie window (argmax agreement ~0.3 across all mappings) — documented.
+- **2C — the de-novo TF-MoDISco CWM-logo grid** (53/66 cells), replacing the q-value heatmap (kept as `recheck/Figure_2C_qval_heatmap.png`).
+- **2D — the 3 published TFs in the exact published style** (green True / salmon Background); counts match exactly (Abf1.1 n=745, Rap1.1 n=644, Reb1p[CCGGGTAA] n=821). The genic features (ATG/5′SS/branch) use the authors' manual curation (different hit-filtering) — documented, not plotted.
+- **2E — published class palette** (Promoter blue, Protein-coding green, Intergenic orange, tRNA red, Transposable purple).
+
+See `recheck/DISCREPANCIES.md` → "Visual-exactness refinement" for full detail.
+
 ### Deep recheck (`recheck/`)
 A stricter pass verified every panel against the **published** version, corrected two stale panels, and ran the GPU pieces. Highlights:
 - **2C — rebuilt as the real 6-dataset × 11-motif conservation grid** (was 6 single-tier logos). Data-driven from the per-tier `modisco report` TOMTOM tables: recovered-TF count declines **R64=9 · strains=9 · Saccharomycetales=9 → Ascomycota=5 → Orbiliales=4 · Schizosacc.=4**; **Mcm1.1 confident through Orbiliales but absent in Schizosaccharomycetales**; Rap1.1/Abf1.1/Dot6 lost beyond Saccharomycetales. 47/54 cells match the published *curated* grid (the 7 differences — Sfp1 promiscuity, weak TATA, borderline Reb1/Snf1 — are documented).

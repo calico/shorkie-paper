@@ -187,7 +187,7 @@ def main():
                  f"(TOMTOM min q-value; '—' = not recovered, q≥{QTHRESH})", fontsize=11)
     fig.colorbar(im, ax=ax, label="-log10(min q-value)", shrink=0.7)
     fig.tight_layout()
-    out = RD / "Figure_2C_reproduced.png"
+    out = RECHECK / "Figure_2C_qval_heatmap.png"   # heatmap kept here; the panel figure is the logo grid (build_2C_logos.py)
     fig.savefig(out, dpi=150)
     plt.close(fig)
     print(f"\n[OK] -> {out}")

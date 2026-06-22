@@ -36,7 +36,7 @@ def main():
     # ---- 2A ----
     a = dict(zip(*[pd.read_csv(RECHECK / "fig2A_consistency.csv")[c] for c in ("metric", "value")]))
     checks.append(Check("2A", "Shorkie_unmasked_vs_iterative_pwm_corr(>=0.4)", 0.4,
-                        float(a["Shorkie_unmasked vs Shorkie_iter pwm_corr"]), mode="ge"))
+                        float(a["Shorkie_unmasked_vs_iter_pwm_corr"]), mode="ge"))
     checks.append(Check("2A", "Cbf1_Ebox_in_promoter", 1.0,
                         float(a["Cbf1_Ebox(CACGTG)_in_Shorkie_promoter"]), mode="ge"))
     checks.append(Check("2A", "polydAdT_in_promoter", 1.0,
@@ -67,9 +67,9 @@ def main():
 
     # ---- 2D ----
     d = pd.read_csv(RECHECK / "fig2D_enrichment.csv")
-    for _, r in d.iterrows():
-        checks.append(Check("2D", f"{r['motif']}_enriched_near_TSS", 1.0,
-                            1.0 if r["enriched_near_tss"] else 0.0, mode="ge"))
+    for _, r in d[d["enriched_near_tss"].isin([True, False])].iterrows():
+        checks.append(Check("2D", f"{r['panel']}_enriched_near_TSS", 1.0,
+                            1.0 if bool(r["enriched_near_tss"]) else 0.0, mode="ge"))
 
     # ---- 2E ----
     e = dict(zip(*[pd.read_csv(RECHECK / "fig2E_separation.csv")[c] for c in ("metric", "value")]))

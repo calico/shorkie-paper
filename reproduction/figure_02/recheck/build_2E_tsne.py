@@ -89,8 +89,10 @@ mfs[["feature"]].to_csv(od / "meta.csv", index=False)
 
 # class order + palette to match the published (Promoter, Intergenic, Protein-coding, tRNA, TE)
 order = ["Promoter", "Intergenic region", "Protein-coding gene", "tRNA", "Transposable element"]
-pal = {"Promoter": "tab:blue", "Intergenic region": "tab:purple",
-       "Protein-coding gene": "tab:orange", "tRNA": "tab:red", "Transposable element": "tab:green"}
+# published palette: the two large classes (Promoter/Protein-coding) blue & green,
+# Intergenic orange (medium), tRNA red (small), Transposable element purple (tiny)
+pal = {"Promoter": "tab:blue", "Protein-coding gene": "tab:green",
+       "Intergenic region": "tab:orange", "tRNA": "tab:red", "Transposable element": "tab:purple"}
 fig, ax = plt.subplots(figsize=(8, 7))
 for f in order:
     i = (mfs["feature"] == f).values

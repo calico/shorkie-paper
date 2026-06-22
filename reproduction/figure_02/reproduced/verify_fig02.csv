@@ -1,5 +1,5 @@
 panel,metric,reported,reproduced,delta,rtol,atol,verdict
-2A,Shorkie_unmasked_vs_iterative_pwm_corr(>=0.4),0.4,0.6032,0.20319999999999994,0.02,0.0,PASS
+2A,Shorkie_unmasked_vs_iterative_pwm_corr(>=0.4),0.4,0.5836,0.18359999999999999,0.02,0.0,PASS
 2A,Cbf1_Ebox_in_promoter,1.0,1.0,0.0,0.02,0.0,PASS
 2A,polydAdT_in_promoter,1.0,1.0,0.0,0.02,0.0,PASS
 2B,iterative_all_positions_covered,1.0,1.0,0.0,0.02,0.0,PASS
