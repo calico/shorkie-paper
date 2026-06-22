@@ -100,9 +100,19 @@ all 12 numbers unchanged). The three panels are now built by a single source of 
   were a **manual (Illustrator) enhancement** of the published figure, faithfully reproduced here in the
   builder. The underlying distances are unchanged and byte-identical on re-run (sacc max 1.0 with 134/165
   ≥0.99; strains max 0.0081, none ≥0.99 — so the strains' upper break segment is empty by design).
-- **1F — panel aspect.** Kept the dashed blue/orange/green/red curves, faint argmin min-markers, legend
-  "<label>; loss = <min>", y-range, and x = epoch×64 (→ ~320k for 165_Sacc); only widened `figsize`
-  (7.2×4.6 → 10×4.45) to match the published F aspect (3012×1340 ≈ 2.25:1).
+  **Follow-up (heights/arrow/ticks):** the first attempt rendered the subplots too tall (portrait
+  `figsize=(7.6,10)`), so the bars looked too high. Re-checked against the full published figure
+  (`paper/Figures/Figure_1.pdf`) and rebuilt each subplot **wide-and-short** (≈4.5:1 w:h) via an explicit
+  spacer-row `GridSpec` (`figsize=(8.6,8.0)`) that gives the title/brace/arrow/"Target Genomes"
+  annotations fixed room independent of the short axes; added the **R64-1-1 arrow to the top
+  (Saccharomycetales) subplot too** (the published shows it on *both* panels) via a shared
+  `_annotate_mash_panel()` helper; and set the top y-ticks to **0.00/0.25/0.50/0.75/1.00** (published
+  spacing).
+- **1F — exact published scale & style.** Kept the dashed blue/orange/green/red curves, faint argmin
+  min-markers, legend "<label>; loss = <min>", and the wide aspect (`figsize=10×4.45`). Re-checked vs the
+  published F and corrected the **scale + style**: legend → **upper center** (was top-right); y-ticks →
+  **0.02 step (0.42/0.44)** via `MultipleLocator` (was a dense 0.005 grid); x-axis pinned to **0–322k with
+  50k ticks to 300000** (the green 165_Sacc curve + min-marker reach ~302k–320k).
 - **1G — panel aspect.** Kept gene(blue)/intergenic(orange) grouped bars, y-range, labels, legend; only
   widened `figsize` (7.2×4.6 → 10×4.5) to match the published G aspect (2611×1181 ≈ 2.21:1).
 

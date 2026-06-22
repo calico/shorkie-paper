@@ -51,6 +51,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib.path as mpath
 from matplotlib.patches import PathPatch
+from matplotlib.ticker import MultipleLocator
 from matplotlib.transforms import blended_transform_factory
 
 from shorkie import config
@@ -116,38 +117,60 @@ def _draw_brace_down(ax, x0, x1, ytop, depth, text, fontsize=10, lw=1.4, color="
             fontsize=fontsize, clip_on=False)
 
 
+def _annotate_mash_panel(ax, n, brace_text):
+    """Shared below-axis annotations for a Mash subplot (same on both panels in the
+    published figure): a steel-blue arrow to the index-0 (R64-1-1, Mash distance 0)
+    bar, a curly brace over the other genomes, and a centred 'Target Genomes' label.
+    Drawn in a blended transform (data x, axes-fraction y) so it works regardless of
+    the panel's y-data scale (Sacc 0-1 vs the strains' broken 0-0.01)."""
+    blend = blended_transform_factory(ax.transData, ax.transAxes)
+    # arrow to the index-0 (R64-1-1, distance 0) bar, label at the lower-left
+    ax.annotate("$S.\\ Cerevisiae$; R64-1-1\n(with Mash Distance 0)",
+                xy=(0, 0.04), xycoords=blend,
+                xytext=(1.5, -0.52), textcoords=blend,
+                arrowprops=dict(arrowstyle="->", color="steelblue", lw=1.4),
+                fontsize=8, ha="left", va="top", style="italic", clip_on=False)
+    # curly brace over the other genomes, just below the axis
+    _draw_brace_down(ax, 1, n - 1, -0.13, 0.14, brace_text, fontsize=9.5)
+    # "Target Genomes" centred below the brace caption
+    ax.text(0.5 * (n - 1), -0.46, "Target Genomes", transform=blend,
+            ha="center", va="top", fontsize=12, clip_on=False)
+
+
 def restyle_1D():
     sacc = pd.read_csv(MASH / "saccharomycetales_dist.tab", sep="\t", header=None,
                        names=["ref", "q", "dist", "p", "sh"])["dist"].sort_values().values
     strn = pd.read_csv(MASH / "strains_dist.tab", sep="\t", header=None,
                        names=["ref", "q", "dist", "p", "sh"])["dist"].sort_values().values
 
-    fig = plt.figure(figsize=(7.6, 10.0))
-    outer = fig.add_gridspec(2, 1, height_ratios=[1.35, 1.0], hspace=0.78)
-    ax_sacc = fig.add_subplot(outer[0])
-    inner = outer[1].subgridspec(2, 1, height_ratios=[1.0, 3.2], hspace=0.06)
-    ax_top = fig.add_subplot(inner[0])   # strains break upper (0.990-1.000)
-    ax_bot = fig.add_subplot(inner[1])   # strains break lower (0.000-0.010)
+    # Wide-and-short plot areas to match the published panel (top Sacc plot ~4.5:1
+    # w:h). Explicit spacer rows (hspace=0) give the title/brace/arrow/"Target
+    # Genomes" annotations fixed room that does NOT shrink with the short axes.
+    fig = plt.figure(figsize=(8.6, 8.0))
+    gs = fig.add_gridspec(6, 1, height_ratios=[1.5,    # 0 ax_sacc plot
+                                               1.8,    # 1 spacer (Sacc annotations + strains title)
+                                               0.40,   # 2 ax_top  (strains 0.990-1.000)
+                                               0.05,   # 3 break gap
+                                               1.5,    # 4 ax_bot  (strains 0.000-0.010)
+                                               1.20],  # 5 spacer (strains annotations)
+                          hspace=0.0)
+    ax_sacc = fig.add_subplot(gs[0])
+    ax_top = fig.add_subplot(gs[2])   # strains break upper (0.990-1.000)
+    ax_bot = fig.add_subplot(gs[4])   # strains break lower (0.000-0.010)
 
     # --- top panel: 165_Saccharomycetales, linear 0..1 ---------------------- #
     ax_sacc.bar(np.arange(len(sacc)), sacc, width=0.75, color=BAR_BLUE)
     ax_sacc.set_ylim(0, 1.0)
-    ax_sacc.set_yticks([0.0, 0.2, 0.4, 0.6, 0.8, 1.0])
-    ax_sacc.set_ylabel("Mash Distance Score", fontsize=11)
+    ax_sacc.set_yticks([0.0, 0.25, 0.5, 0.75, 1.0])
+    ax_sacc.set_ylabel("Mash Distance Score", fontsize=10)
     ax_sacc.set_title("Mash Distance Score for Yeast R64 vs. Target 165_Saccharomycetales Genomes",
-                      fontsize=12)
+                      fontsize=11.5)
     ax_sacc.set_xlim(-1, len(sacc))
     ax_sacc.set_xticks([])
     for sp in ("top", "right"):
         ax_sacc.spines[sp].set_visible(False)
-    # brace over the non-S.cerevisiae genomes (index 1..end; index 0 is R64 at 0)
-    _draw_brace_down(ax_sacc, 1, len(sacc) - 1, -0.05, 0.06,
-                     "All other Saccharomycetales genomes (non–$S.\\ cerevisiae$)", fontsize=10)
-    # "Target Genomes" sits *below* the brace caption (explicit text, not set_xlabel,
-    # so it never collides with the long caption)
-    _trans_sacc = blended_transform_factory(ax_sacc.transData, ax_sacc.transAxes)
-    ax_sacc.text(0.5 * (len(sacc) - 1), -0.235, "Target Genomes", transform=_trans_sacc,
-                 ha="center", va="top", fontsize=12, clip_on=False)
+    _annotate_mash_panel(ax_sacc, len(sacc),
+                         "All other Saccharomycetales genomes (non–$S.\\ cerevisiae$)")
 
     # --- bottom panel: 80_Strains with a broken y-axis ---------------------- #
     x = np.arange(len(strn))
@@ -159,7 +182,7 @@ def restyle_1D():
     ax_bot.set_ylim(0.000, 0.010)
     ax_bot.set_yticks([0.000, 0.005, 0.010])
     ax_top.set_title("Mash Distance Score for Yeast R64 vs. Target 80_Strains Genomes",
-                     fontsize=12)
+                     fontsize=11.5)
     # hide the spines facing the break + the top panel's x-ticks
     ax_top.spines["bottom"].set_visible(False)
     ax_top.spines["top"].set_visible(False)
@@ -168,31 +191,21 @@ def restyle_1D():
     ax_bot.spines["top"].set_visible(False)
     ax_bot.spines["right"].set_visible(False)
     ax_bot.set_xticks([])
-    # shared y-label centred on the broken pair
-    ax_bot.set_ylabel("Mash Distance Score", fontsize=11)
-    ax_bot.yaxis.set_label_coords(-0.085, 0.75)
+    # shared y-label centred on the broken pair (sits at the top of ax_bot ~ the break)
+    ax_bot.set_ylabel("Mash Distance Score", fontsize=10)
+    ax_bot.yaxis.set_label_coords(-0.085, 0.85)
 
-    # diagonal break marks
-    dd = 0.012
+    # diagonal break marks (sized in axes-fraction; ax_top is short so scale them down)
     kw = dict(color="k", clip_on=False, lw=1.2)
-    ax_top.plot((-dd, +dd), (-dd * 3, +dd * 3), transform=ax_top.transAxes, **kw)
-    ax_top.plot((1 - dd, 1 + dd), (-dd * 3, +dd * 3), transform=ax_top.transAxes, **kw)
-    ax_bot.plot((-dd, +dd), (1 - dd, 1 + dd), transform=ax_bot.transAxes, **kw)
-    ax_bot.plot((1 - dd, 1 + dd), (1 - dd, 1 + dd), transform=ax_bot.transAxes, **kw)
+    dxt, dyt = 0.010, 0.06    # ax_top is short -> larger fractional y
+    dxb, dyb = 0.010, 0.022
+    ax_top.plot((-dxt, +dxt), (-dyt, +dyt), transform=ax_top.transAxes, **kw)
+    ax_top.plot((1 - dxt, 1 + dxt), (-dyt, +dyt), transform=ax_top.transAxes, **kw)
+    ax_bot.plot((-dxb, +dxb), (1 - dyb, 1 + dyb), transform=ax_bot.transAxes, **kw)
+    ax_bot.plot((1 - dxb, 1 + dxb), (1 - dyb, 1 + dyb), transform=ax_bot.transAxes, **kw)
 
-    # arrow to the R64-1-1 (Mash distance 0) bar at index 0
-    trans = blended_transform_factory(ax_bot.transData, ax_bot.transData)
-    ax_bot.annotate("$S.\\ Cerevisiae$; R64-1-1\n(with Mash Distance 0)",
-                    xy=(0, 0.0002), xycoords=trans,
-                    xytext=(7, 0.0083), textcoords=trans,
-                    arrowprops=dict(arrowstyle="->", color="steelblue", lw=1.4),
-                    fontsize=8.5, ha="left", va="center", style="italic")
-    # brace over the non-R64-1-1 strains
-    _draw_brace_down(ax_bot, 1, len(strn) - 1, -0.05, 0.07,
-                     "All other $S.\\ cerevisiae$ strain genomes (non–R64-1-1)", fontsize=10)
-    _trans_bot = blended_transform_factory(ax_bot.transData, ax_bot.transAxes)
-    ax_bot.text(0.5 * (len(strn) - 1), -0.255, "Target Genomes", transform=_trans_bot,
-                ha="center", va="top", fontsize=12, clip_on=False)
+    _annotate_mash_panel(ax_bot, len(strn),
+                         "All other $S.\\ cerevisiae$ strain genomes (non–R64-1-1)")
 
     for out in (RD / "Figure_1D_reproduced.png", RECHECK / "Figure_1D_restyled.png"):
         fig.savefig(out, dpi=140, bbox_inches="tight")
@@ -216,8 +229,14 @@ def restyle_1F():
     ax.set_xlabel("# Training Batches")
     ax.set_ylabel("Validation Loss")
     ax.set_title("Validation Losses")
-    ax.set_ylim(0.404, 0.448)
-    ax.legend(fontsize=9, loc="upper right")
+    # Published scale & style: y-ticks only at 0.42/0.44 (0.02 step); x from 0 to
+    # ~322k (the green 165_Sacc curve + its min-marker reach ~302k-320k), 50k ticks;
+    # legend centred at the top (not in the right corner).
+    ax.set_ylim(0.404, 0.447)
+    ax.yaxis.set_major_locator(MultipleLocator(0.02))
+    ax.set_xlim(0, 322000)
+    ax.set_xticks(np.arange(0, 300001, 50000))
+    ax.legend(fontsize=9, loc="upper center")
     fig.tight_layout()
     for out in (RD / "Figure_1F_reproduced.png", RECHECK / "Figure_1F_restyled.png"):
         fig.savefig(out, dpi=140)
