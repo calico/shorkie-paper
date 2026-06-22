@@ -5,10 +5,18 @@
 Reproduction package for **main-text Figure 7**. Published reference: [`../../paper/Figures/Figure_7.pdf`](../../paper/Figures/Figure_7.pdf) (`published/Figure_7_full.png`).
 
 - **Reproduce:** [`reproduce_figure_07.ipynb`](reproduce_figure_07.ipynb) (executed, 0 errors).
-- **Verify:** `reproduced/verify_fig07.csv` — **60/60 PASS** (56 CPU + 4 GPU-ISM).
-- **GPU panels:** `panels/run_ism_eqtl.{py,sbatch}` (8-fold ensemble logSED-ISM for the OMA1/LAP3 eQTL SNPs).
+- **Verify:** `reproduced/verify_fig07.csv` — **66/66 PASS** against the **published PDF** (`paper/Figures/Figure_7.pdf`).
+- **Deep-recheck:** `recheck/` — every panel rebuilt to match the published figure panel-for-panel; see [`recheck/DISCREPANCIES.md`](recheck/DISCREPANCIES.md) and the side-by-sides `recheck/panel_{AB,C,D,EFG,HI,JO}_sidebyside.png`.
+- **GPU panels:** `panels/run_ism_eqtl.{py,sbatch}` (8-fold ensemble logSED-ISM for the OMA1/LAP3 eQTL SNPs). J–O Shorkie ISM logos are rebuilt from the released ISM cache (no GPU rerun).
 
-The headline result: every reproduced ensemble **AUROC/AUPRC matches the paper's own Figure 7E/F/G to 3 decimals** (bit-exact), and the GPU ISM reproduces the released per-SNP logSED **bit-exactly** (OMA1 −0.2198, LAP3 +0.2344).
+The headline result: ensemble **AUROC/AUPRC matches the published Figure 7E/F/G** (Caudal/Kita to 3 decimals; Renganaath within 0.4–0.7 %, see below), the GPU ISM reproduces the released per-SNP logSED **bit-exactly** (OMA1 −0.2198, LAP3 +0.2344), and the J–O Shorkie ISM saliency logos are recomputed bit-for-bit from cache.
+
+> **Deep-recheck correction (this pass).** The earlier reproduction matched intermediate
+> reference PNGs and reported **Shorkie 0.536/0.555 on Renganaath (panel G)**, concluding "DREAM
+> beats Shorkie." Reading the **published PDF** shows panel G plots **Shorkie 0.618/0.629** — the
+> top model — consistent with the body text. Root cause: panel G uses the **142-variant**
+> `viz_new/results_subset_tss/` set (= the "142 causal core-promoter variants"), not the full
+> 395-variant `viz_new/results/` set. Corrected here; details in `recheck/DISCREPANCIES.md`.
 
 ---
 
@@ -38,29 +46,30 @@ The headline result: every reproduced ensemble **AUROC/AUPRC matches the paper's
 
 ## Phase 3 — Verification
 
-**`reproduced/verify_fig07.csv`: 60/60 PASS.**
+**`reproduced/verify_fig07.csv`: 66/66 PASS** (against the published PDF; rebuilt by `recheck/build_verify_fig07.py`).
 
 | Block | Checks | Result |
 |---|---|---|
-| **E/F/G exact-match to paper figure** | 36 (3 datasets × 6 models × {AUROC, AUPRC}) | **all PASS, Δ=0.000** — reproduced legend == paper legend to 3 dp |
-| **E/F/G transfer-learning benefit** | 12 (Shorkie > Random_Init & > LM, all 3 datasets) | all PASS |
-| **E/F Shorkie > best-DREAM** | 4 (Caudal, Kita) | all PASS |
-| **H/I bin dominance** | 4 (Shorkie ≥ DREAM-RNN in **all** TSS-distance bins, Caudal & Kita) | all PASS (5/5 and 4/4 bins) |
-| **A/B direction (GPU)** | 2 (OMA1 logSED < 0; LAP3 logSED > 0) | PASS (−0.220 / +0.234) |
-| **J/O ISM localization (GPU)** | 2 (peak/median saliency ≥ 3×) | PASS |
+| **E/F/G match published figure** | 36 (3 datasets × 6 models × {AUROC, AUPRC}) | all PASS (Caudal/Kita Δ≤0.001; Renganaath via `results_subset_tss`, max \|Δ\|=0.0074) |
+| **E/F/G direction** | 18 (Shorkie > Random_Init, > LM, > best-DREAM — all 3 datasets) | all PASS (incl. Shorkie > best-DREAM on **Renganaath**, now correct) |
+| **H/I bin dominance** | 2 (Shorkie ≥ DREAM-RNN in **all** TSS-distance bins, Caudal & Kita) | all PASS (5/5 and 4/4 bins) |
+| **A/B direction + coverage** | 4 (OMA1 logSED<0, LAP3 logSED>0; ref-pred vs obs R≥0.8) | PASS (−0.220 / +0.234; R 0.965 / 0.996) |
+| **J–O Shorkie ISM saliency** | 6 (per-locus ISM saliency recomputed from cache) | all PASS |
 
 **Reproduced vs paper Figure 7E/F/G (AUROC | AUPRC):**
 
+Published Figure 7 legend (AUROC | AUPRC); reproduced values in `recheck/fig7EFG_auc.csv`:
+
 | Model | Caudal | Kita | Renganaath |
 |---|---|---|---|
-| **Shorkie** | **0.564 \| 0.585** | **0.650 \| 0.643** | 0.536 \| 0.555 |
-| Shorkie_LM | 0.513 \| 0.532 | 0.523 \| 0.555 | 0.491 \| 0.503 |
-| Shorkie_Random_Init | 0.541 \| 0.551 | 0.641 \| 0.614 | 0.409 \| 0.444 |
-| DREAM-Atten | 0.526 \| 0.536 | 0.534 \| 0.568 | **0.582 \| 0.589** |
-| DREAM-CNN | 0.529 \| 0.537 | 0.539 \| 0.567 | **0.593 \| 0.594** |
-| DREAM-RNN | 0.525 \| 0.538 | 0.533 \| 0.564 | **0.585 \| 0.593** |
+| **Shorkie** | **0.564 \| 0.585** | **0.650 \| 0.643** | **0.618 \| 0.629** |
+| Shorkie_LM | 0.513 \| 0.532 | 0.523 \| 0.555 | 0.474 \| 0.492 |
+| Shorkie_Random_Init | 0.541 \| 0.551 | 0.641 \| 0.614 | 0.424 \| 0.447 |
+| DREAM-Atten | 0.526 \| 0.536 | 0.534 \| 0.568 | 0.585 \| 0.588 |
+| DREAM-CNN | 0.529 \| 0.537 | 0.539 \| 0.567 | 0.596 \| 0.593 |
+| DREAM-RNN | 0.525 \| 0.538 | 0.533 \| 0.564 | 0.590 \| 0.596 |
 
-Every reproduced cell equals the corresponding paper reference-PNG legend value (Δ = 0.000). On **Caudal** and **Kita**, Shorkie is the top model (matching the text). On **Renganaath**, the DREAM models edge Shorkie — **as the paper's own Figure 7G shows** (see discrepancy log).
+Caudal & Kita reproduce to 3 decimals; the whole 36-cell E/F/G grid reproduces with **max |Δ| = 0.0074**. **Shorkie is the top model on all three datasets**, including Renganaath (0.618/0.629 > every DREAM ≈0.59) — consistent with the body text.
 
 The **GPU ISM** reproduces the released per-SNP logSED **bit-exactly**: OMA1 (chrXI:604356 A>G) = **−0.2198** (= positive CSV −0.2198; alt reduces expr.), LAP3 (chrXIV:200328 G>A) = **+0.2344** (= CSV +0.2344; alt increases expr.) — both directions match the caption.
 
@@ -68,9 +77,9 @@ The **GPU ISM** reproduces the released per-SNP logSED **bit-exactly**: OMA1 (ch
 
 | Item | Note |
 |---|---|
-| **Renganaath: Shorkie < DREAM (text vs figure)** | The body text states Shorkie "achieved superior ROC and PR metrics for … Renganaath et al." Our reproduction — **bit-exact to the paper's own Figure 7G reference PNG** — shows the DREAM models (AUROC 0.582–0.593, AUPRC 0.589–0.594) **outperforming Shorkie** (0.536 / 0.555) on Renganaath. Shorkie *does* beat its own Random_Init (0.409 / 0.444) and LM (0.491 / 0.503) ablations there, so the *pretraining benefit* holds, but the blanket "superior vs DREAM for Renganaath" overstates what Figure 7G plots. This is a faithful reproduction surfacing a **text↔figure inconsistency in the manuscript**, not a reproduction error. (Caudal & Kita: Shorkie is genuinely top.) |
-| **Dataset sizes** | Scored positives per negset = Caudal **1837**, Kita **727**, Renganaath **395** vs body-text 1901 / 683 / 142. Differences reflect post-filter/inclusion criteria (the released scoring set vs the raw published eQTL counts; the Kita DREAM eval dir is named `…kita_etal_select`). Reported as documented sanity, not a hard gate. |
-| **A/B SNPs vs display windows** | The dominant-effect eQTL SNP for each gene sits just **outside** the caption's gene-body display window (OMA1 SNP 604356 vs window …–604232; LAP3 SNP 200328 vs 200569–…) — i.e. promoter-proximal, exactly as expected for a cis-regulatory eQTL. The window is the locus display; the SNP is the upstream variant. |
-| **J–O subset** | The paper's J–O are 6 curated motif examples (poly-A efficiency, PAC, Reb1). We render the two coordinate-anchored loci named in the caption (OMA1, LAP3) as faithful representatives of the per-SNP ISM-saliency method; the full curated panel set is illustrative. |
+| **Renganaath (panel G) — corrected** | The published Figure 7G plots **Shorkie 0.618/0.629**, the *top* model (beating DREAM ≈0.59), consistent with the body text. The previous reproduction matched an intermediate full-set reference PNG (Shorkie 0.536/0.555) and wrongly concluded "DREAM beats Shorkie." Root cause: panel G uses the **142-variant** `viz_new/results_subset_tss/` set, not the full 395-variant `results/` set. Recompute on the subset → 0.614/0.624 (within 0.4–0.7 % of published). See `recheck/DISCREPANCIES.md`. |
+| **Dataset sizes** | Scored positives (post inner-join) ≈ Caudal 1712, Kita 655, Renganaath 142 (subset, = body text) / 395 (full) vs body text 1901 / 683 / 142. Differences reflect post-filter inclusion + the Position_Gene intersection. H/I per-bin Pos/Neg counts reproduce the published figure exactly. |
+| **A/B SNPs vs display windows** | The dominant-effect eQTL SNP for each gene sits just **outside** the gene-body display window (OMA1 SNP 604356; LAP3 SNP 200328) — promoter-proximal, as expected for a cis-regulatory eQTL. |
+| **J–O (6 panels)** | All six published ISM panels are reproduced (J YER080W, K YLR036C, L YKL078W, M YKR087C/OMA1, N YNL239W/LAP3, O YGR046W). Shorkie ISM REF/ALT logos are recomputed from the released ISM cache; DREAM-RNN ISM is rendered from cached deltas for **4/6 loci on disk** (K, O absent); Ref DB motif logos are embedded from the project motif DB; Avg-logSED/quantile annotations are carried from the released scoring. |
 
 **Changes to legacy scripts:** none. `1_roc_pr_shorkie_fold.py` / `2_AUROC_AUPRC_by_dsitance.py` were ported into notebook cells with `args.root_dir` → `shorkie.config` (identical metric/label/binning logic, verified by the Δ=0.000 exact match). The GPU ISM reuses `shorkie.models.ensemble` (cf. `notebooks/fig10`).

@@ -1,0 +1,7 @@
+panel,gene,snp,ref,alt,motif,shorkie_ism_maxabs,dream_ism_on_disk,avg_logsed_published,q_logsed_published,q_delta_published
+J,YER080W,chrV:321901,G,T,Polyadenylation efficiency elements,0.00951,True,0.145,99.10%,97.62%
+K,YLR036C,chrXII:221376,A,G,Polyadenylation efficiency elements,0.01185,False,-0.269,99.92%,89.41%
+L,YKL078W,chrXI:288774,G,A,PAC motif (Dot6),0.00783,True,0.273,99.97%,98.64%
+M,YKR087C,chrXI:604356,A,G,Reb1.1,0.01292,True,-0.271,99.95%,92.95%
+N,YNL239W,chrXIV:200328,G,A,Reb1.1,0.01019,True,0.177,99.44%,91.44%
+O,YGR046W,chrVII:584683,C,G,Reb1.1,0.01804,False,0.163,99.72%,18.10%

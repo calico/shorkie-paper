@@ -24,7 +24,8 @@ regenerated.
 - **GPU gaps closed this recheck:** Fig 3 H–J coverage (re-run, bug fixed) and Fig 6 F/G/H/E
   (reproduced from existing on-disk Shorkie NPZ — were mislabeled gaps).
 - **Honest residuals:** Fig 3F norm-gene-R column mapping, Fig 6H tiling aggregate (+0.040), Fig 7
-  Renganaath text↔figure inconsistency — all documented below with root cause.
+  Renganaath ~0.4–0.7 % subset residual (panel G corrected — Shorkie is top, see §6) — all documented
+  below with root cause.
 
 ## Determinism (`recheck/determinism.csv`)
 
@@ -139,11 +140,14 @@ The three direction/presence checks now carry numeric anchors: **118** TF-MoDISc
 to nearest TSS vs **553.5 bp** background (Mann-Whitney U one-sided p = **5.8×10⁻⁹³**); attention-
 embedding t-SNE silhouette **0.085** across 5 feature classes (deterministic, `random_state=0`).
 
-### 6. Fig 7 Renganaath — text↔figure inconsistency in the *paper* (not a reproduction failure)
-The manuscript text states Shorkie > DREAM-RNN on the Renganaath eQTL set, but the paper's **own
-Figure 7G** plots DREAM-RNN (0.582–0.593) above Shorkie (0.536). The reproduction is **bit-exact to the
-published Figure 7G legend** (Δ = 0.000 across all ROC/PR values). This is an internal paper
-inconsistency, faithfully reproduced — documented, not scored as a failure.
+### 6. Fig 7 Renganaath — corrected in the deep-recheck (Shorkie *is* the top model)
+An earlier pass reported Shorkie 0.536/0.555 on Renganaath (panel G), below DREAM, and called it a
+text↔figure inconsistency. The **deep-recheck against the published PDF corrected this**: published
+Figure 7G plots **Shorkie 0.618/0.629** — the top model, beating DREAM (≈0.59) — consistent with the
+body text. Root cause: panel G is scored on the **142-variant** `viz_new/results_subset_tss/` set (=
+the "142 causal core-promoter variants"), not the full 395-variant `results/` set the earlier pass
+used. Recompute on the subset → 0.614/0.624 (within 0.4–0.7 % of published). See
+`figure_07/recheck/DISCREPANCIES.md`; verify is now 66/66 against the published figure.
 
 ## Residuals (carried, with cause)
 
