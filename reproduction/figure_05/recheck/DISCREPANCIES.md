@@ -15,18 +15,22 @@ Published panel layout (read off the PDF), and where the prior reproduction diff
 | Fold-change bars (Measurement blue / Prediction orange, ±SEM) | **B** | **G** | correct | match |
 | Pairwise Euclidean-distance heatmap (8×8, viridis) | **C** | **H** | C was a surrogate | **fixed** |
 | **Normalized Pearson's R boxplot** (per timepoint, n=) | **D** | **I** | mislabeled **5E/5J** | **relabeled** |
-| **TF-Modisco binding-site motif progression** | **E** | **J** | mislabeled **5D/5I**, wrong layout | **rebuilt** |
+| TF-Modisco binding-site motif progression | E | J | mislabeled 5D/5I | **skipped** (see §1, §4) |
 
 ---
 
-## 1. Panel letters D↔E and I↔J were swapped  → FIXED
+## 1. Panels E/J intentionally skipped; boxplots relabeled to the published D/I
 
 The prior notebook labeled the **normalized-Pearson-R boxplots** "5E/5J" and the **TF-Modisco motifs**
 "5D/5I". The **published** figure is the opposite: **D/I are the boxplots**, **E/J are the motif
 progression** (panel D sits top-right of the MSN2 block as a boxplot; panel E is the full-width motif row
-below it; same for I/J on the MSN4 side). Root cause: an internal naming choice in
-`reproduce_figure_05.ipynb` that did not match the published lettering. All filenames, titles and the
-verify CSV now use the published letters.
+below it; same for I/J on the MSN4 side). The boxplots are therefore relabeled to the published **D/I**
+(filenames, titles, and the verify CSV).
+
+**Panels E/J (the motif progression) are intentionally SKIPPED from this reproduction** (per user
+direction). The substantive reason is in §4: the published MSN2 panel E uses an extended timepoint series
+that is not in the released MSN2 artifacts, so it cannot be faithfully reproduced; panel J is skipped
+alongside it. This reproduction covers the 8 panels **A–D, F–I**.
 
 ## 2. Panels A & C used a representative surrogate, not the real ATG42 locus  → FIXED (GPU recompute)
 
@@ -66,29 +70,24 @@ only the logo letters + a y=0 baseline. Those annotations are **manual post-hoc 
 added at figure assembly; they are not produced by the pipeline, so the reproduced A/F are the faithful
 script-exact logo stacks without them (per the user's "faithful logo stack only" choice).
 
-## 4. Panels E & J rendered the wrong thing  → REBUILT as the motif progression
+## 4. Panels E & J — intentionally skipped (not reproduced)
 
-The prior notebook rendered, for E/J, the **top-5 TF-Modisco patterns from the single T90–T0 diff** as a
-generic grid. The published E/J are a **curated progression**: a YeTFaSCo reference motif on the left, then
-**one small logo per ΔT(Tn–T0)** showing the TF-Modisco-detected **binding-site** motif (the MSN2/MSN4
-**STRE** element) emerging/strengthening with induction.
+The published E/J are a curated **per-ΔT motif progression**: a YeTFaSCo reference motif on the left, then
+one small logo per ΔT(Tn–T0) showing the TF-Modisco-detected MSN2/MSN4 **STRE** binding site emerging with
+induction. These two panels are **skipped** from this reproduction, for one substantive reason:
 
-**Fix:** `build_5EJ_progression.py` loops the available ΔT timepoints, loads each
-`…/MSN{2,4}/T{n}/modisco_results_10000_500_diff.h5`, and selects the pattern whose trimmed consensus best
-matches the STRE core (a run of G/C) — the analogue of the authors' curation — orienting MSN2 to the
-G-strand (AGGGG, as published E) and MSN4 to the C-strand (CCCC, as published J). The reference logo is a
-YeTFaSCo-style STRE consensus (MSN2 `AGGGGG`, MSN4 `CCCCTT`).
+- The **published MSN2 panel E** is labeled with the **extended series T5,T10,T20,T40,T70,T120,T180**. In the
+  released code (`…/modisco_analysis/2_modisco_script_diff.sh`) that exact series is assigned to **SWI4**,
+  while MSN2/MSN4 use the standard T0,5,10,15,30,45,60,90. The released MSN2 modisco directory contains only
+  the standard 8 timepoints — no T20/T40/T70/T120/T180 — so the published MSN2 panel E (made from a
+  longer/earlier MSN2 induction run out to 180 min, or carrying SWI4 labels) **cannot be faithfully
+  reproduced** from the released artifacts.
+- Panel **J** (the analogous MSN4 motif progression; its T5..T90 series *does* match the released data) is
+  skipped **alongside** E for consistency.
 
-## 5. MSN2 panel-E timepoint series mismatch  → RESIDUAL (documented)
-
-The **published MSN2 panel E** is labeled with the **extended series T5,T10,T20,T40,T70,T120,T180**. In the
-released code (`…/modisco_analysis/2_modisco_script_diff.sh`) that exact series is assigned to **SWI4**,
-while MSN2 (and MSN4) use the **standard** T0,5,10,15,30,45,60,90. The released MSN2 modisco directory
-indeed contains only the standard 8 timepoints — no T20/T40/T70/T120/T180. We therefore reproduce panel E
-over the **available MSN2 timepoints**, and document this as a residual: the published MSN2 panel was made
-from a **longer/earlier MSN2 induction run (out to 180 min)** that is **not in the released artifacts**
-(or carries the SWI4 timepoint labels). **MSN4 panel J's series (5,10,15,30,45,60,90) matches the released
-data exactly**, so J reproduces directly.
+For the record, the STRE motif *is* recoverable from the released ΔT modisco diffs — the GGGG (MSN2) /
+CCCC (MSN4) binding site emerges across the available timepoints — but the panels are excluded from the
+reproduction. (The exploratory progression builder lives only in the git history at commit `55b6173`.)
 
 ---
 

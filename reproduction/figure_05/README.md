@@ -21,29 +21,28 @@ promoter **chrXIII:70,173–70,673**.
 | Fold-change vs T0 (Measurement / Prediction, ±SEM) | **B** | **G** | `…/motif_shorkie__time_series/1_time_track_metrics_viz.py --gene YBR139W / YML100W` |
 | Pairwise Euclidean-distance heatmap (8×8, viridis) | **C** | **H** | per-timepoint mean-centered PWM distance (`recheck/build_logos_distance.py`) |
 | **Normalized Pearson's R boxplot** (per timepoint, `n=`) | **D** | **I** | per-track `pearsonr_norm` grouped by timepoint (`1_time_track_metrics_viz.py`) |
-| **TF-Modisco binding-site motif over ΔT** (YeTFaSCo ref + per-Tn motif) | **E** | **J** | per-Tn `modisco_results_10000_500_diff.h5`, STRE-matched (`recheck/build_5EJ_progression.py`) |
+| TF-Modisco binding-site motif over ΔT | E *(skipped)* | J *(skipped)* | not reproduced — see `recheck/DISCREPANCIES.md` |
 
-> The earlier draft of this notebook had **D/E and I/J swapped** (it called the boxplots "5E/5J" and the
-> modisco panels "5D/5I") and rendered E/J as a generic top-N grid. Both are corrected here.
+> This reproduction covers the **8 panels A–D, F–I**; panels **E/J are intentionally skipped** (the published
+> MSN2 panel E uses an extended timepoint series not in the released artifacts — see DISCREPANCIES.md). Note the
+> normalized-Pearson-R boxplots are the published **D/I** (the prior draft mislabeled them 5E/5J).
 
-## Verification (`reproduced/verify_fig05.csv`)
+## Verification (`reproduced/verify_fig05.csv` — 10/10 PASS over the reproduced panels A–D, F–I)
 
 | Panel | Metric | Target | Reproduced |
 |---|---|---|---|
 | 5A | ATG42 ISM window | chrII:515,214–515,714 | exact (recomputed) |
-| 5C | ATG42 ISM distance monotone-from-T0 | yes | yes |
+| 5C | ATG42 ISM distance diverges-from-T0 | yes | yes |
 | 5D | MSN2 norm-R median | 0.55–0.65 | **0.591**; n-counts 8,12,8,12,9,9,7,9 ✓ |
-| 5E | MSN2 STRE motif recovered over ΔT | ≥1 | all 7 timepoints |
 | 5F | TSL1 ISM window | chrXIII:70,173–70,673 | exact |
-| 5H | TSL1 ISM distance monotone-from-T0 | yes | yes ([0,.04,.09,.21,.36,.42,.49,.55]) |
+| 5H | TSL1 ISM distance diverges-from-T0 | yes | yes ([0,.04,.09,.21,.36,.42,.49,.55]) |
 | 5I | MSN4 norm-R median | 0.55–0.65 | **0.618**; n-counts 11,7,8,10,6,8,12,8 ✓ |
-| 5J | MSN4 STRE motif recovered over ΔT | ≥1 | all 7 timepoints |
 | 5B | MSN2 global ΔlogFC R | 0.4949 | 0.4949 |
 | 5G | MSN4 global ΔlogFC R | 0.3992 | 0.3992 |
 
 ## What changed in this recheck (see `recheck/DISCREPANCIES.md` for full root-cause detail)
 
-1. **Panels D↔E, I↔J relabeled** to the published lettering (D/I = boxplots, E/J = motif progression).
+1. **Normalized-Pearson-R boxplots are the published D/I** (the prior draft mislabeled them 5E/5J).
 2. **Panels A & C now show the REAL ATG42 locus.** The ATG42 promoter ISM was never released (the MSN2
    ISM target set omits chrII:515 kb), so the old notebook used a representative surrogate. We
    **recomputed it on GPU** (`panels/run_atg42_ism.sbatch` → `reproduced/ism_atg42/scores.h5`) with the
@@ -51,15 +50,15 @@ promoter **chrXIII:70,173–70,673**.
 3. **Panels A & F are now full-500 bp** logo stacks (the prior notebook zoomed to a 90 bp window). The
    published red boxes / Reference-DB gene track / feature labels are **manual post-hoc overlays** the
    pipeline never drew (documented; not reproduced — faithful logo stack only).
-4. **Panels E & J rebuilt** as the curated per-ΔT motif progression (YeTFaSCo STRE reference + the
-   TF-Modisco-detected MSN2-GGGG / MSN4-CCCC motif per timepoint).
+4. **Panels E & J are intentionally skipped** (TF-Modisco motif progression) — see the residual below.
 
 ### Documented residuals
 
-- **MSN2 panel-E timepoints.** The **published** MSN2 panel E uses the **extended series
+- **Panels E/J skipped.** The **published** MSN2 panel E uses the **extended series
   T5,T10,T20,T40,T70,T120,T180** (the series the released code assigns to **SWI4**); the released MSN2
-  modisco has only the standard 8 timepoints. We reproduce panel E over the available MSN2 timepoints and
-  document the mismatch. **MSN4 panel J's series matches the released data exactly.**
+  modisco has only the standard 8 timepoints, so panel E cannot be faithfully reproduced. Panel J (the
+  analogous MSN4 motif progression) is skipped alongside it. (The STRE GGGG/CCCC motif does emerge across
+  the available timepoints, but the panels are excluded from this reproduction.)
 - **ATG42 window indexing.** The pipeline's TSS rule (`1_create_target_genes.py`) yields
   chrII:515,213–515,713 on the current GTF — a 1 bp 0-/1-indexing offset from the published caption
   (515,214–515,714); we target the published caption window (cosmetic 1 bp).

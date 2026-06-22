@@ -113,25 +113,5 @@ def distance_heatmap(norm, title, png_name):
     print(f"  saved {out}")
     return D, ts
 
-
-# ---- TF-Modisco motif helpers (E/J progression) ----
-def ic(ppm, bg=np.array([.25, .25, .25, .25]), ps=0.001):
-    return np.sum((np.log((ppm + ps) / (1 + ps * 4)) / np.log(2)) * ppm
-                  - (np.log(bg) * bg / np.log(2))[None, :], axis=1)
-
-
-def trim(cwm, thr=0.3, fl=4):
-    sc = np.sum(np.abs(cwm), axis=1); t = np.max(sc) * thr; w = np.where(sc >= t)[0]
-    return (0, cwm.shape[0]) if len(w) == 0 else (max(w.min() - fl, 0), min(w.max() + fl + 1, cwm.shape[0]))
-
-
-def consensus(ppm):
-    return "".join("ACGT"[i] for i in np.argmax(ppm, axis=1))
-
-
-def max_run(seq, base):
-    best = cur = 0
-    for ch in seq:
-        cur = cur + 1 if ch == base else 0
-        best = max(best, cur)
-    return best
+# (TF-Modisco motif helpers for the E/J progression were removed — panels E/J are skipped;
+#  see recheck/DISCREPANCIES.md.)

@@ -18,9 +18,10 @@ cells.append(md(r"""# Figure 5 — Time-course stress-responsive TF induction (M
 
 Reproduction of **main-text Figure 5** (published: [`../../paper/Figures/Figure_5.pdf`](../../paper/Figures/Figure_5.pdf)).
 Two genes / two halves (β-estradiol induction RNA-seq; T0,T5,T10,T15,T30,T45,T60,T90):
-**5A–E = MSN2 @ ATG42 (YBR139W), chrII:515,214–515,714**; **5F–J = MSN4 @ TSL1 (YML100W), chrXIII:70,173–70,673**.
+MSN2 @ ATG42 (YBR139W), chrII:515,214–515,714; MSN4 @ TSL1 (YML100W), chrXIII:70,173–70,673.
 
-**Published panel map** (D/I = boxplots, E/J = motif progression):
+**Published panel map** — this reproduction covers the 8 panels A–D, F–I; **panels E/J (TF-Modisco motif
+progression) are intentionally skipped** (see `recheck/DISCREPANCIES.md`):
 
 | Row | MSN2 | MSN4 |
 |---|---|---|
@@ -28,12 +29,13 @@ Two genes / two halves (β-estradiol induction RNA-seq; T0,T5,T10,T15,T30,T45,T6
 | Fold-change bars (Measurement / Prediction vs T0) | **B** | **G** |
 | Pairwise Euclidean-distance heatmap (viridis) | **C** | **H** |
 | **Normalized Pearson's R boxplot** (per timepoint) | **D** | **I** |
-| **TF-Modisco binding-site motif over ΔT** | **E** | **J** |
+| TF-Modisco binding-site motif over ΔT | E *(skipped)* | J *(skipped)* |
 
 This notebook delegates to the deep-recheck builders in [`recheck/`](recheck/). See
-[`recheck/DISCREPANCIES.md`](recheck/DISCREPANCIES.md) for: the panel-letter fix (D↔E, I↔J); the **GPU
-recompute of the ATG42 ISM** (panels A/C — the locus was never released); the full-window logo fix; and the
-E/J motif-progression rebuild + the documented MSN2 extended-timepoint residual."""))
+[`recheck/DISCREPANCIES.md`](recheck/DISCREPANCIES.md) for: the **GPU recompute of the ATG42 ISM**
+(panels A/C — the locus was never released); the full-window logo fix; the boxplots being the published
+**D/I** (the prior draft mislabeled them 5E/5J); and **why E/J are skipped** (the published MSN2 panel E
+uses an extended timepoint series not in the released artifacts)."""))
 
 cells.append(md(r"""## Prerequisite — ATG42 ISM (GPU, one-time)
 
@@ -102,15 +104,12 @@ Per-track `pearsonr_norm` grouped by timepoint (`n=` annotated). Medians **MSN2 
 cells.append(code(r"""show("eval_MSN2/YBR139W_ATG42/pearsonr_norm_by_timepoint_boxplot.png",
      "eval_MSN4/YML100W_TSL1/pearsonr_norm_by_timepoint_boxplot.png", width=600)"""))
 
-cells.append(md(r"""## Panels E/J — TF-Modisco binding-site motif over ΔT
+cells.append(md(r"""## Panels E/J — intentionally skipped
 
-`recheck/build_5EJ_progression.py`: for each ΔT(Tn–T0) modisco diff, the STRE-matched binding-site motif
-(MSN2 **GGGG** / MSN4 **CCCC**) + a YeTFaSCo STRE reference. **Residual:** the published MSN2 panel E uses
-the extended series T5,T10,T20,T40,T70,T120,T180 (a SWI4-labeled run **not in the released MSN2 artifacts**);
-we reproduce over the available MSN2 timepoints. MSN4 panel J's series matches the released data exactly."""))
-
-cells.append(code(r"""run_builder("build_5EJ_progression.py")
-show("Figure_5E_MSN2_motif_progression.png", "Figure_5J_MSN4_motif_progression.png", width=1200)"""))
+The published **E/J** (TF-Modisco binding-site motif progression) are **not reproduced**: the published MSN2
+panel E uses an extended timepoint series (T5,T10,T20,T40,T70,T120,T180 — the series the released code assigns
+to SWI4) that is **not in the released MSN2 artifacts**, so panel E cannot be faithfully reproduced; the
+analogous MSN4 panel J is skipped alongside it. See [`recheck/DISCREPANCIES.md`](recheck/DISCREPANCIES.md)."""))
 
 cells.append(md(r"""## Verification
 
