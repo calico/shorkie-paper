@@ -17,6 +17,12 @@ Reproduction package for **main-text Figure 6**. Published reference:
 > fixes every reproduced Pearson/Spearman matches the figure to |Δ| ≤ 0.001. Full root-cause writeup:
 > [`recheck/DISCREPANCIES.md`](recheck/DISCREPANCIES.md).
 
+> **Visual-exactness refinement (2026-06-22):** the panels are restyled to match the published figure
+> pixel-for-pixel — B/C now reproduce `plot_combined_trend_quantiles` (per-gene dashed `'o'` lines over
+> a single `tab20`, three quantile aggregates with **STD** error bars in dark-green/dark-red/black, 3-col
+> legend, two-line title) as **separate** `Figure_6B.png`/`Figure_6C.png`; D–I drop the `(reproduced)`
+> prefix and carry the published panel header + bold panel letter + source font sizes. Numbers unchanged.
+
 ---
 
 ## Dataset
@@ -56,7 +62,7 @@ Panel I is a gaussian-kde 2D density of log2(prediction+1) vs log2(Mean T0 RNA-S
 | `build_panels_DE.py` | 6D Yeast, 6E Random (Shorkie + DREAM) | `reproduced/Figure_6{D,E}.png`, `recheck/fig6_DEFGH_R.csv` |
 | `build_panels_FGH.py` | 6F SNV, 6G motif-pert, 6H motif-tiling (Shorkie + DREAM) | `reproduced/Figure_6{F,G,H}.png` |
 | `build_panel_I.py` | 6I RNA-seq coverage density (Shorkie + DREAM) | `reproduced/Figure_6I.png`, `recheck/fig6_I_R.csv` |
-| `build_panels_BC.py` | 6B/6C AUROC/AUPRC trends + 6A schematic | `reproduced/Figure_6BC.png`, `reproduced/Figure_6A_schematic.png` |
+| `build_panels_BC.py` | 6B/6C AUROC/AUPRC trends + 6A schematic | `reproduced/Figure_6B.png`, `reproduced/Figure_6C.png`, `reproduced/Figure_6A_schematic.png` |
 | `build_verify_fig06.py` | 26-check verification vs published figure | `reproduced/verify_fig06.csv` |
 | `make_sidebyside_fig06.py` | published-vs-reproduced crops + montage | `recheck/panel_*_sidebyside.png` |
 

@@ -98,3 +98,18 @@ log2(prediction+1) vs log2(Mean T0 RNA-Seq coverage+1). Shorkie (8 folds, valid+
   are identical. The reproduced panels follow the published orientation for visual fidelity.
 - **No GPU / no fabrication:** every panel is recomputed from cached NPZ / TSV on disk. The
   prior "6F/6G/6H GPU gap" framing was incorrect — all scored predictions were already cached.
+
+## Visual-exactness refinement (2026-06-22)
+A second pass restyled the panels to match the published figure pixel-for-pixel (numbers unchanged,
+still 26/26):
+- **6B/6C** rewritten to match `3_MPRA_classifier_merge.py::plot_combined_trend_quantiles` (L175–247)
+  exactly — per-gene **dashed `'o'`** lines over a single `tab20` resampled to 18 (quantile order,
+  pos-then-neg), three quantile aggregates with **STD** error bars (`fmt='o-'`, ms=8, capsize=5) in
+  **#006400 / #8B0000 / #000000** (dark green / dark red / black), `legend(loc='best', ncol=3,
+  fontsize=8)`, `figsize=(8,3.7)`, two-line title — emitted as **separate** `Figure_6B.png` /
+  `Figure_6C.png` (replacing the combined `Figure_6BC.png`). (Earlier draft used SE error bars,
+  no markers, 2-col legend — corrected to STD/markers/3-col.)
+- **6D–6H / 6I** drop the `Figure 6X (reproduced) — …` suptitle (the published figure has none),
+  adopt the published panel header (`"Rafi et al. {Name} Sequences\n({single|dual}-sequence)"`;
+  `"RNA-Seq Coverage Prediction (held-out test set)"`), add the bold panel letter, and use the source
+  font sizes. Markers/colors/regression/grid/labels were already source-exact.

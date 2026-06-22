@@ -92,13 +92,13 @@ def subplot(ax, d, title, vmin, vmax):
         ax.text(0.5, 0.5, "No Data", ha="center", va="center"); return None
     sc = ax.scatter(d["x"], d["y"], c=d["z"], s=15, alpha=0.6, cmap="viridis", vmin=vmin, vmax=vmax)
     ax.plot(d["xv"], d["yv"], color="red", lw=2)
-    ax.set_xlabel("Prediction (log₂ scale)", fontsize=11)
-    ax.set_ylabel("Mean T₀ RNA-Seq Coverage (log₂ scale)", fontsize=11)
-    ax.set_title(title, fontsize=12)
+    ax.set_xlabel("Prediction (log₂ scale)", fontsize=12)
+    ax.set_ylabel("Mean T₀ RNA-Seq Coverage (log₂ scale)", fontsize=12)
+    ax.set_title(title, fontsize=14)
     ax.set_box_aspect(1)
     ax.text(0.05, 0.95, f"Pearson r = {d['r']:.3f}\nSpearman ρ = {d['rho']:.3f}",
             transform=ax.transAxes, va="top",
-            bbox=dict(boxstyle="round", fc="white", alpha=0.8), fontsize=11)
+            bbox=dict(boxstyle="round", fc="white", alpha=0.8), fontsize=12)
     return sc
 
 
@@ -115,7 +115,8 @@ def main():
     if sc1 or sc2:
         cbar_ax = fig.add_axes([0.92, 0.2, 0.015, 0.6])
         fig.colorbar(sc1 if sc1 else sc2, cax=cbar_ax, label="Density")
-    fig.suptitle("Figure 6I (reproduced) — RNA-Seq Coverage Prediction (held-out test set)", fontsize=12)
+    fig.suptitle("RNA-Seq Coverage Prediction (held-out test set)", fontsize=14)
+    fig.text(0.02, 0.97, "I", fontsize=20, fontweight="bold", va="top", ha="left")
     out = REPRO / "Figure_6I.png"
     fig.savefig(out, dpi=140, bbox_inches="tight")
     plt.close(fig)

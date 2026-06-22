@@ -36,7 +36,7 @@ PANEL_BBOX = {
     "6I": (0.66, 0.68, 1.00, 1.00),
 }
 REPRO_PNG = {
-    "6A": "Figure_6A_schematic.png", "6B": "Figure_6BC.png", "6C": "Figure_6BC.png",
+    "6A": "Figure_6A_schematic.png", "6B": "Figure_6B.png", "6C": "Figure_6C.png",
     "6D": "Figure_6D.png", "6E": "Figure_6E.png", "6F": "Figure_6F.png",
     "6G": "Figure_6G.png", "6H": "Figure_6H.png", "6I": "Figure_6I.png",
 }

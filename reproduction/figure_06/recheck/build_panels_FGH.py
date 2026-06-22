@@ -42,11 +42,11 @@ def _scatter(ax, x, y, color, label, pear, spear, xlabel, ylabel, title):
     xr = np.linspace(np.min(x), np.max(x), 100)
     ax.plot(xr, s * xr + b, color=mc.COL_REG, lw=2,
             label=f"Pearson: {pear:.3f}, Spearman: {spear:.3f}")
-    ax.set_xlabel(xlabel, fontsize=8.5)
-    ax.set_ylabel(ylabel, fontsize=8.5)
-    ax.set_title(title, fontsize=9)
-    ax.legend(fontsize=7)
-    ax.grid(True, alpha=0.3)
+    ax.set_xlabel(xlabel, fontsize=9.5)
+    ax.set_ylabel(ylabel, fontsize=9.5)
+    ax.set_title(title, fontsize=10)
+    ax.legend(fontsize=8, loc="upper left")
+    ax.grid(True)
 
 
 def main():
@@ -57,7 +57,7 @@ def main():
         s_pred, s_gt, s_pear, s_spear, s_n, n_genes = mc.shorkie_dual(seq_type, gt)
         d_pred, d_gt, d_pear, d_spear, d_n = mc.dream_dual(seq_type, gt, dream)
 
-        fig, axes = plt.subplots(1, 2, figsize=(11, 5))
+        fig, axes = plt.subplots(1, 2, figsize=(10, 5))
         _scatter(axes[0], s_pred, s_gt, mc.COL_SHORKIE, "Data", s_pear, s_spear,
                  "Shorkie predicted logSED differences (Alt - Ref)",
                  "Average expression levels differences\n(YFP fluorescence, Alt - Ref)",
@@ -66,10 +66,11 @@ def main():
                  "DREAM-RNN model prediction differences (Alt - Ref)",
                  "Average expression levels differences\n(YFP fluorescence, Alt - Ref)",
                  f"{nice}:\nDREAM-RNN Model vs Ground Truth ALT / REF Differences")
-        fig.suptitle(f"Figure {panel} (reproduced) — {suptitle}", fontsize=11)
-        fig.tight_layout(rect=[0, 0, 1, 0.94])
+        fig.suptitle(suptitle, fontsize=13)
+        fig.text(0.01, 0.99, panel[-1], fontsize=20, fontweight="bold", va="top", ha="left")
+        fig.tight_layout(rect=[0, 0, 1, 0.93])
         out = REPRO / f"Figure_{panel}.png"
-        fig.savefig(out, dpi=140)
+        fig.savefig(out, dpi=150)
         plt.close(fig)
 
         print(f"[{panel}] {seq_type}: genes={n_genes}  "
