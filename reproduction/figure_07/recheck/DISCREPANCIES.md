@@ -14,8 +14,24 @@ recomputed bit-for-bit from the released ISM cache. Genuine residuals are docume
 Recheck artifacts (this directory): `build_7EFG_roc_pr.py`, `build_7AB_coverage.py`,
 `build_7CD_schematic.py`, `build_7HI_distance.py`, `build_7JO_ism.py`, `build_verify_fig07.py`,
 `make_sidebyside_fig07.py`; CSVs `fig7EFG_auc.csv`, `fig7AB_logsed.csv`, `fig7HI_auprc.csv`,
-`fig7JO_logsed.csv`, `recheck_checks_fig07.csv`; side-by-sides `panel_{AB,C,D,EFG,HI,JO}_sidebyside.png`,
-`Figure_7_published_vs_reproduced.png`.
+`fig7JO_logsed.csv`, `verify_fig7JO.csv`, `recheck_checks_fig07.csv`; side-by-sides
+`panel_{AB,C,D,EFG,HI,JO}_sidebyside.png`, `Figure_7_published_vs_reproduced.png`.
+
+## Refinement pass (match-published)
+A second pass tightened three panel groups to the published rendering exactly:
+- **A/B coverage** now use the published **bar style** (`ax.bar(width=1, alpha=0.7)` — Ref `tab:blue`,
+  Alt `tab:orange`; GT green) with a single consolidated right-side legend (Center / gene Start / End /
+  SNP / Ref / Alt / Ground Truth), matching `plot_coverage_track_pair_bins_w_ref` in the source
+  notebook. The cached track-mean `cov_ref/cov_alt` already equal the published values (soft-clip 384 is
+  a no-op at these loci; y-scales match: A Signal 0–10, GT 0–12).
+- **E/F/G** now set the **exact published axis limits** — PR `xlim(0,1)`/`ylim(0.45,1.05)`, ROC
+  `0–1×0–1`, every subplot square (`set_box_aspect(1)`), 0.2/0.1 tick spacing — matching
+  `1_roc_pr_shorkie_fold.py`. Numbers unchanged (max |Δ|=0.0074).
+- **J–O Shorkie ISM logos** now use the **exact source recipe** — `plot_seq_scores` semantics
+  (per-position argmax-|·| base scaled by the row-sum) on the **raw** cached `pred_ism_wt/mut` over the
+  80 bp window (`center±40`); the prior `(pred_ism − rowmean)×onehot` was ~0.75× scaled. A new
+  `verify_fig7JO.csv` confirms **18/18 PASS** (region, SNP, ref/alt allele, motif, ISM-recomputed for
+  all 6 loci). DREAM-RNN ISM is confirmed on disk for 4/6 loci (K, O genuinely absent).
 
 ---
 

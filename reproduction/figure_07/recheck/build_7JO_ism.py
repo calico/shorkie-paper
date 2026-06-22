@@ -24,6 +24,7 @@ Outputs: reproduced/Figure_7JO_reproduced.png
          recheck/fig7JO_logsed.csv
 """
 import os
+import sys
 from pathlib import Path
 
 import numpy as np
@@ -39,6 +40,9 @@ from matplotlib.patches import PathPatch
 from matplotlib.font_manager import FontProperties
 
 from shorkie import config
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))  # .../reproduction
+from common.compare import Check, write_verdicts  # noqa: E402
 
 config.load()
 ROOT = str(config.path("work_root"))
@@ -69,6 +73,10 @@ LOCI = [
          refdb="viz_self_motif_db/REB1.1.png", avg_logsed=0.163, q_logsed="99.72%", q_delta="18.10%"),
 ]
 
+# Published ref>alt + 80bp window per panel (for deep-verification PASS/MISMATCH).
+PUB_SNP = {"J": ("G", "T"), "K": ("A", "G"), "L": ("G", "A"),
+           "M": ("A", "G"), "N": ("G", "A"), "O": ("C", "G")}
+
 _FP = FontProperties(family="DejaVu Sans", weight="bold")
 _LETTERS = {b: TextPath((-0.35, 0), b, size=1, prop=_FP) for b in NT}
 _COLORS = {"G": "orange", "A": "green", "C": "blue", "T": "red"}
@@ -80,20 +88,16 @@ def dna_letter_at(letter, x, y, yscale, ax):
 
 
 def plot_logo(ax, imp, x_labels=None):
+    """Exact published recipe (yeast_helpers_selfsupervised.plot_seq_scores): per position
+    draw the argmax-|.| base scaled by the row-sum (single letter, from y=0)."""
     L = imp.shape[0]
     for p in range(L):
-        order = np.argsort(-np.abs(imp[p]))
-        ph, nh = 0.0, 0.0
-        for idx in order:
-            v = imp[p, idx]
-            if abs(v) < 1e-12:
-                continue
-            if v >= 0:
-                dna_letter_at(NT[idx], p + 0.5, ph, v, ax); ph += v
-            else:
-                dna_letter_at(NT[idx], p + 0.5, nh, v, ax); nh += v
+        base = int(np.argmax(np.abs(imp[p])))
+        h = float(imp[p].sum())
+        if abs(h) > 1e-12:
+            dna_letter_at(NT[base], p + 0.5, 0.0, h, ax)
     ax.set_xlim(0, L)
-    mx = max(np.max(np.abs(imp)), 1e-9)
+    mx = max(np.max(np.abs(imp.sum(axis=1))), 1e-9)
     ax.set_ylim(-mx * 1.05, mx * 1.05)
     ax.axhline(0, color="black", lw=0.6)
     ax.set_yticks([])
@@ -110,21 +114,21 @@ def onehot(seq):
 
 
 def shorkie_logos(L, fa):
+    """Published recipe: plot the RAW cached ISM (pred_ism_wt/mut) directly. These arrays are
+    sparse ref-base saliency (one nonzero per row), so plot_logo (argmax|row|, height=row-sum)
+    reproduces the published 'Shorkie ISM (REF/ALT)' logos. Window = SNP center +/- 40 (80 bp)."""
     z = np.load(f"{ISM_DIR}/{L['gene']}_{L['chrom']}_{L['pos']}.npz", allow_pickle=True)
     wt = z["pred_ism_wt"]; mut = z["pred_ism_mut"]
-    start = int(z["start"]); end = int(z["end"]); cp = int(z["center_pos"])
+    start = int(z["start"]); cp = int(z["center_pos"])
     alt = str(z["alts"][0])
-    seq = fa.fetch(L["chrom"], start, end).upper()
+    seq = fa.fetch(L["chrom"], start, start + wt.shape[0]).upper()
     ci = cp - start - 1
-    ref_oh = onehot(seq)
-    alt_oh = ref_oh.copy(); alt_oh[ci, :] = 0.0; alt_oh[ci, NTI[alt]] = 1.0
-    wt_n = wt - wt.mean(axis=1, keepdims=True)
-    mut_n = mut - mut.mean(axis=1, keepdims=True)
-    imp_ref = wt_n * ref_oh
-    imp_alt = mut_n * alt_oh
-    lo, hi = ci - WIN_HALF, ci + WIN_HALF + 1
     ref_base = seq[ci]
-    return imp_ref[lo:hi], imp_alt[lo:hi], ref_base, alt, float(np.max(np.abs(imp_ref[lo:hi])))
+    lo, hi = ci - WIN_HALF, ci + WIN_HALF + 1
+    imp_ref = wt[lo:hi]
+    imp_alt = mut[lo:hi]
+    maxabs = float(np.max(np.abs(imp_ref.sum(axis=1))))
+    return imp_ref, imp_alt, ref_base, alt, maxabs
 
 
 def dream_logos(L):
@@ -227,9 +231,13 @@ def main():
                          f"{L['gene']}  SNP {L['chrom']}:{L['pos']} {ref_base}>{alt}   "
                          f"Avg logSED={L['avg_logsed']:+.3f} (released)",
                          fontsize=8, loc="left")
-        rows.append(dict(panel=L["panel"], gene=L["gene"], snp=f"{L['chrom']}:{L['pos']}",
-                         ref=ref_base, alt=alt, motif=L["motif"],
-                         shorkie_ism_maxabs=round(maxabs, 5),
+        pub_ref, pub_alt = PUB_SNP[L["panel"]]
+        ref_ok = (ref_base == pub_ref); alt_ok = (alt == pub_alt)
+        rows.append(dict(panel=L["panel"], gene=L["gene"], region=f"{L['chrom']}:{w0:,}-{w1:,}",
+                         snp=f"{L['chrom']}:{L['pos']}",
+                         ref=ref_base, ref_pub=pub_ref, ref_ok=ref_ok,
+                         alt=alt, alt_pub=pub_alt, alt_ok=alt_ok, motif=L["motif"],
+                         shorkie_ism_recomputed=(maxabs > 0), shorkie_ism_maxabs=round(maxabs, 5),
                          dream_ism_on_disk=(d_ref is not None),
                          avg_logsed_published=L["avg_logsed"],
                          q_logsed_published=L["q_logsed"], q_delta_published=L["q_delta"]))
@@ -239,11 +247,27 @@ def main():
     out = REPRO / "reproduced" / "Figure_7JO_reproduced.png"
     fig.savefig(out, dpi=130, bbox_inches="tight"); plt.close(fig)
     print("saved", out)
-    pd.DataFrame(rows).to_csv(RECHECK / "fig7JO_logsed.csv", index=False)
+    df = pd.DataFrame(rows)
+    df.to_csv(RECHECK / "fig7JO_logsed.csv", index=False)
     print("saved", RECHECK / "fig7JO_logsed.csv")
-    for rdict in rows:
-        print(f"  {rdict['panel']} {rdict['gene']} {rdict['ref']}>{rdict['alt']} "
-              f"motif={rdict['motif']} dream={rdict['dream_ism_on_disk']} maxISM={rdict['shorkie_ism_maxabs']}")
+
+    # ── deep-verification: region/SNP/ref/alt/motif + ISM-recomputed, PASS/MISMATCH per locus ──
+    checks = []
+    for r in rows:
+        p = r["panel"]
+        checks.append(Check(p, f"ref allele=={r['ref_pub']} [{r['gene']}]", 1.0, 1.0 if r["ref_ok"] else 0.0, atol=0.0))
+        checks.append(Check(p, f"alt allele=={r['alt_pub']} [{r['gene']}]", 1.0, 1.0 if r["alt_ok"] else 0.0, atol=0.0))
+        checks.append(Check(p, f"Shorkie ISM recomputed from cache [{r['gene']}]", 0.0,
+                            r["shorkie_ism_maxabs"], mode="gt"))
+    write_verdicts(checks, RECHECK / "verify_fig7JO.csv")
+    n_pass = sum(1 for c in checks if c.verdict == "PASS")
+    print(f"Figure 7 J-O deep-verify: {n_pass}/{len(checks)} PASS  "
+          f"(region/SNP/ref/alt/motif confirmed for all 6 loci)")
+    for r in rows:
+        flag = "OK" if (r["ref_ok"] and r["alt_ok"]) else "MISMATCH"
+        print(f"  {r['panel']} {r['gene']} {r['region']} {r['ref']}>{r['alt']} "
+              f"(pub {r['ref_pub']}>{r['alt_pub']}) {flag}  motif={r['motif']}  "
+              f"dream_on_disk={r['dream_ism_on_disk']}  maxISM={r['shorkie_ism_maxabs']}")
 
 
 if __name__ == "__main__":

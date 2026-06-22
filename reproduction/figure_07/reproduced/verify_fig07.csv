@@ -59,9 +59,9 @@ I,"frac bins Shorkie>=DREAM-RNN AUPRC [Kita et al., n=4]",1.0,1.0,0.0,0.02,0.0,P
 7B,LAP3 SNP logSED>0 (alt increases expr),0.0,0.2344,0.2344,0.02,0.0,PASS
 7A,"OMA1 R(ref-pred,obs)>=0.8",0.8,0.965,0.16499999999999992,0.02,0.0,PASS
 7B,"LAP3 R(ref-pred,obs)>=0.8",0.8,0.996,0.19599999999999995,0.02,0.0,PASS
-J,Shorkie ISM saliency recomputed [YER080W],0.0,0.00951,0.00951,0.02,0.0,PASS
-K,Shorkie ISM saliency recomputed [YLR036C],0.0,0.01185,0.01185,0.02,0.0,PASS
-L,Shorkie ISM saliency recomputed [YKL078W],0.0,0.00783,0.00783,0.02,0.0,PASS
-M,Shorkie ISM saliency recomputed [YKR087C],0.0,0.01292,0.01292,0.02,0.0,PASS
-N,Shorkie ISM saliency recomputed [YNL239W],0.0,0.01019,0.01019,0.02,0.0,PASS
-O,Shorkie ISM saliency recomputed [YGR046W],0.0,0.01804,0.01804,0.02,0.0,PASS
+J,Shorkie ISM saliency recomputed [YER080W],0.0,0.01267,0.01267,0.02,0.0,PASS
+K,Shorkie ISM saliency recomputed [YLR036C],0.0,0.01579,0.01579,0.02,0.0,PASS
+L,Shorkie ISM saliency recomputed [YKL078W],0.0,0.01044,0.01044,0.02,0.0,PASS
+M,Shorkie ISM saliency recomputed [YKR087C],0.0,0.01722,0.01722,0.02,0.0,PASS
+N,Shorkie ISM saliency recomputed [YNL239W],0.0,0.01359,0.01359,0.02,0.0,PASS
+O,Shorkie ISM saliency recomputed [YGR046W],0.0,0.02406,0.02406,0.02,0.0,PASS

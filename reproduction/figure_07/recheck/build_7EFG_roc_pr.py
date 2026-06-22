@@ -40,6 +40,7 @@ import pandas as pd
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MultipleLocator
 from scipy import stats as sp_stats
 from sklearn.metrics import roc_curve, auc, precision_recall_curve, average_precision_score
 
@@ -216,7 +217,10 @@ def main():
             ax.fill_between(COMMON_REC, np.clip(mp - sp, 0, 1), np.clip(mp + sp, 0, 1), alpha=0.15, color=c)
             rows.append(dict(panel=p, dataset=exp, model=col, metric="PR",
                              auc_mean=round(ma, 4), auc_sem=round(sa, 4), published=PUB_PR[exp][col]))
-        ax.set_ylim(0.45, 1.05); ax.set_xlabel("Recall"); ax.set_ylabel("Precision")
+        ax.set_xlim(0, 1); ax.set_ylim(0.45, 1.05)
+        ax.xaxis.set_major_locator(MultipleLocator(0.2)); ax.yaxis.set_major_locator(MultipleLocator(0.1))
+        ax.set_box_aspect(1)
+        ax.set_xlabel("Recall"); ax.set_ylabel("Precision")
         ax.set_title(f"{p}  PR Ensemble ({exp}, 4 neg sets)", fontsize=12)
         ax.legend(loc="upper right", fontsize=8)
         # ROC (bottom)
@@ -232,6 +236,9 @@ def main():
             ax.fill_between(COMMON_FPR, np.clip(mt - st, 0, 1), np.clip(mt + st, 0, 1), alpha=0.15, color=c)
             rows.append(dict(panel=p, dataset=exp, model=col, metric="ROC",
                              auc_mean=round(ma, 4), auc_sem=round(sa, 4), published=PUB_ROC[exp][col]))
+        ax.set_xlim(0, 1); ax.set_ylim(0, 1)
+        ax.xaxis.set_major_locator(MultipleLocator(0.2)); ax.yaxis.set_major_locator(MultipleLocator(0.2))
+        ax.set_box_aspect(1)
         ax.set_xlabel("FPR"); ax.set_ylabel("TPR")
         ax.set_title(f"{p}  ROC Ensemble ({exp}, 4 neg sets)", fontsize=12)
         ax.legend(loc="lower right", fontsize=8)

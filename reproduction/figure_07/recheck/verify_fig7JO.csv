@@ -1,0 +1,19 @@
+panel,metric,reported,reproduced,delta,rtol,atol,verdict
+J,ref allele==G [YER080W],1.0,1.0,0.0,0.02,0.0,PASS
+J,alt allele==T [YER080W],1.0,1.0,0.0,0.02,0.0,PASS
+J,Shorkie ISM recomputed from cache [YER080W],0.0,0.01267,0.01267,0.02,0.0,PASS
+K,ref allele==A [YLR036C],1.0,1.0,0.0,0.02,0.0,PASS
+K,alt allele==G [YLR036C],1.0,1.0,0.0,0.02,0.0,PASS
+K,Shorkie ISM recomputed from cache [YLR036C],0.0,0.01579,0.01579,0.02,0.0,PASS
+L,ref allele==G [YKL078W],1.0,1.0,0.0,0.02,0.0,PASS
+L,alt allele==A [YKL078W],1.0,1.0,0.0,0.02,0.0,PASS
+L,Shorkie ISM recomputed from cache [YKL078W],0.0,0.01044,0.01044,0.02,0.0,PASS
+M,ref allele==A [YKR087C],1.0,1.0,0.0,0.02,0.0,PASS
+M,alt allele==G [YKR087C],1.0,1.0,0.0,0.02,0.0,PASS
+M,Shorkie ISM recomputed from cache [YKR087C],0.0,0.01722,0.01722,0.02,0.0,PASS
+N,ref allele==G [YNL239W],1.0,1.0,0.0,0.02,0.0,PASS
+N,alt allele==A [YNL239W],1.0,1.0,0.0,0.02,0.0,PASS
+N,Shorkie ISM recomputed from cache [YNL239W],0.0,0.01359,0.01359,0.02,0.0,PASS
+O,ref allele==C [YGR046W],1.0,1.0,0.0,0.02,0.0,PASS
+O,alt allele==G [YGR046W],1.0,1.0,0.0,0.02,0.0,PASS
+O,Shorkie ISM recomputed from cache [YGR046W],0.0,0.02406,0.02406,0.02,0.0,PASS

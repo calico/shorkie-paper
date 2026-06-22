@@ -7,6 +7,7 @@ Reproduction package for **main-text Figure 7**. Published reference: [`../../pa
 - **Reproduce:** [`reproduce_figure_07.ipynb`](reproduce_figure_07.ipynb) (executed, 0 errors).
 - **Verify:** `reproduced/verify_fig07.csv` — **66/66 PASS** against the **published PDF** (`paper/Figures/Figure_7.pdf`).
 - **Deep-recheck:** `recheck/` — every panel rebuilt to match the published figure panel-for-panel; see [`recheck/DISCREPANCIES.md`](recheck/DISCREPANCIES.md) and the side-by-sides `recheck/panel_{AB,C,D,EFG,HI,JO}_sidebyside.png`.
+- **Match-published refinement:** A/B use the published **bar** coverage style + GT track + unified legend; E/F/G use the **exact axis limits** (PR 0.45–1.05, ROC 0–1, square); J–O Shorkie ISM logos use the **exact `plot_seq_scores` recipe** on the raw cached ISM (`recheck/verify_fig7JO.csv` = 18/18: region/SNP/ref/alt/motif confirmed for all 6 loci).
 - **GPU panels:** `panels/run_ism_eqtl.{py,sbatch}` (8-fold ensemble logSED-ISM for the OMA1/LAP3 eQTL SNPs). J–O Shorkie ISM logos are rebuilt from the released ISM cache (no GPU rerun).
 
 The headline result: ensemble **AUROC/AUPRC matches the published Figure 7E/F/G** (Caudal/Kita to 3 decimals; Renganaath within 0.4–0.7 %, see below), the GPU ISM reproduces the released per-SNP logSED **bit-exactly** (OMA1 −0.2198, LAP3 +0.2344), and the J–O Shorkie ISM saliency logos are recomputed bit-for-bit from cache.

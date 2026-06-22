@@ -23,7 +23,8 @@ import pandas as pd
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-from matplotlib.patches import Polygon, Rectangle
+from matplotlib.patches import Polygon, Rectangle, Patch
+from matplotlib.lines import Line2D
 
 from shorkie import config
 from shorkie.viz.load_cov import read_coverage, seq_norm
@@ -121,28 +122,34 @@ def build_one(name, panel, label, gtf_df):
     chrom_roman = chrom[3:] if chrom.startswith("chr") else chrom
     genes = genes_in_window(gtf_df, chrom_roman, g0_bp, g1_bp)
 
-    fig, axes = plt.subplots(3, 1, figsize=(11, 5.4), sharex=True,
+    fig, axes = plt.subplots(3, 1, figsize=(12.5, 5.4), sharex=True,
                              gridspec_kw={"height_ratios": [3, 3, 1.1]})
-    # (1) Signal: Ref (blue) + Alt (orange) overlaid filled
+    gene = str(z["gene"])
+    # (1) Signal: Ref (blue) + Alt (orange) overlaid bars (width=1.0, alpha=0.7) — published style
     ax = axes[0]
-    ax.fill_between(xb, 0, cov_ref[b_lo:b_hi], color="#1f77b4", alpha=0.65, lw=0, label="Ref")
-    ax.fill_between(xb, 0, cov_alt[b_lo:b_hi], color="#ff7f0e", alpha=0.55, lw=0,
-                    label=f"Alt ({snp_ref}>{snp_alt})")
+    ax.bar(xb, cov_ref[b_lo:b_hi], width=1.0, color="tab:blue", alpha=0.7, lw=0)
+    ax.bar(xb, cov_alt[b_lo:b_hi], width=1.0, color="tab:orange", alpha=0.7, lw=0)
     ax.set_ylabel("Signal", fontsize=10); ax.set_ylim(bottom=0)
-    for xv, c, ls, lab in [(center_bin, "black", ":", "Center"),
-                           (gene_start_bin, "red", "--", f"{str(z['gene'])} Start"),
-                           (gene_end_bin, "red", "--", f"{str(z['gene'])} End")]:
+    for xv, c, ls in [(center_bin, "black", ":"), (gene_start_bin, "red", "--"),
+                      (gene_end_bin, "red", "--")]:
         ax.axvline(xv, color=c, ls=ls, lw=1.0, alpha=0.8)
-    ax.plot([snp_bin], [0], marker="*", ms=15, color="black", clip_on=False, label="SNP")
-    ax.legend(loc="upper right", fontsize=8, ncol=2)
+    ax.plot([snp_bin], [0], marker="*", ms=15, color="black", clip_on=False)
     ax.set_title(f"{panel}  {label}  {chrom}:{snp_pos} {snp_ref}>{snp_alt}  (logSED={logsed:+.3f})",
                  fontsize=11)
-    # (2) GT Signal (green)
+    # unified legend (published: Center / gene Start / gene End / SNP / Ref / Alt / Ground Truth)
+    handles = [Line2D([0], [0], color="black", ls=":", label="Center"),
+               Line2D([0], [0], color="red", ls="--", label=f"{gene} Start"),
+               Line2D([0], [0], color="red", ls="--", label=f"{gene} End"),
+               Line2D([0], [0], marker="*", color="black", ls="none", ms=10, label="SNP"),
+               Patch(color="tab:blue", alpha=0.7, label="Ref"),
+               Patch(color="tab:orange", alpha=0.7, label=f"Alt ({snp_ref}>{snp_alt})"),
+               Patch(color="tab:green", alpha=0.7, label="Ground Truth")]
+    ax.legend(handles=handles, loc="upper left", bbox_to_anchor=(1.005, 1.0), fontsize=8, frameon=False)
+    # (2) GT Signal (green) bars
     ax = axes[1]
-    ax.fill_between(xb, 0, obs[b_lo:b_hi], color="#2ca02c", alpha=0.7, lw=0, label="Ground Truth")
+    ax.bar(xb, obs[b_lo:b_hi], width=1.0, color="tab:green", alpha=0.7, lw=0)
     ax.set_ylabel("GT Signal", fontsize=10); ax.set_ylim(bottom=0)
     ax.axvline(snp_bin, color="black", ls=":", lw=0.8, alpha=0.6)
-    ax.legend(loc="upper right", fontsize=8)
     # (3) gene track
     ax = axes[2]
     draw_genes(ax, genes, g0_bp, stride, seq_out_start)
@@ -153,7 +160,7 @@ def build_one(name, panel, label, gtf_df):
 
     fig.tight_layout(h_pad=0.4)
     out = REPRO / "reproduced" / f"Figure_7{panel}_reproduced.png"
-    fig.savefig(out, dpi=150); plt.close(fig)
+    fig.savefig(out, dpi=150, bbox_inches="tight"); plt.close(fig)
     print(f"saved {out}")
 
     r_ref = float(np.corrcoef(cov_ref[b_lo:b_hi], obs[b_lo:b_hi])[0, 1])
