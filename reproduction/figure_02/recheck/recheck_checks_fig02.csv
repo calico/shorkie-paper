@@ -1,0 +1,17 @@
+panel,metric,reported,reproduced,delta,rtol,atol,verdict
+2A,Shorkie_unmasked_vs_iterative_pwm_corr(>=0.4),0.4,0.6032,0.20319999999999994,0.02,0.0,PASS
+2A,Cbf1_Ebox_in_promoter,1.0,1.0,0.0,0.02,0.0,PASS
+2A,polydAdT_in_promoter,1.0,1.0,0.0,0.02,0.0,PASS
+2B,iterative_all_positions_covered,1.0,1.0,0.0,0.02,0.0,PASS
+2B,n_iterations(==ceil(1/0.15)=7),7.0,7.0,0.0,0.0,0.0,PASS
+2C,TF_motifs_recovered_in_R64(>=8/9),8.0,9.0,1.0,0.02,0.0,PASS
+2C,conservation_decline_count(R64>Schizo),1.0,1.0,0.0,0.02,0.0,PASS
+2C,Mcm1.1_present_through_Orbiliales,1.0,1.0,0.0,0.02,0.0,PASS
+2C,Mcm1.1_absent_in_Schizosacc(==0),0.0,0.0,0.0,0.02,0.0,PASS
+2C,promoterTFs(Rap1/Abf1/Dot6)_lost_beyond_Sacc,1.0,1.0,0.0,0.02,0.0,PASS
+2D,Abf1.1_enriched_near_TSS,1.0,1.0,0.0,0.02,0.0,PASS
+2D,Rap1.1_enriched_near_TSS,1.0,1.0,0.0,0.02,0.0,PASS
+2D,Reb1p_enriched_near_TSS,1.0,1.0,0.0,0.02,0.0,PASS
+2E,feature_classes_present(==5),5.0,5.0,0.0,0.0,0.0,PASS
+2E,tSNE_silhouette_2d(>0),0.0,0.0795,0.0795,0.02,0.0,PASS
+2E,n_points_all_16_chr(>=10000),10000.0,16384.0,6384.0,0.02,0.0,PASS

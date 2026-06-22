@@ -1,0 +1,6 @@
+metric,value
+Shorkie_unmasked vs Shorkie_iter maxbase_agree,0.465
+Shorkie_unmasked vs Shorkie_iter pwm_corr,0.6032
+Shorkie_unmasked reconstruction_acc vs true,0.951
+Cbf1_Ebox(CACGTG)_in_Shorkie_promoter,1
+polydAdT_run>=8_in_Shorkie_promoter,1

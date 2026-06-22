@@ -1,0 +1,4 @@
+motif,n_true,n_bg,median_abs_dist_true,median_abs_dist_bg,frac_within_250_true,frac_within_250_bg,enriched_near_tss
+Abf1.1,745,745,232.0,556.0,0.5275,0.2685,True
+Rap1.1,644,644,312.0,552.0,0.3571,0.2516,True
+Reb1p,1298,1298,321.5,577.5,0.4199,0.255,True

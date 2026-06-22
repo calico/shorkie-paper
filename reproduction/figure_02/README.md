@@ -23,11 +23,13 @@ Figure 2 demonstrates that the masked DNA LM reconstructs canonical yeast TF mot
 
 **Env:** `yeast_ml` (CPU). Data on disk: modisco `.h5` (173 MB, `saccharomycetales_viz_seq/unet_small_bert_drop/modisco_results_w16384_n100000.h5`); TSS-distance CSVs (58,170 motif hits, 101 motifs); 17 `embeddings_chr*.h5`. GPU/external only for 2A's SpeciesLM + iterative rows and 2B.
 
-### Reproduction scope
-- **Fully reproduced (CPU):** 2C (in-distribution TF-MoDISco motifs), 2D (TSS-distance histograms), 2E (t-SNE).
-- **Partial (CPU proxy + documented):** 2A — the Shorkie-LM PWM logo is reproduced from modisco; the SpeciesLM comparison row needs the external Karollus et al. model and the iterative-inference row needs a GPU forward pass over the SMT3 window.
-- **Documented gap (GPU):** 2B (iterative 15%-masked prediction matrix).
-- **Cross-tier (2C grid):** the in-distribution motifs are shown here; the 6-dataset conservation grid (Ascomycota/Orbiliales/Schizosaccharomycetales/strains rows) is the subject of `fig04` / `motif_lm__unseen_species`.
+### Reproduction scope (after the deep recheck)
+- **Fully reproduced (CPU):** 2C (the full 6×11 conservation grid), 2D (the published TFs), 2E (t-SNE, all 16 chr).
+- **Reproduced (GPU):** 2B + the 2A 15%-iterative row — iterative-masking SMT3 inference (`panels/run_iterative_smt3.{py,sbatch}`).
+- **Reproduced from cache (CPU):** the 2A Shorkie-LM row.
+- **External (documented):** the 2A SpeciesLM row (Karollus / Tomaz da Silva et al. model; cached prediction shown, alignment not reconstructable).
+
+The notes below are the *original* (pre-recheck) scope; the deep recheck closed the GPU gaps and rebuilt 2C/2D — see the Deep recheck section.
 
 ---
 
@@ -37,17 +39,22 @@ Executed `reproduce_figure_02.ipynb` (8/8 cells, 0 errors, 5 embedded figures). 
 
 ## Phase 3 — Verification
 
-**`reproduced/verify_fig02.csv`: 3/3 PASS.**
-- **2C** — TF-MoDISco recovers ≥6 motifs (the released `.h5` has the full pos-pattern set). ✅
-- **2D** — pooled TF-motif hits sit nearer the TSS than the genome-wide background (median |distance to TSS|: TF ≪ background). ✅
-- **2E** — all 5 genomic-element classes present and cluster (Protein-coding 1046, Promoter 960, Intergenic 449, tRNA 38, Transposable element 7). ✅
+**`reproduced/verify_fig02.csv`: 16/16 PASS** (deep recheck — tightened from the original 3 qualitative checks). 2A ×3 · 2B ×2 · 2C ×5 · 2D ×3 · 2E ×3. See [`recheck/DISCREPANCIES.md`](recheck/DISCREPANCIES.md).
 
-**Visual:** reproduced panels vs `published/Figure_2_full.png` — 2C motif logos (poly(dA:dT)/TATA-like, Reb1, etc.), 2D upstream-of-TSS enrichment, and 2E element clusters match the published structure.
+### Deep recheck (`recheck/`)
+A stricter pass verified every panel against the **published** version, corrected two stale panels, and ran the GPU pieces. Highlights:
+- **2C — rebuilt as the real 6-dataset × 11-motif conservation grid** (was 6 single-tier logos). Data-driven from the per-tier `modisco report` TOMTOM tables: recovered-TF count declines **R64=9 · strains=9 · Saccharomycetales=9 → Ascomycota=5 → Orbiliales=4 · Schizosacc.=4**; **Mcm1.1 confident through Orbiliales but absent in Schizosaccharomycetales**; Rap1.1/Abf1.1/Dot6 lost beyond Saccharomycetales. 47/54 cells match the published *curated* grid (the 7 differences — Sfp1 promiscuity, weak TATA, borderline Reb1/Snf1 — are documented).
+- **2D — reproduced the published TFs Abf1.1/Rap1.1/Reb1p** (was the wrong subset Sfp1p/AZF1.6/GCR2.6/RPN4.7), each enriched near the TSS vs background (Abf1.1 n=745 matches the published panel exactly). The genic features (ATG/5′SS/branch) are not in the released TSS CSV.
+- **2B + 2A-iterative — run on GPU** (`panels/run_iterative_smt3.{py,sbatch}`): iterative 15% masking (convention from `hound_eval_mlm_perplexity_region.py`), 7 iterations, full coverage; reconstructs the SMT3 promoter incl. the poly(dA:dT) motif. Shorkie unmasked↔iterative PWM corr = 0.60; unmasked recovers the true promoter at 95.1%.
+- **2E — recomputed on all 16 chromosomes** (16,384 intervals, was capped at 2,500); 5 classes, silhouette = 0.079 (tRNA/TE/Promoter well separated).
+- **2A SpeciesLM row** is external (`johahi/specieslm-fungi-upstream-k1`); its cached prediction is shown but cannot be position-aligned to the Shorkie window without re-running the external model (documented).
+- Per-panel `recheck/panel_{A..E}_sidebyside.png` + `recheck/Figure_2_published_vs_reproduced.png`.
 
-### Discrepancy log
+### Discrepancy log (superseded by `recheck/DISCREPANCIES.md`)
 | Panel | Status | Note |
 |---|---|---|
-| 2A | partial | Shorkie-LM PWM reproduced (CPU); SpeciesLM comparison row = external Karollus et al. model; 15% iterative-inference row = GPU forward pass over the SMT3 window |
-| 2B | documented gap | iterative 15%-masked prediction matrix requires a GPU LM forward pass |
-| 2C | reproduced (in-distribution) | the full 6-dataset × 11-motif conservation grid's cross-tier rows come from per-tier MoDISco (`fig04`/`motif_lm__unseen_species`); motif→TF naming via TOMTOM/FIMO |
-| 2D | reproduced | a representative promoter-TF subset is shown (not the exact 6 published TFs); the near-TSS enrichment claim holds |
+| 2A | rows 2–3 reproduced; row 1 external | Shorkie unmasked + 15% iterative reproduced (GPU); SpeciesLM external, alignment documented |
+| 2B | **reproduced (GPU)** | iterative 15%-masked PPM reconstruction, 7 iterations, full coverage |
+| 2C | **grid reproduced** | data-driven 6×11 TOMTOM conservation grid; 47/54 vs published curation; curation differences documented |
+| 2D | **published TFs reproduced** | Abf1.1/Rap1.1/Reb1p (corrected from a wrong subset); each near-TSS enriched |
+| 2E | reproduced (all 16 chr) | silhouette-quantified separation; t-SNE layout stochastic |
