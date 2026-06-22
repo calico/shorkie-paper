@@ -1,43 +1,18 @@
 #!/bin/bash
+# Figure 1C — step 1/3: nucmer alignment of the R64 reference against every genome
+# in <data_type> (writes one .delta per target). Shared paths/tools come from
+# _genome_dist_env.sh. See README.md.
+#
+#   bash 1_nucmer_aln_genome.sh <data_type> [--dry-run]
+#   e.g.  bash 1_nucmer_aln_genome.sh strains_gtf
+source "$(dirname "${BASH_SOURCE[0]}")/_genome_dist_env.sh"
+gd_init "${1:-}" mummer "${@:2}"
+gd_need nucmer
 
-cfg() { python -c "import sys; from shorkie import config; print(config.get(sys.argv[1]) or '')" "$1"; }
-CORPUS_BUILD_DATA_ROOT="$(cfg corpus_build_data_root)"
-CORPUS_BUILD_RESULTS_ROOT="$(cfg corpus_build_results_root)"
-
-data_type=$1
-# Directory containing the fasta files
-SEQ_BED_DIR="${CORPUS_BUILD_DATA_ROOT}/data_${data_type}/sequences_train_split"
-
-REF_FASTA="${CORPUS_BUILD_DATA_ROOT}/yeast/ensembl_fungi_59/data_r64_gtf/fasta/GCA_000146045_2.cleaned.fasta"
-REF_GTF="${CORPUS_BUILD_DATA_ROOT}/yeast/ensembl_fungi_59/data_r64_gtf/gtf/GCA_000146045_2.59.gtf"
-ref_base_name=$(basename "$REF_FASTA" .cleaned.fasta)
-
-FASTA_DIR="${CORPUS_BUILD_DATA_ROOT}/yeast/ensembl_fungi_59/data_${data_type}/fasta"
-GTF_DIR="${CORPUS_BUILD_DATA_ROOT}/yeast/ensembl_fungi_59/data_${data_type}/gtf"
-OUTPUT_DIR="${CORPUS_BUILD_RESULTS_ROOT}/ensembl_fungi_59/${data_type}/genome_dist/${data_type}/mummer"
-
-mkdir -p $OUTPUT_DIR
-
-# Initialize empty arrays
-gff_files=()
-bed_files=()
-
-# 1. Collect GTF and FASTA file paths
-for fasta_file in "$FASTA_DIR"/*.cleaned.fasta; do
-    base_name=$(basename "$fasta_file" .cleaned.fasta)
-
-    gtf_file=$GTF_DIR/${base_name}.59.gtf
-    bed_file_full=${SEQ_BED_DIR}/${base_name}.txt
-
-    echo "Reference fasta: " $REF_FASTA
-    echo "Reference gtf  : " $REF_GTF
-
-    echo "Target fasta: " $fasta_file
-    echo "Target gtf  : " $gtf_file
-
-    mkdir -p ${OUTPUT_DIR}
-    
-    nucmer -t 40 -p ${OUTPUT_DIR}/nucmer_aln_${data_type}_${ref_base_name}_${base_name} \
-    ${REF_FASTA} \
-    ${fasta_file}
+for tgt in "$FASTA_DIR"/*.cleaned.fasta; do
+  base="$(basename "$tgt" .cleaned.fasta)"
+  pfx="$OUTPUT_DIR/nucmer_aln_${DATA_TYPE}_${ref_base_name}_${base}"
+  echo "[nucmer] R64 vs $base"
+  gd_run nucmer -t "$GD_THREADS" -p "$pfx" "$REF_FASTA" "$tgt"
 done
+echo "[done] nucmer .delta files in $OUTPUT_DIR"

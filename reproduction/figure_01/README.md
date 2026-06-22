@@ -101,5 +101,9 @@ A second, stricter pass verified every result against the **published** figure a
 - **1G provenance closed:** the published bar heights pixel-fit the reproduced perplexities (R²=0.999998, max resid 0.0002 ppl; `measure_panelG.py` → `panelG_barheight_fit.csv`).
 - **1C strain rep corrected** YJM1078/"YPF136" → **YJM195** (GCA_000975585.2; the genome the published panel shows) → exact match; stale YJM1078 coords removed.
 - **Determinism:** mash tables + all MUMmer coords + the ete4 newick re-run **byte-identical** (`diff_heavy_panels.py` → `determinism_fig01.csv`).
-- **1F x-axis** confirmed (`n_epochs×64` → 165_Sacc ~320k = published ~300k); panels 1F/1G restyled to match (`restyle_panels_FG.py`).
+- **1F x-axis** confirmed (`n_epochs×64` → 165_Sacc ~320k = published ~300k).
+- **Exact-render pass (D/F/G):** panels D, F, G re-rendered to match the published crops in style **and**
+  panel proportions (`restyle_panels_DFG.py`; pure render of byte-identical data, numbers unchanged 12/12).
+  1D now reproduces the published portrait/broken-axis/brace styling (a manual Illustrator enhancement of
+  the plain released bar chart); 1F/1G widened to the published wide aspect. A/B/C/E left as-is.
 - Per-panel `recheck/panel_{B,C,D,F,G}_sidebyside.png` + `recheck/Figure_1_published_vs_reproduced.png` give clean [published | reproduced] composites.

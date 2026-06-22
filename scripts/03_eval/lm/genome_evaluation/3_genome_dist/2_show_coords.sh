@@ -1,43 +1,23 @@
 #!/bin/bash
+# Figure 1C — step 2/3: extract human-readable alignment coordinates from each
+# nucmer .delta produced by step 1 (show-coords -lcr -> one .txt per target).
+# Shared paths/tools come from _genome_dist_env.sh. See README.md.
+#
+#   bash 2_show_coords.sh <data_type> [--dry-run]
+source "$(dirname "${BASH_SOURCE[0]}")/_genome_dist_env.sh"
+gd_init "${1:-}" mummer "${@:2}"
+gd_need show-coords
 
-cfg() { python -c "import sys; from shorkie import config; print(config.get(sys.argv[1]) or '')" "$1"; }
-CORPUS_BUILD_DATA_ROOT="$(cfg corpus_build_data_root)"
-CORPUS_BUILD_RESULTS_ROOT="$(cfg corpus_build_results_root)"
-
-data_type=$1
-# Directory containing the fasta files
-#SEQ_BED_DIR="${CORPUS_BUILD_DATA_ROOT}/yeast/ensembl_fungi_59/data_${data_type}/sequences_train_split"
-
-REF_FASTA="${CORPUS_BUILD_DATA_ROOT}/yeast/ensembl_fungi_59/data_r64_gtf/fasta/GCA_000146045_2.cleaned.fasta"
-REF_GTF="${CORPUS_BUILD_DATA_ROOT}/yeast/ensembl_fungi_59/data_r64_gtf/gtf/GCA_000146045_2.59.gtf"
-ref_base_name=$(basename "$REF_FASTA" .cleaned.fasta)
-
-FASTA_DIR="${CORPUS_BUILD_DATA_ROOT}/yeast/ensembl_fungi_59/data_${data_type}/fasta"
-GTF_DIR="${CORPUS_BUILD_DATA_ROOT}/yeast/ensembl_fungi_59/data_${data_type}/gtf"
-OUTPUT_DIR="${CORPUS_BUILD_RESULTS_ROOT}/ensembl_fungi_59/${data_type}/genome_dist/${data_type}/mummer"
-
-mkdir -p $OUTPUT_DIR
-
-# Initialize empty arrays
-gff_files=()
-bed_files=()
-
-# 1. Collect GTF and FASTA file paths
-for fasta_file in "$FASTA_DIR"/*.cleaned.fasta; do
-    base_name=$(basename "$fasta_file" .cleaned.fasta)
-
-    gtf_file=$GTF_DIR/${base_name}.59.gtf
-    bed_file_full=${SEQ_BED_DIR}/${base_name}.txt
-
-    echo "Reference fasta: " $REF_FASTA
-    echo "Reference gtf  : " $REF_GTF
-
-    echo "Target fasta: " $fasta_file
-    echo "Target gtf  : " $gtf_file
-
-    mkdir -p ${OUTPUT_DIR}
-    
-    show-coords -lcr ${OUTPUT_DIR}/nucmer_aln_${data_type}_${ref_base_name}_${base_name}.delta > ${OUTPUT_DIR}/2_show_coords_${data_type}_${ref_base_name}_${base_name}.txt
-
-    echo ""
+for tgt in "$FASTA_DIR"/*.cleaned.fasta; do
+  base="$(basename "$tgt" .cleaned.fasta)"
+  delta="$OUTPUT_DIR/nucmer_aln_${DATA_TYPE}_${ref_base_name}_${base}.delta"
+  out="$OUTPUT_DIR/2_show_coords_${DATA_TYPE}_${ref_base_name}_${base}.txt"
+  [[ -f "$delta" ]] || { echo "[skip] missing $delta (run 1_nucmer_aln_genome.sh first)"; continue; }
+  echo "[show-coords] $base"
+  if [[ "$DRY_RUN" == 1 ]]; then
+    echo "  [dry-run] show-coords -lcr $delta > $out"
+  else
+    show-coords -lcr "$delta" > "$out"
+  fi
 done
+echo "[done] coords .txt files in $OUTPUT_DIR"

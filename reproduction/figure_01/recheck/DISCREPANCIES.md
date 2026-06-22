@@ -13,7 +13,7 @@ representative **corrected to YJM195** (now an exact match); schematics A/E are
 schematic by design.
 
 Recheck artifacts (this directory): `recompute_fig01.py`, `recheck_checks_fig01.csv`,
-`recompute_fig01_table.csv`, `restyle_panels_FG.py`, `measure_panelG.py`,
+`recompute_fig01_table.csv`, `restyle_panels_DFG.py`, `measure_panelG.py`,
 `panelG_barheight_fit.csv`, `rerun_heavy_panels.sh`, `diff_heavy_panels.py`,
 `determinism_fig01.csv`, `regen_panelC.py`, `make_sidebyside_fig01.py`,
 `panel_{B,C,D,F,G}_sidebyside.png`, `Figure_1_published_vs_reproduced.png`.
@@ -27,10 +27,10 @@ Recheck artifacts (this directory): `recompute_fig01.py`, `recheck_checks_fig01.
 | **1A** | schematic | conceptual | programmatic block-stack, not the illustrator art | hand-drawn schematic (out of scope) |
 | **1B** | heavy (ete4) | topology + highlighted clade faithful; **newick byte-identical on re-run** | 987 leaves vs 1361 input taxids; final tree iTOL-styled | NCBI taxonomy versioning (merged/retired taxids; 2023 order split); iTOL styling not script-reproducible |
 | **1C** | heavy (MUMmer) | **exact** — strain rep now YJM195; **all coords byte-identical on re-run** | layout/box-color cosmetic | *fixed*: was wrong strain (see below) |
-| **1D** | heavy (mash) | **exact** — **both tables byte-identical on re-run** | broken-axis vs sorted-bar cosmetic | rendering choice only |
+| **1D** | heavy (mash) | **exact** — **both tables byte-identical on re-run**; now rendered in the published style | broken-axis/braces were a manual enhancement (see "Exact-render pass") | rendering choice only |
 | **1E** | schematic | conceptual | worked one-hot + loss-weight example | hand-drawn schematic (out of scope) |
-| **1F** | computational | **exact (Δ=0)** vs published legend | x-axis "discrepancy" was a crop mis-read | resolved (see below) |
-| **1G** | computational | **exact (Δ=0)**; **provenance closed** | numbers only in the figure, not the text | bar-height fit ties them (see below) |
+| **1F** | computational | **exact (Δ=0)** vs published legend; panel aspect now matches | x-axis "discrepancy" was a crop mis-read | resolved (see below) |
+| **1G** | computational | **exact (Δ=0)**; **provenance closed**; panel aspect now matches | numbers only in the figure, not the text | bar-height fit ties them (see below) |
 
 ---
 
@@ -77,6 +77,34 @@ Recheck artifacts (this directory): `recompute_fig01.py`, `recheck_checks_fig01.
 - Reproduced gene/intergenic: R64 **3.7561/3.7386** · 80_Strains **3.7342/3.7225** ·
   165_Saccharomycetales **3.5488/3.6360** · 1341_Fungus **3.6043/3.6851**
   (overall PPL 3.7458/3.7257/**3.5853**/3.6380 → 165_Saccharomycetales lowest, the "sweet spot").
+
+---
+
+## Exact-render pass (panels D / F / G) — style + panel proportions
+
+A later strict pass (user-requested) re-rendered **D, F, G** to match the published crops *exactly* in
+style **and** panel proportions — a **pure render** of byte-identical cached data (no GPU, no recompute;
+all 12 numbers unchanged). The three panels are now built by a single source of truth,
+`restyle_panels_DFG.py`, which the notebook D/F/G cells import and call (they return `FIG1F_MIN` /
+`FIG1G_GENE` / `FIG1G_INTER`, so the verify cell stays **12/12**). Panels A, B, C, E were left as-is.
+
+- **1D — full published styling reproduced.** Matches `published/Figure_1_D_pub.png` (1329×1659 px,
+  portrait ~0.80 w/h): two stacked panels (top = 165_Saccharomycetales, linear y 0–1; bottom = 80_Strains
+  with a **broken y-axis** — lower 0.000–0.010 holds every bar, upper 0.990–1.000 is empty but shows the
+  full Mash range — plus diagonal break marks), `skyblue` **gapped** bars (width 0.75), published titles
+  ("Mash Distance Score for Yeast R64 vs. Target {165_Saccharomycetales|80_Strains} Genomes"), an arrow to
+  the R64-1-1 (Mash distance 0) bar, and curly-brace "All other … genomes (non–…)" annotations + a
+  "Target Genomes" label (no numeric x-ticks). **Finding:** the released
+  `scripts/03_eval/lm/genome_evaluation/3_genome_dist/mash/2_mash_genome_viz.py` emits only a plain
+  skyblue bar chart (one per tier) — the broken-axis / brace / arrow styling and the two-tier composite
+  were a **manual (Illustrator) enhancement** of the published figure, faithfully reproduced here in the
+  builder. The underlying distances are unchanged and byte-identical on re-run (sacc max 1.0 with 134/165
+  ≥0.99; strains max 0.0081, none ≥0.99 — so the strains' upper break segment is empty by design).
+- **1F — panel aspect.** Kept the dashed blue/orange/green/red curves, faint argmin min-markers, legend
+  "<label>; loss = <min>", y-range, and x = epoch×64 (→ ~320k for 165_Sacc); only widened `figsize`
+  (7.2×4.6 → 10×4.45) to match the published F aspect (3012×1340 ≈ 2.25:1).
+- **1G — panel aspect.** Kept gene(blue)/intergenic(orange) grouped bars, y-range, labels, legend; only
+  widened `figsize` (7.2×4.6 → 10×4.5) to match the published G aspect (2611×1181 ≈ 2.21:1).
 
 ---
 
