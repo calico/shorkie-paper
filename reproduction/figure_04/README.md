@@ -4,10 +4,22 @@
 
 Reproduction package for **main-text Figure 4**. Published reference: [`../../paper/Figures/Figure_4.pdf`](../../paper/Figures/Figure_4.pdf) (`published/Figure_4_full.png`).
 
-- **Reproduce:** [`reproduce_figure_04.ipynb`](reproduce_figure_04.ipynb) (executed in tmux, 8 code cells, 0 errors, 3 panel PNGs).
-- **Verify:** [Verification](#phase-3--verification) + `reproduced/verify_fig04.csv` — **14/14 PASS**.
+- **Reproduce:** [`reproduce_figure_04.ipynb`](reproduce_figure_04.ipynb) delegates to the `recheck/build_4*.py` builders.
+- **Verify:** `reproduced/verify_fig04.csv` (correctness + panel-completeness checks).
 
-All panels are **CPU-reproducible**: the ISM `scores.h5` were precomputed (on GPU) in the original run and are read from disk; no GPU is needed to regenerate the figure.
+All panels are **CPU-reproducible** from cached numeric data (ISM `scores.h5`, LM `preds.npz`,
+modisco `.h5`, the yeast motif database); no GPU is needed to regenerate the figure.
+
+> **Deep recheck (focused upgrade).** The first reproduction passed correctness checks but
+> rendered far fewer elements than the published panels (no "Shorkie LM" row, no Reference-DB
+> overlay, no gene models/annotations, panel D was text-only, panel H was an unnamed stack).
+> The recheck under [`recheck/`](recheck/) closes these gaps: 4-row promoter logos
+> (`build_4ABC.py`), splicing schematic + DB/reconstruction (`build_4D.py`), splicing ISM +
+> gene models + splice boxes (`build_4EFG.py`), and the 12-TF database-vs-reconstruction grid
+> (`build_4H.py`, paired with TomTom — MEME 5.5.7 built from source). See
+> [`recheck/DISCREPANCIES.md`](recheck/DISCREPANCIES.md) for the per-panel status, root causes,
+> and the documented residuals (no SS-MoDISco for panel D; no Random_Init tree for B/C/E–G;
+> LM↔ISM window offset; the irreducibly-manual Illustrator composition).
 
 ---
 

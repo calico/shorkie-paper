@@ -1,0 +1,4 @@
+panel,gene,chrom,start,end,max_abs_saliency,localization,window_overlaps_gene
+4E,DTD1,chrIV,65191,65816,0.0382,15.5,1
+4F,MMS2,chrVII,346354,346954,0.0326,10.02,1
+4G,HOP2,chrVII,435573,436451,0.004,17.5,1

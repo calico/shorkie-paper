@@ -235,3 +235,8 @@ paper/
 # small text outputs (.coords/.tab/.nwk) and rendered PNGs are kept.
 reproduction/**/*.delta
 reproduction/**/reproduced/**/*.fasta
+# Figure 4 recheck regenerable caches/intermediates (rebuilt from gated preds.npz /
+# the modisco h5 via recheck/build_4*.py + run_tomtom.py).
+reproduction/figure_04/recheck/lm_cache_*.npz
+reproduction/figure_04/recheck/_modisco_RP_query.meme
+reproduction/figure_04/recheck/_tomtom_RP/

@@ -1,0 +1,13 @@
+panel_tf,db_motif,recon_search,modisco_pattern,match_method,tomtom_qval,matched_name
+Rap1,RAP1,RAP1,pos_patterns.pattern_53,report_html,0.000616,RAP1.3
+Fhl1,FHL1,FHL1,pos_patterns.pattern_6,report_html,0.002205,FHL1.1
+Sfp1.1,SFP1,SFP1,pos_patterns.pattern_64,report_html,0.007244,SFP1.1
+TATA Box,@TATATA,SPT15,neg_patterns.pattern_11,report_html,0.244247,SPT15.1
+Reb1,REB1,REB1,pos_patterns.pattern_59,report_html,0.220115,Reb1p&consensus=CCGGGTAA
+Abf1,ABF1,ABF1,pos_patterns.pattern_1,report_html,0.055709,Abf1p&consensus=AGCCGTAAATAGTTATCTTCCAAG
+Tbf1.1,TBF1,TBF1,pos_patterns.pattern_37,report_html,1.0,TBF1.1
+Cbf1,CBF1,CBF1,pos_patterns.pattern_43,tomtom_full,0.804926,CBF1
+Ume6.2,UME6,UME6,pos_patterns.pattern_16,tomtom_full,0.997795,UME6
+Dot6p,DOT6,DOT6,neg_patterns.pattern_18,report_html,0.561386,Dot6p&consensus=axgaxgCGATGAGStgH
+PAC motif (Dot6),@PAC_motif,DOT6,neg_patterns.pattern_18,report_html,0.561386,Dot6p&consensus=axgaxgCGATGAGStgH
+RRPE motif (Stb3),@TGAAAAATTTT,STB3,neg_patterns.pattern_2,report_html,0.000988,Stb3p&consensus=aattTTtCA
