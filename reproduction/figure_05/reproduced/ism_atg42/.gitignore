@@ -1,0 +1,6 @@
+# The recomputed ATG42 promoter ISM (12 MB) is regenerable, not committed.
+# Rebuild with:  sbatch reproduction/figure_05/panels/run_atg42_ism.sbatch
+# (self_supervised_unet_small_bert_drop f0c0; hound_ism_bed.py -l 500 --rc --stats logSED;
+#  BED = panels/atg42.bed = chrII:515,214-515,714). Panels 5A/5C are built from it by
+#  recheck/build_logos_distance.py and the resulting PNGs ARE committed.
+scores.h5

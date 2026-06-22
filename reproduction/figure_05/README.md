@@ -4,59 +4,76 @@
 
 Reproduction package for **main-text Figure 5**. Published reference: [`../../paper/Figures/Figure_5.pdf`](../../paper/Figures/Figure_5.pdf) (`published/Figure_5_full.png`).
 
-- **Reproduce:** [`reproduce_figure_05.ipynb`](reproduce_figure_05.ipynb) (executed in tmux, 0 errors).
-- **Verify:** `reproduced/verify_fig05.csv` — **8/8 PASS**.
-
-This figure was the largest gap (no prior topic notebook). **Everything is CPU-reproducible** — the ISM `scores.h5` were precomputed (GPU) in the original run; this notebook only reads them.
-
----
-
-## Phase 1 — Discovery
+- **Reproduce:** [`reproduce_figure_05.ipynb`](reproduce_figure_05.ipynb) + the builders in [`recheck/`](recheck/).
+- **Verify:** `reproduced/verify_fig05.csv`.
+- **Discrepancies & root causes:** [`recheck/DISCREPANCIES.md`](recheck/DISCREPANCIES.md).
+- **Side-by-side vs published:** `recheck/Figure_5_published_vs_reproduced.png` + `recheck/panel_*_sidebyside.png`.
 
 Two genes / two halves (β-estradiol induction RNA-seq; timepoints T0,T5,T10,T15,T30,T45,T60,T90):
-- **5A–E = MSN2 @ ATG42** (YBR139W), promoter window **chrII:515,214–515,714** (−450..+50 rel. TSS).
-- **5F–J = MSN4 @ TSL1** (YML100W), promoter window **chrXIII:70,173–70,673** — panels analogous.
+**5A–E = MSN2 @ ATG42** (YBR139W), promoter **chrII:515,214–515,714**; **5F–J = MSN4 @ TSL1** (YML100W),
+promoter **chrXIII:70,173–70,673**.
 
-| Panel | Claim (from caption) | Source script | Computation |
+## Published panel map (verified against the PDF)
+
+| Row content | MSN2 | MSN4 | Source recipe |
 |---|---|---|---|
-| **5A/5F** | Shorkie ISM sequence logos, rows = successive timepoints | `…/3_timepoint_analysis/1_timepoint_viz_scores_h5_diff.py` | per-base logSED T0-averaged within each timepoint, mean-centered, projected on the reference base |
-| **5B/5G** | experimental vs Shorkie-predicted fold-change at the locus, per timepoint | `motif_shorkie_time_series/1_time_track_metrics_viz.py` (`--gene YBR139W` / `YML100W`) | per-gene log2 fold-change vs T0 |
-| **5C/5H** | pairwise Euclidean-distance heatmap of ISM logos | `…/3_timepoint_analysis/2_timepoint_viz_scores_h5_pairwise.py` | per-timepoint mean-centered PWM → pairwise Euclidean distance (8×8) |
-| **5D/5I** | TF-MoDISco motifs from ΔT ISM matrices | `…/2_timepoint_analysis/modisco_analysis` | TF-MoDISco on T-vs-T0 ISM-difference contributions |
-| **5E/5J** | **boxplot of normalized Pearson's R across all genes, per timepoint** | `1_time_track_metrics_viz.py` (`pearsonr_norm`) | per-track normalized, mean-centered Pearson R between measured & predicted profiles |
+| ISM logos, 8 rows T0..T90, **full 500 bp** promoter | **A** | **F** | per-timepoint logSED, mean-centered, projected on ref base (`recheck/build_logos_distance.py`) |
+| Fold-change vs T0 (Measurement / Prediction, ±SEM) | **B** | **G** | `…/motif_shorkie__time_series/1_time_track_metrics_viz.py --gene YBR139W / YML100W` |
+| Pairwise Euclidean-distance heatmap (8×8, viridis) | **C** | **H** | per-timepoint mean-centered PWM distance (`recheck/build_logos_distance.py`) |
+| **Normalized Pearson's R boxplot** (per timepoint, `n=`) | **D** | **I** | per-track `pearsonr_norm` grouped by timepoint (`1_time_track_metrics_viz.py`) |
+| **TF-Modisco binding-site motif over ΔT** (YeTFaSCo ref + per-Tn motif) | **E** | **J** | per-Tn `modisco_results_10000_500_diff.h5`, STRE-matched (`recheck/build_5EJ_progression.py`) |
 
-**Data (under `work_root`):** ISM `gene_exp_motif_test_{MSN2,MSN4}_targets/f0c0/part*/scores.h5` (logSED `(N,500,4,3053)` float16); gene-level TSVs `self_supervised_unet_small_bert_drop/gene_target_preds/f0c0/RNA-Seq/gene_{targets,preds}_norm.tsv`; targets sheet `cleaned_sheet_RNA-Seq.txt` (track→timepoint, `track_offset=1148`); ΔT TF-MoDISco `2_timepoint_analysis/modisco_analysis/results/.../{T0..T90}/modisco_results_10000_500_diff.h5`.
+> The earlier draft of this notebook had **D/E and I/J swapped** (it called the boxplots "5E/5J" and the
+> modisco panels "5D/5I") and rendered E/J as a generic top-N grid. Both are corrected here.
 
-### Reproduction approach
-- **5B/5E/5G/5J** — **re-ran the original `1_time_track_metrics_viz.py`** (CPU) for MSN2 (`--tf MSN2 --gene YBR139W`) and MSN4 (`--tf MSN4 --gene YML100W`); outputs under `reproduced/eval_MSN2/`, `reproduced/eval_MSN4/`. This is the faithful path (the script's order-sensitive T0-baseline / representative-track selection is non-trivial to re-derive).
-- **5F/5H** — recomputed in-notebook from the **TSL1** window (`MSN4_targets/f0c0/part2 idx7` = chrXIII:70,173–70,673, the exact published locus): per-timepoint ISM logos + the 8×8 Euclidean-distance heatmap (track indices grouped by timepoint via `cleaned_sheet_RNA-Seq.txt`, `offset=1148`).
-- **5D/5I** — rendered ΔT(T90−T0) TF-MoDISco motif logos from the precomputed `modisco_results_10000_500_diff.h5` (same IC-weighted logo helper as Figure 4H).
-- **5A/5C** — illustrated with a representative MSN2-target promoter (see gap below).
+## Verification (`reproduced/verify_fig05.csv`)
 
----
+| Panel | Metric | Target | Reproduced |
+|---|---|---|---|
+| 5A | ATG42 ISM window | chrII:515,214–515,714 | exact (recomputed) |
+| 5C | ATG42 ISM distance monotone-from-T0 | yes | yes |
+| 5D | MSN2 norm-R median | 0.55–0.65 | **0.591**; n-counts 8,12,8,12,9,9,7,9 ✓ |
+| 5E | MSN2 STRE motif recovered over ΔT | ≥1 | all 7 timepoints |
+| 5F | TSL1 ISM window | chrXIII:70,173–70,673 | exact |
+| 5H | TSL1 ISM distance monotone-from-T0 | yes | yes ([0,.04,.09,.21,.36,.42,.49,.55]) |
+| 5I | MSN4 norm-R median | 0.55–0.65 | **0.618**; n-counts 11,7,8,10,6,8,12,8 ✓ |
+| 5J | MSN4 STRE motif recovered over ΔT | ≥1 | all 7 timepoints |
+| 5B | MSN2 global ΔlogFC R | 0.4949 | 0.4949 |
+| 5G | MSN4 global ΔlogFC R | 0.3992 | 0.3992 |
 
-## Phase 3 — Verification
+## What changed in this recheck (see `recheck/DISCREPANCIES.md` for full root-cause detail)
 
-**`reproduced/verify_fig05.csv`: 8/8 PASS.**
+1. **Panels D↔E, I↔J relabeled** to the published lettering (D/I = boxplots, E/J = motif progression).
+2. **Panels A & C now show the REAL ATG42 locus.** The ATG42 promoter ISM was never released (the MSN2
+   ISM target set omits chrII:515 kb), so the old notebook used a representative surrogate. We
+   **recomputed it on GPU** (`panels/run_atg42_ism.sbatch` → `reproduced/ism_atg42/scores.h5`) with the
+   exact released driver/model/flags, single-locus BED = the ATG42 promoter window.
+3. **Panels A & F are now full-500 bp** logo stacks (the prior notebook zoomed to a 90 bp window). The
+   published red boxes / Reference-DB gene track / feature labels are **manual post-hoc overlays** the
+   pipeline never drew (documented; not reproduced — faithful logo stack only).
+4. **Panels E & J rebuilt** as the curated per-ΔT motif progression (YeTFaSCo STRE reference + the
+   TF-Modisco-detected MSN2-GGGG / MSN4-CCCC motif per timepoint).
 
-| Panel | Metric | Reported | Reproduced | Verdict |
-|---|---|---|---|---|
-| **5E** | normalized Pearson R median (MSN2, all genes) | 0.55–0.65 | **0.591** | PASS |
-| **5J** | normalized Pearson R median (MSN4, all genes) | 0.55–0.65 | **0.618** | PASS |
-| 5F | TSL1 window | chrXIII:70,173–70,673 | exact | PASS |
-| 5H | TSL1 ISM distance diverges monotonically from T0 | yes | [0, .04, .09, .21, .36, .42, .49, .55] | PASS |
-| 5B | MSN2 global ΔlogFC Pearson R | 0.4949 (on-disk ref) | 0.4949 | PASS |
-| 5G | MSN4 global ΔlogFC Pearson R | 0.3992 (on-disk ref) | 0.3992 | PASS |
-| 5D | MSN2 ΔT TF-MoDISco motifs | ≥1 | 20 | PASS |
-| 5I | MSN4 ΔT TF-MoDISco motifs | ≥1 | 10 | PASS |
+### Documented residuals
 
-The **headline anchor** — the genome-wide normalized, mean-centered Pearson's R of **0.55–0.65** (caption panel E/J) — is reproduced exactly (MSN2 0.591, MSN4 0.618). The per-timepoint raw R rises with induction (MSN2 T5→T90: 0.40→0.63), and the TSL1 ISM distance heatmap shows monotone temporal divergence — both directional confirmations of induction-driven signal.
+- **MSN2 panel-E timepoints.** The **published** MSN2 panel E uses the **extended series
+  T5,T10,T20,T40,T70,T120,T180** (the series the released code assigns to **SWI4**); the released MSN2
+  modisco has only the standard 8 timepoints. We reproduce panel E over the available MSN2 timepoints and
+  document the mismatch. **MSN4 panel J's series matches the released data exactly.**
+- **ATG42 window indexing.** The pipeline's TSS rule (`1_create_target_genes.py`) yields
+  chrII:515,213–515,713 on the current GTF — a 1 bp 0-/1-indexing offset from the published caption
+  (515,214–515,714); we target the published caption window (cosmetic 1 bp).
+- **Two distinct R quantities.** Global ΔlogFC R (0.49/0.40, raw fold-change) vs the normalized
+  mean-centered per-track R (0.55–0.65, panels D/I). Both reproduce.
 
-### Discrepancy log (honest)
-| Item | Note |
-|---|---|
-| **ATG42 (MSN2 @ chrII:515,214–515,714) ISM not in released artifacts** | The per-locus ISM `scores.h5` for ATG42 is **absent** from the released `gene_exp_motif_test_MSN2_targets` set (30 chrII windows, none near 515 kb; no ATG42-specific `scores.h5` on disk). So panels **5A/5C** are shown with a **representative MSN2-target promoter** (clearly labelled), plus the genome-wide MSN2 ΔT TF-MoDISco (5D). The **MSN4 @ TSL1** ISM **is** present, so **5F/5H** are reproduced at the exact published locus. |
-| 5B/5G label | The metric script labels its output by the example gene (`YBR139W_ATG42`), but `global_fc_metrics` / `global_lfc_scatter` / the R boxplots are computed **genome-wide** (all genes × timepoints, N=45,682 pairs) — not gene-specific. The per-gene fold-change panel (`fold_change_by_timepoint_bar.png`) is the locus-specific 5B/5G. |
-| 0.4949/0.3992 vs 0.55–0.65 | Two distinct quantities: the **global ΔlogFC** Pearson R (0.49/0.40, raw fold-change) vs the **normalized mean-centered per-track** R (0.55–0.65, the manuscript anchor / panel E·J). Both reproduced. |
+## Data sources (under `work_root`)
 
-**Changes to legacy scripts:** none. `1_time_track_metrics_viz.py` was re-run unmodified (absolute `--out_dir` into `reproduced/`).
+- ISM logSED `…/motif_shorkie_RP_TSS/gene_exp_motif_test_{MSN2,MSN4}_targets/f0c0/part*/scores.h5`
+  `(N,500,4,3053)` f16 (+ the recomputed `reproduced/ism_atg42/scores.h5` for ATG42).
+- Gene-level eval re-run of `1_time_track_metrics_viz.py` → `reproduced/eval_{MSN2,MSN4}/`.
+- ΔT TF-Modisco `…/2_timepoint_analysis/modisco_analysis/results/.../T{n}/modisco_results_10000_500_diff.h5`.
+- Targets sheet `cleaned_sheet_RNA-Seq.txt` (track→timepoint, `track_offset=1148`); model
+  `self_supervised_unet_small_bert_drop/train/f0c0`.
+
+> Note: `notebooks/fig05_promoter_umap.ipynb` is a **different** analysis (LM promoter-embedding UMAP),
+> not main-text Figure 5, despite the `fig05` filename prefix.

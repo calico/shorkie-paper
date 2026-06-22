@@ -1,9 +1,13 @@
 panel,metric,reported,reproduced,delta,rtol,atol,verdict
-5E,"MSN2_norm_PearsonR_median_in[0.55,0.65]",0.6,0.591,-0.009000000000000008,0.0,0.05,PASS
-5J,"MSN4_norm_PearsonR_median_in[0.55,0.65]",0.6,0.618,0.018000000000000016,0.0,0.05,PASS
-5F,TSL1_window==chrXIII:70173-70673,1.0,1.0,0.0,0.0,0.0,PASS
-5H,TSL1_distance_monotone_from_T0,1.0,1.0,0.0,0.0,0.0,PASS
-5B,MSN2_global_dLFC_PearsonR,0.4949,0.4949,0.0,0.0,0.001,PASS
-5G,MSN4_global_dLFC_PearsonR,0.3992,0.3992,0.0,0.0,0.001,PASS
-5D,MSN2_dT_modisco_motifs(>=1),1.0,20.0,19.0,0.02,0.0,PASS
-5I,MSN4_dT_modisco_motifs(>=1),1.0,10.0,9.0,0.02,0.0,PASS
+5A,ATG42_window==chrII:515214-515714,1.0,1.0,0.0,0.02,0.0,PASS
+5B,MSN2_global_dLFC_PearsonR,0.4949,0.4949,0.0,0.02,0.001,PASS
+5C,ATG42_distance_diverges_from_T0,1.0,1.0,0.0,0.02,0.0,PASS
+5D,"MSN2_boxplot_ncounts==[8, 12, 8, 12, 9, 9, 7, 9]",1.0,1.0,0.0,0.02,0.0,PASS
+5D,"MSN2_norm_PearsonR_median_in[0.55,0.65]",0.6,0.591,-0.009000000000000008,0.02,0.05,PASS
+5E,MSN2_STRE_motif_recovered(>=1_dT),1.0,7.0,6.0,0.02,0.0,PASS
+5F,TSL1_window==chrXIII:70173-70673,1.0,1.0,0.0,0.02,0.0,PASS
+5G,MSN4_global_dLFC_PearsonR,0.3992,0.3992,0.0,0.02,0.001,PASS
+5H,TSL1_distance_diverges_from_T0,1.0,1.0,0.0,0.02,0.0,PASS
+5I,"MSN4_boxplot_ncounts==[11, 7, 8, 10, 6, 8, 12, 8]",1.0,1.0,0.0,0.02,0.0,PASS
+5I,"MSN4_norm_PearsonR_median_in[0.55,0.65]",0.6,0.618,0.018000000000000016,0.02,0.05,PASS
+5J,MSN4_STRE_motif_recovered(>=1_dT),1.0,7.0,6.0,0.02,0.0,PASS
