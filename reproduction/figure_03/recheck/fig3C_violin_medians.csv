@@ -1,0 +1,5 @@
+track_type,n,Shorkie_median,Random_median
+RNA-Seq,3053,0.7763,0.703
+1000 strains RNA-Seq,1014,0.6294,0.5793
+ChIP-MNase,20,0.4455,0.4241
+ChIP-exo,1128,0.3563,0.3148

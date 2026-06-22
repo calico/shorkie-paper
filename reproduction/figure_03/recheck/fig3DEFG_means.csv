@@ -1,0 +1,9 @@
+panel_id,panel,group,n,Random_mean_x,Shorkie_mean_y,pct_above_diag
+3D,Pearson's R (Bin level),RNA-Seq,3053,0.7145,0.7774,100.0
+3D,Pearson's R (Bin level),1000 strains RNA-Seq,1014,0.5316,0.5728,100.0
+3E,Pearson's R (Gene Level),RNA-Seq,3053,0.8009,0.8797,100.0
+3E,Pearson's R (Gene Level),1000-RNA-seq,1014,0.8523,0.899,100.0
+3F,Pearson's R Norm (Gene Level),RNA-Seq,3053,0.3558,0.3808,77.4
+3F,Pearson's R Norm (Gene Level),1000-RNA-seq,1013,0.2827,0.2828,51.7
+3G,Pearson's R within-gene (Track Level),RNA-Seq,3555,0.6092,0.7314,75.3
+3G,Pearson's R within-gene (Track Level),1000-RNA-seq,3842,0.4718,0.5973,79.2

@@ -17,36 +17,46 @@ Figure 3 establishes that LM-pretrained **Shorkie** beats the from-scratch **Sho
 |---|---|---|---|---|---|
 | **A** | Shorkie architecture (U-Net + 8 transformer blocks + task heads) | schem | — (params) | `02_train/shorkie_finetuned/params.json` → `models.shorkie_finetuned` | none |
 | **B** | β-estradiol induction protocol (→ time-point RNA-seq tracks) | schem | — | `datasets.bigwigs` | none |
-| **C** | bin-level Pearson R distribution by track type (Shorkie vs Random_Init) | comp | `03_eval/supervised/track_prediction_eval/2_bin_gene_level_metrics/1_bin_level_freq_viz.py` | `train/f{i}c0/eval/acc.txt` | none |
-| **D** | bin-level R scatter (Random_Init x vs Shorkie y) | comp | `…/2_bin_gene_level_metrics/3_gene_level_score_dist_viz.py` (track) | `acc.txt` | `fig09`(partial) |
-| **E** | gene-level R scatter | comp | `…/3_gene_level_score_dist_viz.py` (gene) | `gene_level_eval_rc/.../gene_acc.txt` | `fig09` |
-| **F** | quantile-normalized gene-level R scatter | comp | `…/3_gene_level_score_dist_viz.py` (`pearsonr_norm`) | `gene_acc.txt` | `fig09` |
-| **G** | gene-by-gene track-level R | comp | `…/4_track_level_score_diff_viz.py` (`pearsonr_gene`) | `gene_acc.txt` | none |
-| **H–J** | coverage at RPL7A / RPS16B-RPL13A / EFM5 (obs vs Shorkie vs Random_Init) | gpu | `…/3_viz_rnaseq_tracks/2_yeast_rna_seq_models.py` | ensemble + bigwig | `fig08` |
+| **C** | bin-level Pearson R distribution by track type — **split violin** | comp | `…/1_bin_level_freq_viz.py::plot_box_violin` | `train/f{i}c0/eval/acc.txt` (median-per-id) | none |
+| **D** | bin-level R scatter (Random_Init x vs Shorkie y) | comp | `…/1_bin_level_freq_viz.py::scatter_all_groups_scatter` | top-level `acc.txt` (mean-per-id) | none |
+| **E** | gene-level R scatter (`pearsonr`) | comp | `…/3_gene_level_score_dist_viz.py` **`level="track"`** | per-dt `gene_level_eval_rc/…/{dt}/acc.txt` | `fig09` |
+| **F** | quantile-normalized gene-level R scatter (`pearsonr_norm`) | comp | `…/3_gene_level_score_dist_viz.py` **`level="track"`** | per-dt `acc.txt` | `fig09` |
+| **G** | within-gene track-level R (`pearsonr_gene`) | comp | `…/3_gene_level_score_dist_viz.py` **`level="gene"`** | per-dt `gene_acc.txt` (drop bottom-10% cov) | none |
+| **H–J** | coverage at RPL7A / RPS16B-RPL13A / EFM5 (obs vs Shorkie vs Random_Init) | gpu | `…/3_viz_rnaseq_tracks/2_yeast_rna_seq_models.py` (+ `3_gene_annotation_viz.py`) | ensemble + bigwig + GTF | `fig08` |
+
+> **Note on the panel E/F/G titles:** the released `3_gene_level_score_dist_viz.py` has an *inverted*
+> `level`↔title naming — panels **E/F** (titled "Gene Level") are emitted at `level="track"` (reading the
+> per-data-type `acc.txt`), and panel **G** (titled "Track Level") at `level="gene"` (reading `gene_acc.txt`).
 
 **Models:** Shorkie = `self_supervised_unet_small_bert_drop`; Shorkie_Random_Init = `supervised_unet_small_bert_drop_variants/learning_rate_0.0005` (the script's optimized-LR from-scratch baseline) — both 8-fold under `datasets.supervised_root`. Env `yeast_ml` (CPU for C–G; GPU for H–J). Eval-table columns: bin `index,pearsonr,r2,identifier,description`; gene `gene_id,pearsonr,pearsonr_norm,pearsonr_gene,…`. Track types parsed from `description`: RNA-Seq (3053), ChIP-exo (1128), 1000-strain RNA-Seq (1014), ChIP-MNase (20).
 
 ### Reproduction scope
-- **Fully reproduced (CPU):** 3C (bin-R density), 3D (bin scatter), 3E/3F/3G (gene-level scatters). 3A schematic (programmatic block-stack from `params.json`); 3B documented.
-- **GPU (documented):** 3H–J coverage tracks — reuse `fig08` (`process_sequence`+`load_ensemble`+`predict_tracks`+`read_coverage`+`plot_coverage_track_bins`); run for the 3 loci × {Shorkie, Random_Init} via `sbatch -A ssalzbe1_gpu -p ica100 --gres=gpu:1`. The methodology is already validated in `fig08` (Phase-7b, one gene).
+- **Fully reproduced (CPU), exact-match to the published figure:** 3C (split violin), 3D (bin scatter), 3E/3F/3G (gene-level scatters). 3A schematic (programmatic block-stack from `params.json`, track-count box ChIP-exo 1128 / Histone 20 / RNA-Seq 3053 / 1000-strain 1014); 3B documented schematic.
+- **GPU (cached):** 3H–J coverage at the 3 loci × {Shorkie, Random_Init}, one model per process via `sbatch reproduction/figure_03/panels/run_coverage.sbatch`; re-rendered (gene-annotation track + published colors) by `panels/plot_coverage.py`. No GPU rerun needed — the coverage NPZ is cached in `reproduced/coverage/`.
 
 ---
 
 ## Phase 3 — Verification
 
-**`reproduced/verify_fig03.csv`: 5/5 PASS.**
-- **3C** — RNA-Seq bin-level median Pearson R: Shorkie **0.776 ≈ 0.78** (PASS); plain from-scratch baseline **0.666 ≈ 0.67** (PASS). The manuscript's "0.67 → 0.78" is reproduced.
-- **Direction** — Shorkie > Random_Init at bin level (3C/3D) and gene level (3E), and Shorkie wins in >50% of genes (3G). All PASS.
+**`reproduced/verify_fig03.csv`: 33/33 PASS** — checked against the values **printed on the published
+figure** (recomputed with the source-of-truth recipes; see `recheck/DISCREPANCIES.md`).
+- **3C** — 8 split-violin medians, e.g. RNA-Seq Shorkie **0.776** / Random_Init **0.703**; 1000-strain 0.629/0.579; ChIP-MNase 0.446/0.424; ChIP-exo 0.356/0.315. All match.
+- **3D/3E/3F/3G** — every group mean point matches the published printed value (3D RNA-Seq 0.71/0.78; 3E 0.80/0.88; 3F 0.36/0.38; 3G 0.61/0.73; + the 1000-strain points).
+- **3H/3I/3J** — coverage Pearson R vs observed 0.96–0.99 (Shorkie), 0.85–0.97 (Random_Init).
 
-### Discrepancy log (honest)
-| Item | Reproduced | Published | Note |
-|---|---|---|---|
-| 3C bin-R (RNA-Seq) | **0.776 / 0.666** | 0.78 / 0.67 | ✅ matches (Random_Init = the *plain* `supervised_unet_small_bert_drop` from-scratch baseline; the lr-variant gives 0.703) |
-| 3E gene-R | ~0.84 / ~0.84 (`pearsonr`); ~0.73 / ~0.61 (`pearsonr_gene`, RNA-Seq) | 0.88 / 0.74 | direction holds, but the exact magnitudes are **not reproducible** from the released eval tables — the released lr-variant Random_Init baseline is *stronger* than the published one, and the published 0.88/0.74 likely apply a gene-expression filter + a specific from-scratch checkpoint not in the released tables |
-| 3G % genes Shorkie>Random | ~54% (`pearsonr`); ~84% (`pearsonr_gene`, RNA-Seq) | 87.8% | same cause; the `pearsonr_gene`/RNA-Seq metric is closest (≈84%) |
+### Discrepancy log (honest) — see [`recheck/DISCREPANCIES.md`](recheck/DISCREPANCIES.md) for full detail
+| Item | Status | Root cause |
+|---|---|---|
+| 3C plot type | **fixed** | published is a **split violin** (`plot_box_violin`); the reproduction had rendered the KDE branch of the same script |
+| 3C Random_Init median | **fixed** | the figure plots the **lr=5e-4 variant** (RNA-Seq median **0.703**); the prior verify checked **0.67** = the manuscript-*text* plain-supervised baseline (a different model) |
+| 3E/3F/3G gene-level means | **fixed** | the prior reproduction pooled `gene_acc.txt` across all tracks (→0.9178); the correct recipe reads per-data-type `acc.txt` (E/F, `level="track"`) and `gene_acc.txt` (G, `level="gene"`, drop bottom-10% `coverage_norm_self`) and reproduces 0.80/0.88, 0.36/0.38, 0.61/0.73 **exactly** |
+| 3H/I/J styling | **fixed** | fine-tuned row recoloured red→**orange**; gene-annotation track + intron dashed lines added (GTF) |
+| **3G "87.8% of genes"** | **residual (documented)** | the manuscript-text fraction does **not** reproduce — pearsonr_gene RNA-Seq fraction-above-diagonal is robustly **~75%** across every metric/level/filter/pooling variant; the panel-G scatter and its means (0.61/0.73) reproduce exactly, so only the headline text fraction differs (likely an earlier checkpoint / gene-filter at writing time) |
 
-The qualitative claim (**LM pretraining improves coverage prediction; Shorkie > Random_Init**) is robustly reproduced; the exact gene-level magnitudes depend on the original analysis's gene-filtering/checkpoint and are documented rather than forced.
+> **Recheck update (2026-06-22):** full figure-exactness pass. All four data panels (C/D/E/F/G) and the
+> coverage panels (H/I/J) now match the published figure in plot type, styling, colours, and printed
+> numbers (33/33). Builders live in `recheck/` (`build_3C_violin.py`, `build_3DEFG_scatter.py`,
+> `build_verify_fig03.py`, `make_sidebyside_fig03.py`); `panels/plot_coverage.py` gained the
+> gene-annotation track. Side-by-sides in `recheck/Figure_3_published_vs_reproduced.png`.
 
-> **Recheck update (2026-06-21):** 3E gene-R magnitude is now resolved — panel **3E = 0.88 reproduces to 0.8799** (median over genes of the per-gene-mean `pearsonr` pooled across all 4 track groups × 8 folds; the "0.84" above was a narrower glob). Panels **3H–J coverage are reproduced**: a first run flat-lined the Random_Init track to `ln 2 ≈ 0.693` (a cross-architecture Keras weight-restore collision — the 170-feature Shorkie loaded first corrupts the 4-feature Random_Init restore in the same process), fixed by loading **one model per process** (`panels/run_coverage.py`). Result: R(Shorkie,obs) 0.96–0.99, R(Random_Init,obs) 0.85–0.97 at the held-out fold per locus. See `../VERIFICATION_REPORT.md`.
-
-**Changes to legacy scripts:** none edited; the script's `supervised_…_variants/learning_rate_0.0005` Random_Init path is used as-is, with the plain baseline additionally computed because it matches the published 0.67 bin anchor.
+**Changes to legacy scripts:** none edited; the released figure scripts' recipes are reproduced faithfully.
