@@ -1,0 +1,3 @@
+metric,mean,min,threshold
+AUROC,0.9953,0.7563,0.95
+AUPRC,0.9958,0.7870,0.95

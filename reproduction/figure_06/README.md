@@ -2,57 +2,67 @@
 
 > *"Shorkie predicts promoter variant effects validated by MPRAs."*
 
-Reproduction package for **main-text Figure 6**. Published reference: [`../../paper/Figures/Figure_6.pdf`](../../paper/Figures/Figure_6.pdf) (`published/Figure_6_full.png`).
+Reproduction package for **main-text Figure 6**. Published reference:
+[`../../paper/Figures/Figure_6.pdf`](../../paper/Figures/Figure_6.pdf) (`published/Figure_6_full.png`).
 
-- **Reproduce:** [`reproduce_figure_06.ipynb`](reproduce_figure_06.ipynb) (executed in tmux, 0 errors).
-- **Verify:** `reproduced/verify_fig06.csv` — **7/7 PASS** (CPU panels).
+- **Reproduce:** [`reproduce_figure_06.ipynb`](reproduce_figure_06.ipynb) — delegates to the
+  `recheck/` builders (executed with `nbconvert`, 0 errors).
+- **Verify:** `reproduced/verify_fig06.csv` — **26/26 PASS** against the values printed on the
+  published figure (both the Shorkie and DREAM-RNN subpanels of D–I).
 
-> **Recheck update (2026-06-21):** the four previously "documented gaps" **E/F/G/H are reproduced**. Their 8-fold Shorkie logSED predictions were already on disk (the notebook had searched the wrong subtree, `scores_avg/results/` instead of `single_measurement_stranded/all_seq_types/`). Reproduced Pearson — **6E 0.696** (pub 0.695), **6F 0.5475** (0.539), **6G 0.8185** (0.819), **6H 0.6013** (≈0.561) — see `reproduced/refalt/{recompute_mpra_fgh.py,mpra_fgh_R.csv,scatter_*.png}` and 3-way diffs in `recheck/`. 6D native R **0.644 reconciled** with the manuscript's ~0.70 (different model/metric/dataset; DREAM-RNN native R is only 0.26–0.34). See `../VERIFICATION_REPORT.md`.
-
----
-
-## Phase 1 — Discovery
-
-**Dataset:** the Random-Promoter **DREAM Challenge MPRA** — Rafi et al. 2024, *"A community effort to optimize sequence-based deep learning models of gene regulation," Nat Biotechnol* — a held-out set of **71,103** sequences in 8 categories (native yeast, random, high/low-expression, challenging, SNV, motif-perturbation, motif-tiling); baseline comparator = **DREAM-RNN**. Reuses the validated `notebooks/fig12_mpra_benchmark.ipynb` aggregation (`gene_avg_scores`, reporter-gene panels, `pos`-column ground-truth join).
-
-| Panel | Claim | Source script | Config key | Tier |
-|---|---|---|---|---|
-| **A** | MPRA insertion schematic (100–200 bp upstream, 10-bp steps) | — (programmatic) | — | schematic |
-| **B** | AUROC, high- vs low-expression across insertion sites (3 expr. quantiles) | `scores_avg/7_MPRA_classifier_avg.py` | `results.mpra_viz` | CPU |
-| **C** | AUPRC, same | same | `results.mpra_viz` | CPU |
-| **D** | Shorkie logSED vs measured, native yeast | `scores_avg/8_MPRA_avg.py` + `fig12` | `results.mpra_viz`, `datasets.mpra` | CPU |
-| **E** | same, challenging sequences | same | — | **gap** (NPZ not released) |
-| **F** | SNV ref−alt effects | `eQTL_MPRA_models_ISM/0_ref_alt_score_difference.py` | `datasets.mpra` | **gap** (GPU) |
-| **G** | motif-perturbation ref−alt | same | `datasets.mpra` | **gap** (GPU) |
-| **H** | motif-tiling ref−alt | same | `datasets.mpra` | **gap** (GPU) |
-| **I** | endogenous RNA-seq coverage, Shorkie vs DREAM-RNN (domain specificity) | `MPRA_RNASeq/` | `results.mpra_viz` | CPU |
-
-**Aggregation (from `fig12`):** per reporter gene and insertion context, the per-sequence score = mean logSED over tracks; averaged across the 11 insertion contexts (`context_position = 100 + i×10`) and across the reporter-gene panel → one score per library sequence, correlated against the measured MAUDE expression (joined via each subset CSV's `pos` column into `filtered_test_data_with_MAUDE_expression.txt`).
+> **Deep recheck (2026-06-22):** the whole figure is reproduced **exactly from cached data — no
+> GPU**. Reading the published PDF panel-by-panel revealed the earlier reproduction was incomplete:
+> every panel D–I is a **two-scatter composite** (Shorkie blue **+** DREAM-RNN green), panel E is
+> **Random** (not "challenging"), and panels D–H use the **180 bp** insertion context. With those
+> fixes every reproduced Pearson/Spearman matches the figure to |Δ| ≤ 0.001. Full root-cause writeup:
+> [`recheck/DISCREPANCIES.md`](recheck/DISCREPANCIES.md).
 
 ---
 
-## Phase 3 — Verification
+## Dataset
 
-**`reproduced/verify_fig06.csv`: 7/7 PASS** (CPU panels).
+The Random-Promoter **DREAM Challenge MPRA** (Rafi et al. 2024, *Nat Biotechnol*) — a held-out set
+of **71,103** sequences in 8 categories (native yeast, random, high/low-expression, challenging,
+SNV, motif-perturbation, motif-tiling); baseline comparator = **DREAM-RNN**.
 
-| Panel | Metric | Reported | Reproduced | Verdict |
+## Panels (all CPU-reproducible from cached NPZ/TSV)
+
+| Panel | Claim | Shorkie (pub→repro) | DREAM-RNN (pub→repro) | Source script |
 |---|---|---|---|---|
-| **6B** | mean AUROC (high vs low, all genes/sites) | > 0.95 | **0.9988** | PASS |
-| **6C** | mean AUPRC | > 0.95 | **0.9988** | PASS |
-| **6D** | native Shorkie logSED Pearson R | 0.644 (fig12) | **0.644** (ρ=0.660) | PASS |
-| **6D** | native R positive concordance | > 0.5 | 0.644 | PASS |
-| **6I** | DREAM-RNN endogenous predictions present (7126 genes) | yes | yes | PASS |
-| **6I** | Shorkie-vs-DREAM density rendered | yes | yes | PASS |
-| **6E** | challenging NPZ absent (gap evidence) | 0 entries | 0 entries | PASS |
+| **6A** | MPRA insertion schematic (100–200 bp, 10-bp steps) | schematic | — | programmatic |
+| **6B** | AUROC, high- vs low-expr across insertion sites (3 quantiles) | >0.95 → **0.995** | — | `4_mpra_high_low_seq/5_MPRA_classifier_avg.py` |
+| **6C** | AUPRC, same | >0.95 → **0.996** | — | same |
+| **6D** | Yeast (single) | 0.695 → **0.695** | 0.891 → **0.891** | `5_mpra_viz/MPRA_scatter_regression_single.py` + `MPRA_ref_model_viz_single_index.py` |
+| **6E** | **Random** (single) | 0.744 → **0.744** | 0.981 → **0.981** | same |
+| **6F** | SNV (dual Alt−Ref) | 0.539 → **0.539** | 0.866 → **0.866** | `5_mpra_viz/MPRA_scatter_regression_dual_trim.py` + `MPRA_ref_model_viz_dual_indices.py` |
+| **6G** | Motif Perturbation (dual) | 0.819 → **0.819** | 0.983 → **0.983** | same |
+| **6H** | Motif Tiling (dual) | 0.561 → **0.561** | 0.943 → **0.943** | same |
+| **6I** | Endogenous RNA-seq coverage density | r=0.895 → **0.895** | r=0.249 → **0.249** | `MPRA_RNASeq/9_combined_density_subplot.py` |
 
-The headline classification anchor (**AUROC & AUPRC > 0.95** for high- vs low-expression separation) is reproduced strongly (mean 0.9988 across the 10 reporter genes with released high/low NPZ × 11 insertion sites). The native-yeast concordance reproduces fig12 exactly.
+**Recipe (locked against the source scripts + on-disk data):** Shorkie scores come from the complete
+stranded NPZ tree `…/MPRA_promoter_seqs/results/single_measurement_stranded/all_seq_types/`, using
+the **180 bp** insertion context; per-sequence score = mean logSED over tracks (dual panels use
+ALT−REF). DREAM-RNN per-sequence predictions come from
+`data/random-promoter-dream-challenge-2022/data/DREAM-RNN_output.txt`. Ground-truth MAUDE expression
+from `data/MPRA/filtered_test_data_with_MAUDE_expression.txt`, joined by each subset CSV's
+`pos`/`alt_pos`/`ref_pos` columns (random/challenging/SNV/motif subsampled via `fix/*_sample_ids.tsv`).
+Panel I is a gaussian-kde 2D density of log2(prediction+1) vs log2(Mean T0 RNA-Seq coverage+1).
 
-### Discrepancy log (honest)
-| Item | Note |
-|---|---|
-| **6D native R: 0.644 vs reported ~0.70** | The reproduced Shorkie **logSED** native-yeast Pearson R is **0.644** (Spearman 0.660) — identical to the validated `fig12` value. The manuscript reports **~0.70** for native sequences, and panel 6D plots **both Shorkie and DREAM-RNN** vs measured. The ~0.06 gap most likely reflects (a) the reported value being the DREAM-RNN curve or a context-marginalized log-fold-change score rather than the released per-context-averaged logSED NPZ, and/or (b) a different fold/aggregation. Reported honestly; not forced. |
-| **6E challenging / random NPZ absent** | The per-context Shorkie NPZ for the *challenging* and *random* categories are **not in the released `scores_avg/results/` tree** (`challenging_seqs`/`all_random_seqs` = 0 entries). Verified on disk. Regenerating them needs the upstream GPU MPRA-inference stage. |
-| **6F/6G/6H dual-seq ref−alt** | The input subset CSVs are present (`all_SNVs_seqs.csv` 13.6 MB, `motif_perturbation.csv`, `motif_tiling_seqs.csv`), but the scored ref/alt predictions require **model inference (GPU)** via `0_ref_alt_score_difference.py`; no CPU-recomputable scored tables are on disk. Manuscript anchors (F=0.54, G=0.82, H=0.56) are recorded for a future GPU pass. |
-| 6B/6C gene count | Only the 10 reporter genes with released high/low-expression NPZ are scored (the others lack high/low NPZ on disk); the mean is over those 10 genes × 11 insertion sites. |
+## `recheck/` builders
 
-**Changes to legacy scripts:** none. The `fig12` aggregation is reused unmodified; the B/C AUROC/AUPRC and the 6A schematic are computed in-notebook (ports of `7_MPRA_classifier_avg.py` and the insertion-site description).
+| File | Builds | Output |
+|---|---|---|
+| `mpra_common.py` | shared loaders (GT, DREAM, NPZ aggregation, index maps; `SITE=180`) | — |
+| `build_panels_DE.py` | 6D Yeast, 6E Random (Shorkie + DREAM) | `reproduced/Figure_6{D,E}.png`, `recheck/fig6_DEFGH_R.csv` |
+| `build_panels_FGH.py` | 6F SNV, 6G motif-pert, 6H motif-tiling (Shorkie + DREAM) | `reproduced/Figure_6{F,G,H}.png` |
+| `build_panel_I.py` | 6I RNA-seq coverage density (Shorkie + DREAM) | `reproduced/Figure_6I.png`, `recheck/fig6_I_R.csv` |
+| `build_panels_BC.py` | 6B/6C AUROC/AUPRC trends + 6A schematic | `reproduced/Figure_6BC.png`, `reproduced/Figure_6A_schematic.png` |
+| `build_verify_fig06.py` | 26-check verification vs published figure | `reproduced/verify_fig06.csv` |
+| `make_sidebyside_fig06.py` | published-vs-reproduced crops + montage | `recheck/panel_*_sidebyside.png` |
+
+## Verification — `reproduced/verify_fig06.csv` (26/26 PASS)
+
+Shorkie + DREAM-RNN Pearson **and** Spearman for panels D/E/F/G/H, both 6I density correlations, and
+6B/6C AUROC/AUPRC > 0.95 — every reproduced value matches the published figure to |Δ| ≤ 0.001.
+See [`recheck/DISCREPANCIES.md`](recheck/DISCREPANCIES.md) for the per-panel root-cause writeup
+(missing DREAM subpanels, the E→Random relabel, the 6D NPZ-subtree fix, and the 180 bp recipe).
