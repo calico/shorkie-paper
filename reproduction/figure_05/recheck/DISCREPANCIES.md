@@ -100,7 +100,9 @@ reproduction. (The exploratory progression builder lives only in the git history
   diverges monotonically from T0. ATG42 now exact (recomputed).
 - **D/I — normalized Pearson R boxplots.** Per-timepoint `pearsonr_norm`; medians **MSN2 0.591 / MSN4 0.618**
   (published band 0.55–0.65); per-timepoint n-counts **MSN2 8,12,8,12,9,9,7,9** and **MSN4 11,7,8,10,6,8,12,8**
-  match the published boxplots exactly.
+  match the published boxplots exactly. Surfaced as top-level `reproduced/Figure_5D_MSN2_boxplot.png` /
+  `Figure_5I_MSN4_boxplot.png` by `recheck/build_DI_boxplots.py` (re-renders the source `1_time_track_metrics_viz.py`
+  recipe from `eval_{TF}/eval.txt`). (The B/G fold-change bars remain under `eval_*/` — same data, not surfaced.)
 - **Global ΔlogFC R (supporting).** MSN2 **0.4949**, MSN4 **0.3992** (raw fold-change, all genes×timepoints,
   N=45,682) — distinct from the normalized per-track R of D/I; both reproduce.
 

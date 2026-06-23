@@ -31,7 +31,7 @@ PANELS = {
           "5B — ATG42 fold-change vs T0 (Measurement / Prediction)"),
     "C": ((0.345, 0.262, 0.66, 0.430), RD / "Figure_5C_ATG42_distance.png",
           "5C — ATG42 ISM pairwise distance (viridis)"),
-    "D": ((0.66, 0.262, 1.00, 0.430), RD / "eval_MSN2/YBR139W_ATG42/pearsonr_norm_by_timepoint_boxplot.png",
+    "D": ((0.66, 0.262, 1.00, 0.430), RD / "Figure_5D_MSN2_boxplot.png",
           "5D — MSN2 normalized Pearson's R per timepoint"),
     # 5E (MSN2 TF-Modisco motif progression) intentionally skipped — see DISCREPANCIES.md
     "F": ((0.00, 0.520, 1.00, 0.752), RD / "Figure_5F_TSL1_logos.png",
@@ -40,7 +40,7 @@ PANELS = {
           "5G — TSL1 fold-change vs T0 (Measurement / Prediction)"),
     "H": ((0.345, 0.765, 0.66, 0.928), RD / "Figure_5H_TSL1_distance.png",
           "5H — TSL1 ISM pairwise distance (viridis)"),
-    "I": ((0.66, 0.765, 1.00, 0.928), RD / "eval_MSN4/YML100W_TSL1/pearsonr_norm_by_timepoint_boxplot.png",
+    "I": ((0.66, 0.765, 1.00, 0.928), RD / "Figure_5I_MSN4_boxplot.png",
           "5I — MSN4 normalized Pearson's R per timepoint"),
     # 5J (MSN4 TF-Modisco motif progression) intentionally skipped — see DISCREPANCIES.md
 }

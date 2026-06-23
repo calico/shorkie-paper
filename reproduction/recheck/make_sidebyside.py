@@ -106,12 +106,13 @@ MANIFEST = {
     "05": dict(reproduced=[
         ("5A ATG42 ISM logos (repro)", R("05", "Figure_5A_ATG42_logos.png")),
         ("5C ATG42 distance heatmap (repro)", R("05", "Figure_5C_ATG42_distance.png")),
+        ("5D MSN2 norm-R boxplot (repro)", R("05", "Figure_5D_MSN2_boxplot.png")),
         ("5F TSL1 ISM logos (repro)", R("05", "Figure_5F_TSL1_logos.png")),
         ("5H TSL1 distance heatmap (repro)", R("05", "Figure_5H_TSL1_distance.png")),
-        ("5I MSN4 norm-R boxplot (repro)", R("05", "eval_MSN4", "YML100W_TSL1", "pearsonr_norm_by_timepoint_boxplot.png")),
+        ("5I MSN4 norm-R boxplot (repro)", R("05", "Figure_5I_MSN4_boxplot.png")),
     ], originals=[
         ("5I MSN4 norm-R boxplot (ORIGINAL script)", TS / "eval_MSN4" / "YML100W_TSL1" / "pearsonr_norm_by_timepoint_boxplot.png",
-         R("05", "eval_MSN4", "YML100W_TSL1", "pearsonr_norm_by_timepoint_boxplot.png")),
+         R("05", "Figure_5I_MSN4_boxplot.png")),
     ]),
     "06": dict(reproduced=[
         ("6BC AUROC/AUPRC (repro)", R("06", "Figure_6BC_auroc_auprc.png")),

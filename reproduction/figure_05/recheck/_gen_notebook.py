@@ -98,11 +98,13 @@ cells.append(code(r"""show("eval_MSN2/YBR139W_ATG42/fold_change_by_timepoint_bar
 
 cells.append(md(r"""## Panels D/I — normalized Pearson's R per timepoint (the 0.55–0.65 anchor)
 
-Per-track `pearsonr_norm` grouped by timepoint (`n=` annotated). Medians **MSN2 0.591 / MSN4 0.618**
-(published band 0.55–0.65); per-timepoint n-counts **8,12,8,12,9,9,7,9** (MSN2) / **11,7,8,10,6,8,12,8** (MSN4)."""))
+`recheck/build_DI_boxplots.py` re-renders the per-track `pearsonr_norm` boxplot (grouped by timepoint, `n=`
+annotated) from `eval_{MSN2,MSN4}/eval.txt` into the top-level `reproduced/Figure_5D_MSN2_boxplot.png` /
+`Figure_5I_MSN4_boxplot.png`. Medians **MSN2 0.591 / MSN4 0.618** (published band 0.55–0.65); per-timepoint
+n-counts **8,12,8,12,9,9,7,9** (MSN2) / **11,7,8,10,6,8,12,8** (MSN4)."""))
 
-cells.append(code(r"""show("eval_MSN2/YBR139W_ATG42/pearsonr_norm_by_timepoint_boxplot.png",
-     "eval_MSN4/YML100W_TSL1/pearsonr_norm_by_timepoint_boxplot.png", width=600)"""))
+cells.append(code(r"""run_builder("build_DI_boxplots.py")
+show("Figure_5D_MSN2_boxplot.png", "Figure_5I_MSN4_boxplot.png", width=600)"""))
 
 cells.append(md(r"""## Panels E/J — intentionally skipped
 

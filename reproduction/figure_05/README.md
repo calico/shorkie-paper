@@ -20,7 +20,7 @@ promoter **chrXIII:70,173–70,673**.
 | ISM logos, 8 rows T0..T90, **full 500 bp** promoter | **A** | **F** | per-timepoint logSED, mean-centered, projected on ref base (`recheck/build_logos_distance.py`) |
 | Fold-change vs T0 (Measurement / Prediction, ±SEM) | **B** | **G** | `…/motif_shorkie__time_series/1_time_track_metrics_viz.py --gene YBR139W / YML100W` |
 | Pairwise Euclidean-distance heatmap (8×8, viridis) | **C** | **H** | per-timepoint mean-centered PWM distance (`recheck/build_logos_distance.py`) |
-| **Normalized Pearson's R boxplot** (per timepoint, `n=`) | **D** | **I** | per-track `pearsonr_norm` grouped by timepoint (`1_time_track_metrics_viz.py`) |
+| **Normalized Pearson's R boxplot** (per timepoint, `n=`) | **D** | **I** | per-track `pearsonr_norm` by timepoint; surfaced to top-level `reproduced/Figure_5{D,I}_*boxplot.png` (`recheck/build_DI_boxplots.py`, faithful to `1_time_track_metrics_viz.py`) |
 | TF-Modisco binding-site motif over ΔT | E *(skipped)* | J *(skipped)* | not reproduced — see `recheck/DISCREPANCIES.md` |
 
 > This reproduction covers the **8 panels A–D, F–I**; panels **E/J are intentionally skipped** (the published
