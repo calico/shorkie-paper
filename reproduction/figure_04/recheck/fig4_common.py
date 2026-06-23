@@ -115,6 +115,19 @@ SPLICE = [
     dict(panel="F", gene="MMS2", part=57),
     dict(panel="G", gene="HOP2", part=80),
 ]
+# Exact genomic window shown in each published Figure-4 panel header (read off
+# published/Figure_4_full.png and cross-checked against the LM 450/50 TSS window for
+# A/B/C). The clean ISM grid slices each saliency logo to these windows; for FUN12 &
+# MMS2 the released ISM scores.h5 window is offset, so only the covered intersection is
+# drawn (see slice_to_window's covered_frac).
+PUB_WIN = {
+    "RPL26A": ("chrXII", 818862, 819362),   # A — == ISM data window (full)
+    "FUN12":  ("chrI",   75977,  76477),    # B — ISM data is chrI:76,101-76,601 (~124 bp offset)
+    "KRE33":  ("chrXIV", 374871, 375371),   # C — == ISM data window (full)
+    "DTD1":   ("chrIV",  65235,  65431),    # E — within SS data window (full)
+    "MMS2":   ("chrVII", 346669, 347169),   # F — ISM data is chrVII:346,354-346,954 (partial)
+    "HOP2":   ("chrVII", 435625, 436401),   # G — within SS data window (full)
+}
 # Panel H curated TF order (figure label -> meme motif name / cached asset).
 FIG4H_TFS = [
     ("Rap1", "RAP1"), ("Fhl1", "FHL1"), ("Sfp1.1", "SFP1"), ("TATA Box", "@TATATA"),
@@ -195,6 +208,27 @@ def localization(v):
     persite = np.abs(v).sum(axis=1)
     med = float(np.median(persite))
     return float(persite.max() / med) if med > 0 else float("inf")
+
+
+def slice_to_window(v, data_start, pub_start, pub_end):
+    """Slice a per-base saliency array `v` (L,4) — which covers genomic [data_start,
+    data_start+L) — down to the published window [pub_start, pub_end).
+
+    Returns (v_sub, x0, covered_frac):
+      v_sub        the rows of v inside the window (may be empty / partial),
+      x0           genomic coordinate of v_sub[0] (draw the logo at this x),
+      covered_frac fraction of the published window the data actually covers
+                   (1.0 = fully covered; <1.0 for the offset FUN12/MMS2 windows; 0.0 = no overlap).
+    The caller sets ax.set_xlim(pub_start, pub_end) so a partial logo sits in the covered
+    sub-range with the uncovered flank left blank — rows still align on genomic coordinate."""
+    L = int(v.shape[0])
+    data_end = data_start + L
+    lo = max(int(pub_start), int(data_start))
+    hi = min(int(pub_end), int(data_end))
+    pub_len = int(pub_end) - int(pub_start)
+    if hi <= lo or pub_len <= 0:
+        return v[:0], int(pub_start), 0.0
+    return v[lo - data_start: hi - data_start], lo, (hi - lo) / pub_len
 
 
 # ======================================================================================

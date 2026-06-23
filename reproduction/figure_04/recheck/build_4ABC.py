@@ -60,7 +60,12 @@ def main():
         loc_ism = float("nan"); ovl = 0
         if ism is not None:
             v, c2, istart, iend = ism
-            F.draw_logo(ax, v, x0=istart); ax.set_xlim(rs, re_)
+            # slice to the displayed (published) window first so draw_logo's auto y-scale
+            # reflects the visible region, not a peak in the clipped flank (FUN12 offset)
+            v_sub, x0i, _ = F.slice_to_window(v, istart, rs, re_)
+            if v_sub.shape[0]:
+                F.draw_logo(ax, v_sub, x0=x0i)
+            ax.set_xlim(rs, re_)
             loc_ism = F.localization(v)
             ovl = int(not (iend < F.gene_features(gene)["start"] - 600 or istart > F.gene_features(gene)["end"] + 100))
         else:
@@ -68,7 +73,11 @@ def main():
         # 3) Random_Init ISM
         ax = axes[2]; loc_rnd = float("nan")
         if rnd is not None:
-            vr, _, rst, _ = rnd; F.draw_logo(ax, vr, x0=rst); ax.set_xlim(rs, re_)
+            vr, _, rst, _ = rnd
+            vr_sub, x0r, _ = F.slice_to_window(vr, rst, rs, re_)
+            if vr_sub.shape[0]:
+                F.draw_logo(ax, vr_sub, x0=x0r)
+            ax.set_xlim(rs, re_)
             loc_rnd = F.localization(vr)
         else:
             ax.text((rs + re_) / 2, 0.0, "no Random_Init tree (RP sub only)",

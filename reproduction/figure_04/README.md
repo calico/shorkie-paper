@@ -50,7 +50,7 @@ The gene → `(tree, sub, part, idx)` mapping was **not trusted as hardcoded**. 
 
 ## Phase 3 — Verification
 
-**`reproduced/verify_fig04.csv`: 19/19 PASS.** Figure 4 is qualitative (saliency maps + motif logos), so each panel is verified two ways (the deep recheck added the panel-completeness checks — "Shorkie LM row rendered" for A/B/C, panel-H TomTom-matched-TF count, panel-D reconstruction rendered):
+**`reproduced/verify_fig04.csv`: 25/25 PASS.** Figure 4 is qualitative (saliency maps + motif logos), so each panel is verified two ways (the deep recheck added the panel-completeness checks — "Shorkie LM row rendered" for A/B/C, panel-H TomTom-matched-TF count, panel-D reconstruction rendered; the last 6 checks cover the [clean uniform ISM grid](#clean-uniform-ism-grid-build_4_ism_gridpy) — 10 logos, uniform box size, region coverage, localization):
 
 1. **Coordinate-overlap (correctness):** every panel's ISM window provably overlaps its R64 gene — 6/6 PASS. This is the strong check: it proves the reproduced panel shows the *claimed* gene.
 2. **Localized ISM signal (scale-invariant):** the Shorkie saliency peak exceeds **5× the window median** per-site saliency (a concentrated motif, not diffuse noise). Measured localization ratios:
@@ -89,8 +89,10 @@ CPU-only and resolve every path through `shorkie.config` — no hardcoded machin
    committed**, so the rest runs without MEME installed.
 2. `build_4ABC.py`, `build_4D.py`, `build_4EFG.py`, `build_4H.py` — render the panel PNGs into
    `reproduced/` and write the per-panel metric CSVs.
-3. `build_verify_fig04.py` — recomputes the checks → `reproduced/verify_fig04.csv`.
-4. `make_sidebyside_fig04.py` — published-vs-reproduced comparison PNGs (verification aid).
+3. `build_4_ism_grid.py` — the clean uniform ISM grid (see below) → `Figure_4_ISM_grid_reproduced.png`
+   + `fig4_ism_grid_metrics.csv`.
+4. `build_verify_fig04.py` — recomputes the checks → `reproduced/verify_fig04.csv`.
+5. `make_sidebyside_fig04.py` — published-vs-reproduced comparison PNGs (verification aid).
 
 The notebook [`reproduce_figure_04.ipynb`](reproduce_figure_04.ipynb) simply invokes builders 2–3 in order.
 
@@ -98,3 +100,36 @@ The notebook [`reproduce_figure_04.ipynb`](reproduce_figure_04.ipynb) simply inv
 PNGs, `verify_fig04.csv`, and `tomtom_RP_matches.tsv` (so panel H reproduces without MEME). Gitignored
 caches, regenerated on demand: `lm_cache_*.npz` (LM per-row slices), `_modisco_RP_query.meme` +
 `_tomtom_RP/` (TomTom intermediates), and `__pycache__/`.
+
+---
+
+## Clean uniform ISM grid (`build_4_ism_grid.py`)
+
+A single annotation-free view — `reproduced/Figure_4_ISM_grid_reproduced.png` — that re-plots **every
+per-base saliency logo Figure 4 is built from**, on a deliberately uniform footing. It uses only the
+**precomputed** scores (ISM `scores.h5`, LM `preds.npz` via the per-row caches) — **no ISM re-run, no
+GPU**. Three rules:
+
+1. **Uniform scale** — every logo is drawn in the *identical physical box* (11.0 × 0.85 in). Because the
+   panel windows differ in length (196 bp – 776 bp), bp-per-inch varies (letters look wider in short
+   windows). Verified by `uniform_box_size` in the verify CSV.
+2. **Exact region match** — each logo's x-axis is the *published* panel window. Where the released ISM
+   window is offset from the paper's, only the covered intersection is drawn and the covered fraction is
+   recorded (the left flank is left blank; rows still align on genomic coordinate).
+3. **All saliency rows that exist** — Shorkie LM + Shorkie ISM + Shorkie Random_Init, included only where
+   the precomputed data is on disk. No Reference-DB, gene models, TF boxes, splice boxes, dividers or
+   curated text — just the logos + a minimal `gene · source` label and the genomic coordinates.
+
+| Panel | Gene | Published window | Rows rendered | ISM coverage |
+|---|---|---|---|---|
+| A | RPL26A | chrXII:818,862-819,362 | LM · ISM · Random_Init | 100% |
+| B | FUN12 | chrI:75,977-76,477 | LM · ISM | **75%** (ISM data is chrI:76,101-76,601, ~124 bp offset) |
+| C | KRE33 | chrXIV:374,871-375,371 | LM · ISM | ~100% |
+| E | DTD1 | chrIV:65,235-65,431 | ISM | 100% |
+| F | MMS2 | chrVII:346,669-347,169 | ISM | **57%** (ISM data is chrVII:346,354-346,954) |
+| G | HOP2 | chrVII:435,625-436,401 | ISM | 100% |
+
+> **Residual (not fabricated).** The published B/C panels show a Random_Init row and the published F panel
+> shows LM + Random_Init rows, but those came from data not in the released registry (`motif_random_init_RP_TSS`
+> has only the **RP** sub; LM `preds.npz` has no `eval_SS`). The grid plots only the saliency rows whose
+> data is actually on disk, so FUN12/KRE33 show LM+ISM and the splice genes show ISM only.

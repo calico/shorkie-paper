@@ -18,3 +18,9 @@ panel,metric,reported,reproduced,delta,rtol,atol,verdict
 4H,n_TFMoDISco_patterns(>=6),6.0,105.0,99.0,0.02,0.0,PASS
 4H,panelH_TomTom_matched_TFs(>=8of12),8.0,12.0,4.0,0.02,0.0,PASS
 4D,panelD_reconstruction_rendered,1.0,1.0,0.0,0,0,PASS
+4grid,ISM_grid_png_rendered,1.0,1.0,0.0,0,0,PASS
+4grid,n_saliency_logos(==10),10.0,10.0,0.0,0,0,PASS
+4grid,uniform_box_size(all_equal),1.0,1.0,0.0,0,0,PASS
+4grid,full_coverage_genes(>=0.99),0.99,0.998,0.008000000000000007,0.02,0.0,PASS
+4grid,FUN12/MMS2_ISM_partial(<=0.99),0.99,0.752,-0.238,0.02,0.0,PASS
+4grid,all_ISM_localization(>=5.0x),5.0,10.02,5.02,0.02,0.0,PASS

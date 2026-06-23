@@ -66,6 +66,25 @@ def main():
     checks.append(Check("4D", "panelD_reconstruction_rendered", 1.0,
                         1.0 if (F.RD / "Figure_4D_reproduced.png").exists() else 0.0, rtol=0, atol=0))
 
+    # ---- clean uniform ISM grid (build_4_ism_grid.py) ----
+    grid_csv = F.RECHECK / "fig4_ism_grid_metrics.csv"
+    if grid_csv.exists():
+        g = pd.read_csv(grid_csv)
+        checks.append(Check("4grid", "ISM_grid_png_rendered", 1.0,
+                            1.0 if (F.RD / "Figure_4_ISM_grid_reproduced.png").exists() else 0.0, rtol=0, atol=0))
+        checks.append(Check("4grid", "n_saliency_logos(==10)", 10.0, float(len(g)), rtol=0, atol=0))
+        # every logo drawn at the identical physical box size (uniform scale)
+        uniform = 1.0 if (g["box_w_in"].nunique() == 1 and g["box_h_in"].nunique() == 1) else 0.0
+        checks.append(Check("4grid", "uniform_box_size(all_equal)", 1.0, uniform, rtol=0, atol=0))
+        # exact region match: full coverage for RPL26A/KRE33/DTD1/HOP2, partial for FUN12/MMS2 ISM
+        full = g[g["gene"].isin(["RPL26A", "KRE33", "DTD1", "HOP2"])]
+        checks.append(Check("4grid", "full_coverage_genes(>=0.99)", 0.99, float(full["covered_frac"].min()), mode="ge"))
+        part = g[(g["gene"].isin(["FUN12", "MMS2"])) & (g["source"] == "Shorkie ISM")]
+        checks.append(Check("4grid", "FUN12/MMS2_ISM_partial(<=0.99)", 0.99, float(part["covered_frac"].max()), mode="le"))
+        # every ISM logo localizes (peak/median per-site saliency)
+        ism = g[g["source"] == "Shorkie ISM"]
+        checks.append(Check("4grid", f"all_ISM_localization(>={LOC_MIN}x)", LOC_MIN, float(ism["localization"].min()), mode="ge"))
+
     print(summary(checks))
     write_verdicts(checks, F.RD / "verify_fig04.csv")
     npass = sum(c.verdict == "PASS" for c in checks)
