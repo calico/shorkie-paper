@@ -113,6 +113,15 @@ all 12 numbers unchanged). The three panels are now built by a single source of 
   published F and corrected the **scale + style**: legend → **upper center** (was top-right); y-ticks →
   **0.02 step (0.42/0.44)** via `MultipleLocator` (was a dense 0.005 grid); x-axis pinned to **0–322k with
   50k ticks to 300000** (the green 165_Sacc curve + min-marker reach ~302k–320k).
+  **Follow-up (smoothing + green clip):** to match the *original* generator
+  `scripts/03_eval/lm/lm_model_eval/3_dataset_comparison.py::plot_losses` (the "same smooth parameter"),
+  ported its **`moving_average(window_size=21)` + `maybe_trim_end(trim_end=5)`** smoothing into
+  `restyle_1F()` and plot the smoothed curves (the raw red 1341_Fungus was far spikier than the published);
+  the legend min is still taken from the **raw (trimmed)** array, so the printed mins
+  (0.4181/0.4154/**0.4018**/0.4055) and verify are unchanged. Also fixed the **green curve being clipped**:
+  its min is **0.4018** but `ylim` started at 0.404, so the bottom of the green descent was cut at the axis
+  floor — lowered `ylim` to **(0.400, 0.446)** (ticks now 0.40/0.42/0.44) so the full descent shows, as the
+  legacy auto-scale did.
 - **1G — panel aspect.** Kept gene(blue)/intergenic(orange) grouped bars, y-range, labels, legend; only
   widened `figsize` (7.2×4.6 → 10×4.5) to match the published G aspect (2611×1181 ≈ 2.21:1).
 

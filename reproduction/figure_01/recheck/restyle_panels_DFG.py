@@ -214,25 +214,60 @@ def restyle_1D():
           f"strains n={len(strn)} max={strn.max():.5f}")
 
 
+# Smoothing used by the original Figure-1F generator
+# (scripts/03_eval/lm/lm_model_eval/3_dataset_comparison.py): a symmetric moving
+# average with adaptive edges (moving_average L142-157) + a tail trim of the last
+# `trim_end` points (maybe_trim_end L160-166). Defaults window_size=21, trim_end=5.
+SMOOTH_WINDOW = 21
+TRIM_END = 5
+
+
+def _moving_average(x, window_size=SMOOTH_WINDOW):
+    """Symmetric moving average with adaptive (truncated) edges — verbatim port of the
+    legacy plot_losses smoothing so 1F matches the original published curves."""
+    x = np.asarray(x, dtype=float)
+    if window_size <= 1 or x.size == 0:
+        return x.copy()
+    out = np.empty_like(x)
+    half = window_size // 2
+    n = len(x)
+    for j in range(n):
+        lo, hi = max(0, j - half), min(n - 1, j + half)
+        out[j] = x[lo:hi + 1].mean()
+    return out
+
+
+def _trim_end(x, trim_end=TRIM_END):
+    if trim_end <= 0 or x.size == 0:
+        return x
+    return x[:1] if trim_end >= len(x) else x[:-trim_end]
+
+
 def restyle_1F():
     fig, ax = plt.subplots(figsize=(10.0, 4.45))
     mins = {}
     for t in TIERS:
         vls = np.array([float(VLRE.search(ln).group(1)) for ln in open(LMR / SUBS[t] / "train" / "train.out")
                         if ln.strip().startswith("Epoch") and VLRE.search(ln)])
-        x = np.arange(1, len(vls) + 1) * BATCHES_PER_EPOCH
-        mins[t] = float(vls.min())
-        ax.plot(x, vls, ls="--", color=COL[t], lw=1.1, alpha=0.9,
-                label=f"{LABEL_F[t]}; loss = {vls.min():.4f}")
-        # faint vertical min-marker at the argmin batch (matches the published guide lines)
-        ax.axvline(int(vls.argmin() + 1) * BATCHES_PER_EPOCH, color=COL[t], ls="--", lw=0.8, alpha=0.35)
+        # Same plot as the legacy 3_dataset_comparison.py: plot the SMOOTHED curve
+        # (moving_average(21) -> trim last 5) but take the legend min from the raw
+        # (trimmed) data, so the printed min is unchanged (verify stays 12/12).
+        va_orig = _trim_end(vls)
+        va_smooth = _trim_end(_moving_average(vls))
+        x = np.arange(1, len(va_smooth) + 1) * BATCHES_PER_EPOCH
+        mins[t] = float(va_orig.min())
+        ax.plot(x, va_smooth, ls="--", color=COL[t], lw=1.2, alpha=0.9,
+                label=f"{LABEL_F[t]}; loss = {va_orig.min():.4f}", zorder=-100)
+        # faint vertical min-marker at the (raw) argmin batch (legacy: alpha 0.25, lw 1)
+        ax.axvline((int(va_orig.argmin()) + 1) * BATCHES_PER_EPOCH,
+                   color=COL[t], ls="--", lw=1.0, alpha=0.25, zorder=-200)
     ax.set_xlabel("# Training Batches")
     ax.set_ylabel("Validation Loss")
     ax.set_title("Validation Losses")
-    # Published scale & style: y-ticks only at 0.42/0.44 (0.02 step); x from 0 to
-    # ~322k (the green 165_Sacc curve + its min-marker reach ~302k-320k), 50k ticks;
-    # legend centred at the top (not in the right corner).
-    ax.set_ylim(0.404, 0.447)
+    # y starts low enough to show the FULL green descent (165_Sacc min 0.4018) — the
+    # previous 0.404 floor clipped it; 0.02 ticks (0.40/0.42/0.44). x to ~320k (the
+    # smoothed+trimmed green reaches ~319.7k), 50k ticks; legend centred at the top.
+    ax.set_ylim(0.400, 0.446)
     ax.yaxis.set_major_locator(MultipleLocator(0.02))
     ax.set_xlim(0, 322000)
     ax.set_xticks(np.arange(0, 300001, 50000))
