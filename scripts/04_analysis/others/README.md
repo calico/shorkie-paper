@@ -1,12 +1,9 @@
 # 04_analysis/others — phylogeny & architecture schematic
 
-Two standalone supplementary figures: a phylogenetic species tree of the
-training-corpus fungi built from NCBI taxonomy, and a schematic of the
-Shorkie-LM / supervised model architecture. Numbered-step prefixes encode
-execution order; each compute `*.py` keeps its paired `*.sh` runner where one
-exists. Paths are read from `config/paths.yaml` via `shorkie.config` (e.g.
-`work_root`) and `scripts/common/env.sh` (e.g. `WORK_ROOT`,
-`BASKERVILLE_SCRIPTS`).
+A phylogenetic species tree of the training-corpus fungi built from NCBI
+taxonomy (Figure 1B), plus a note on where the Shorkie-LM architecture schematic
+(Figure 1A) is now reproduced. Numbered-step prefixes encode execution order.
+Paths are read from `config/paths.yaml` via `shorkie.config` (e.g. `work_root`).
 
 ## `phylogenetic_tree/`
 
@@ -23,12 +20,13 @@ Builds and annotates the species tree for the fungal training corpus.
 External tools: `ete4` (NCBI taxonomy query + tree handling); annotation
 outputs are for [iTOL](https://itol.embl.de/).
 
-## `viz_shorkie_lm_arch/`
+## Architecture schematic (Figure 1A)
 
-| File | Purpose |
-|------|---------|
-| `viz_lm.py` | Build the `SeqNN` model from `params.json` + `model_best.h5` and render a `model.png` layer diagram via Keras `plot_model`. |
-| `viz_lm.sh` | SLURM wrapper invoking `hound_model_viz.py` (`${BASKERVILLE_SCRIPTS}`) over a trained fold checkpoint under `${WORK_ROOT}`. |
-
-External tools: `baskerville` / `hound_model_viz.py` (Calico
-baskerville-yeast), TensorFlow/Keras (`plot_model`, needs Graphviz/`pydot`).
+There is no standalone script here for the Shorkie-LM architecture schematic. It is
+reproduced directly in the figure-reproduction code from the released `params.json`
+(no TensorFlow/Keras/Graphviz needed): `reproduction/figure_01/` →
+`recheck/build_panels_ABCE.py::build_1A()` (loads `models.shorkie_lm/params.json` and
+renders the trunk block-stack with matplotlib). The earlier
+`viz_shorkie_lm_arch/{viz_lm.py,viz_lm.sh}` fragments (a non-functional Keras
+`plot_model` / baskerville `hound_model_viz.py` wrapper) were removed in favor of that
+self-contained, CPU-only reproduction.

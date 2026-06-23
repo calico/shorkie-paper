@@ -66,7 +66,7 @@ See [`notebooks/README.md`](./notebooks/README.md) for the full artifact + `conf
 
 | Notebook | Figure | Runs from released data? | Upstream `scripts/` stage |
 |---|---|:--:|---|
-| `fig01_lm_architecture` | LM architecture schematic | ✅ | `04_analysis/others/viz_shorkie_lm_arch/` |
+| `fig01_lm_architecture` | LM architecture schematic | ✅ | — (built from released `params.json`; see `04_analysis/others/README.md`) |
 | `fig02_lm_genome_eval` | LM perplexity / loss | ⬚ | `03_eval/lm/lm_model_eval/` |
 | `fig03_lm_motifs` | LM MoDISco motif logos | ⬚ | `04_analysis/shorkie_lm/motif_analysis/motif_lm/` |
 | `fig04_cross_species_motifs` | cross-species motifs | ⬚ | `…/motif_lm__unseen_species/` |

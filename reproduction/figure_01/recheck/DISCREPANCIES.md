@@ -13,9 +13,10 @@ representative **corrected to YJM195** (now an exact match); schematics A/E are
 schematic by design.
 
 Recheck artifacts (this directory): `recompute_fig01.py`, `recheck_checks_fig01.csv`,
-`recompute_fig01_table.csv`, `restyle_panels_DFG.py`, `measure_panelG.py`,
+`recompute_fig01_table.csv`, `restyle_panels_DFG.py` (D/F/G builders),
+`build_panels_ABCE.py` (A/B/C/E builders), `measure_panelG.py`,
 `panelG_barheight_fit.csv`, `rerun_heavy_panels.sh`, `diff_heavy_panels.py`,
-`determinism_fig01.csv`, `regen_panelC.py`, `make_sidebyside_fig01.py`,
+`determinism_fig01.csv`, `make_sidebyside_fig01.py`,
 `panel_{B,C,D,F,G}_sidebyside.png`, `Figure_1_published_vs_reproduced.png`.
 
 ---
