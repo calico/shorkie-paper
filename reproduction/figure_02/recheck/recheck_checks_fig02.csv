@@ -1,7 +1,10 @@
 panel,metric,reported,reproduced,delta,rtol,atol,verdict
-2A,Shorkie_unmasked_vs_iterative_pwm_corr(>=0.4),0.4,0.5836,0.18359999999999999,0.02,0.0,PASS
-2A,Cbf1_Ebox_in_promoter,1.0,1.0,0.0,0.02,0.0,PASS
-2A,polydAdT_in_promoter,1.0,1.0,0.0,0.02,0.0,PASS
+2A,three_rows_same_width,1.0,1.0,0.0,0.02,0.0,PASS
+2A,SpeciesLM_argmax_vs_genome_agree(>=0.8),0.8,0.9455,0.14549999999999996,0.02,0.0,PASS
+2A,SpeciesLM_vs_Shorkie_registered_pwm_corr(>=0.5),0.5,0.9511,0.45109999999999995,0.02,0.0,PASS
+2A,Shorkie_unmasked_vs_iterative_pwm_corr(>=0.4),0.4,0.7087,0.3087,0.02,0.0,PASS
+2A,Cbf1_Ebox_in_window,1.0,1.0,0.0,0.02,0.0,PASS
+2A,polydAdT_in_window,1.0,1.0,0.0,0.02,0.0,PASS
 2B,iterative_all_positions_covered,1.0,1.0,0.0,0.02,0.0,PASS
 2B,n_iterations(==ceil(1/0.15)=7),7.0,7.0,0.0,0.0,0.0,PASS
 2C,TF_motifs_recovered_in_R64(>=8/9),8.0,9.0,1.0,0.02,0.0,PASS

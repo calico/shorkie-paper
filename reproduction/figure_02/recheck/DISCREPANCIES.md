@@ -28,19 +28,21 @@ The first deep-recheck pass verified the DATA but drew some panels in non-publis
 re-renders them to look like the published figure (same DNA logos, regions, colours, styles). Skip 2B
 per the user.
 
-- **2A — real conservation DNA letter logos.** Replicates the upstream scripts' own `plot_dna_logo`
-  (conservation = 2−entropy; per-position letter heights = p·conservation) with the **published colour
-  scheme (A green, C blue, G orange, T red)**, three stacked rows. **Shorkie LM** row = SMT3 (YDR510W)
-  gene-averaged 512 bp-upstream PWM, plot[204:500] (the `2_viz_dna_pwm_shorkie_lm.py` region) — recovers
-  the true promoter at 95.7% and shows the **poly(dA:dT), Cbf1/Tye7 E-box (CACGTG), Reb1** motifs
-  (annotated). **Shorkie 15% iterative** row = same method on the GPU iterative reconstruction (corr
-  0.58 to unmasked). **SpeciesLM** row = the external model's released `all_prbs.npy`, plot[97:207]
-  (the `1_viz_dna_logo_specieslm_fungi.py` region) — rendered with the same `plot_dna_logo`. *Residual:*
-  the external SpeciesLM's `all_prbs` **cannot be position-aligned** to the Shorkie window — its argmax
-  agrees with the SMT3 genomic sequence at only ~0.26–0.36 across all tested mappings (first-500,
-  last-500, 2 bp-downsampled, fwd/rc), so the three rows are each shown over their own script's region
-  (the genomic alignment of the external row to the Shorkie rows is not reconstructable without
-  re-running the SpeciesLM model).
+- **2A — three conservation DNA logos, all registered to the same window.** Replicates the upstream
+  scripts' own `plot_dna_logo` (conservation = 2−entropy; per-position letter heights = p·conservation)
+  with the **published colour scheme (A green, C blue, G orange, T red)**, three stacked rows over the
+  **same 110 bp window `SMT3_seq[690:800]`** so **poly(dA:dt), Cbf1p, Tye7.1** line up vertically across
+  rows (motif labels once along the top). **SpeciesLM** row = the external
+  `johahi/specieslm-fungi-upstream-k1` model's per-position reconstruction PWM over the 1003 bp SMT3
+  upstream, **regenerated** by `scripts/04_analysis/shorkie_lm/lm_SMT3_viz/0_compute_specieslm_smt3.py`
+  (`reproduced/specieslm_smt3/all_prbs_SMT3.npy`; argmax-vs-genome **0.946**), plot[690:800]. **Shorkie
+  LM** row = SMT3 (YDR510W) gene-averaged 512 bp-upstream `x_pred` PWM, slice [201:311] (== SMT3_seq[690:800];
+  recovers the genome at **0.955**). **Shorkie 15% iterative** row = same averaging on the GPU iterative
+  reconstruction (corr **0.71** to unmasked). The window is the authors' own `dep_map[690:800]` zoom
+  (compute_SMT3_gene.ipynb cell 18) = `4_viz_smt3_logo_unmasked.py`'s `[203:311]` Shorkie slice; pixel-
+  measured against the published PNG (Cbf1p `CACGTG`@frac 0.42 → bp 736, Tye7.1@0.80 → bp ~778). The three
+  rows are genomically registered (`SMT3_seq[690]==upstream[201]`, string-verified); **SpeciesLM-vs-Shorkie
+  registered PWM correlation 0.95**.
 - **2C — the de-novo TF-MoDISco CWM-logo grid** (was a q-value heatmap). `build_2C_logos.py` renders,
   for each (tier × motif) cell marked present, the **CWM logo** of the best-TOMTOM-matching modisco
   pattern (from the per-tier `.h5`), "—" for absent; 5′SS/branch matched by consensus. **53/66 cells
@@ -66,7 +68,7 @@ per the user.
 
 | Panel | Type | Match to published | Residual / note | Root cause |
 |---|---|---|---|---|
-| **2A** | logos (2 in-repo + 1 external) | Shorkie rows reproduced exactly | SpeciesLM row alignment not reconstructable | external model; see below |
+| **2A** | logos (3 rows, 1 external regenerated) | **all 3 rows reproduced + aligned** | none (SpeciesLM PWM regenerated) | wrong cached file was chrX; see below |
 | **2B** | GPU (iterative MLM) | **reproduced** (was a documented gap) | iteration partition is seeded | new GPU job this recheck |
 | **2C** | computational (TOMTOM) | conservation structure reproduced | 47/54 cells match the published curation | published grid is visually curated; see below |
 | **2D** | computational | **published TFs reproduced** | genic features (ATG/5′SS/branch) absent from released data | wrong-subset fix; separate genic analysis |
@@ -126,21 +128,27 @@ per the user.
   analysis. Reproduced the 3 TF histograms; the 3 genic-feature histograms are
   documented as out-of-released-data.
 
-### 2A — Shorkie rows reproduced; SpeciesLM external
+### 2A — all three rows reproduced + aligned (SpeciesLM regenerated; the old "not alignable" was a wrong-file bug)
 - Published 2A overlays the SMT3 (YDR510W, chrIV:1,469,400 ATG, + strand) promoter logo
-  from 3 sources. The **two Shorkie rows are reproduced** over the 1 kb upstream:
-  - **Shorkie LM (unmasked)** from `preds_smt3_unmasked.npz` — recovers the true
-    promoter sequence at **95.1%** accuracy and contains the **Cbf1 E-box (CACGTG)** and
-    a **poly(dA:dT)** run (the published-highlighted motifs).
-  - **Shorkie LM 15% iterative** from this recheck's GPU job — consistent with the
-    unmasked prediction (PWM correlation **0.60**, max-base agreement 0.47).
-- **SpeciesLM row (external):** the model is `johahi/specieslm-fungi-upstream-k1`
-  (Tomaz da Silva et al.), not in this repo. Its released cached prediction
-  (`all_prbs.npy`, 500 bp of the 1 kb 5′ of the SMT3 ATG) is displayed, but its exact
-  **position-wise alignment to the Shorkie window cannot be reconstructed** without
-  re-running the external model — cross-correlation against the Shorkie prediction finds
-  no clean offset (best corr 0.17), and the SpeciesLM k-mer tokenisation/coordinates
-  differ. Shown over the proximal promoter and labelled external/approximate.
+  from 3 sources, **all over the same 110 bp window `SMT3_seq[690:800]`**.
+- **Root cause of the old failure (now fixed):** the committed reproduction loaded
+  `dependencies_DNALM/all_prbs.npy` and plotted `[97:207]`. That file on disk is
+  **byte-identical to `all_prbs_chrX_607855_608355.npy`** — a **chrX:607,855-608,355**
+  example (shape `(500,4)`), i.e. a *different locus entirely* (argmax vs the SMT3
+  sequence ~0.26–0.34). The correct SMT3 SpeciesLM PWM was never saved; the prior recheck
+  then wrongly concluded the external row was "not position-alignable (best corr 0.17)".
+- **Fix:** `0_compute_specieslm_smt3.py` re-runs the external
+  `johahi/specieslm-fungi-upstream-k1` model (proxy `kazachstania_africana_…`,
+  `softmax(logits)[:, 2:-1, ACGT]`) over the 1003 bp `SMT3_five_prime_seq` to regenerate
+  the per-position reconstruction PWM `all_prbs_SMT3.npy` (argmax-vs-genome **0.946**).
+  The window is the authors' `dep_map[690:800]` zoom = `4_viz`'s `[203:311]` Shorkie
+  slice; `SMT3_seq[690]==Shorkie-upstream[201]` (string-verified), so all three rows are
+  genomically registered and the motifs (**poly(dA:dt), Cbf1p, Tye7.1**) line up.
+- **Rows:** SpeciesLM `all_prbs_SMT3[690:800]`; Shorkie LM `x_pred` upstream `[201:311]`
+  (genome recon **0.955**); Shorkie 15% iterative `[201:311]` (corr **0.71** to unmasked).
+  **SpeciesLM-vs-Shorkie registered PWM correlation 0.95** (was the "0.17 not-alignable"
+  residual). Verify checks (`fig2A_consistency.csv`): same width, SpeciesLM↔genome 0.946,
+  registered corr 0.95, Cbf1 E-box + poly(dA:dt) present.
 
 ### 2B — GPU iterative reconstruction (was a documented gap)
 - The committed reproduction skipped 2B (GPU required). This recheck **runs it on GPU**

@@ -1,0 +1,7 @@
+model=johahi/specieslm-fungi-upstream-k1
+proxy_species=kazachstania_africana_cbs_2517_gca_000304475
+seq_len=1003
+tokenization=joined
+special_token_slice=[2:-1]
+argmax_vs_SMT3_agreement=0.9591
+published_region=[690:986]

@@ -1,4 +1,11 @@
 #!/usr/bin/env python3
+# NOTE (Figure 2A): the `all_prbs.npy` loaded below is a chrX:607,855-608,355 example
+# (byte-identical to all_prbs_chrX_607855_608355.npy), NOT the SMT3 promoter, and the
+# active [97:207] slice plots that example. The published Fig-2A SpeciesLM row is the SMT3
+# upstream reconstruction over SMT3_seq[690:800] — regenerate it with
+# `0_compute_specieslm_smt3.py` (-> all_prbs_SMT3.npy) and render via
+# `reproduction/figure_02/recheck/build_2A_logos.py`. This script is kept only as the
+# original chrX-example logo generator.
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl

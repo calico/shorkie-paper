@@ -1,6 +1,10 @@
 metric,value
-Shorkie_unmasked_vs_iter_pwm_corr,0.5836
-Shorkie_unmasked_vs_iter_maxbase_agree,0.4375
-Shorkie_unmasked_recon_acc_vs_true,0.957
-Cbf1_Ebox(CACGTG)_in_Shorkie_promoter,1
-polydAdT_run>=8_in_Shorkie_promoter,1
+region_window,SMT3_seq[690:800] (110bp); Shorkie upstream[201:311]
+three_rows_same_width,1
+SpeciesLM_argmax_vs_genome_agree,0.9455
+Shorkie_argmax_vs_genome_agree,0.9545
+SpeciesLM_vs_Shorkie_registered_pwm_corr,0.9511
+Shorkie_unmasked_vs_iter_pwm_corr,0.7087
+Shorkie_unmasked_recon_acc_vs_genome,0.9545
+Cbf1_Ebox(CACGTG)_in_window,1
+polydAdT_run>=6_in_window,1

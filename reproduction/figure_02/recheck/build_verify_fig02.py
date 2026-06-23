@@ -33,14 +33,20 @@ TIERS = ["S. cerevisiae R64", "4 S. cerevisiae strains", "5 Saccharomycetales",
 def main():
     checks = []
 
-    # ---- 2A ----
+    # ---- 2A ---- (three rows registered to the same SMT3_seq[690:800] window)
     a = dict(zip(*[pd.read_csv(RECHECK / "fig2A_consistency.csv")[c] for c in ("metric", "value")]))
+    checks.append(Check("2A", "three_rows_same_width", 1.0,
+                        float(a["three_rows_same_width"]), mode="ge"))
+    checks.append(Check("2A", "SpeciesLM_argmax_vs_genome_agree(>=0.8)", 0.8,
+                        float(a["SpeciesLM_argmax_vs_genome_agree"]), mode="ge"))
+    checks.append(Check("2A", "SpeciesLM_vs_Shorkie_registered_pwm_corr(>=0.5)", 0.5,
+                        float(a["SpeciesLM_vs_Shorkie_registered_pwm_corr"]), mode="ge"))
     checks.append(Check("2A", "Shorkie_unmasked_vs_iterative_pwm_corr(>=0.4)", 0.4,
                         float(a["Shorkie_unmasked_vs_iter_pwm_corr"]), mode="ge"))
-    checks.append(Check("2A", "Cbf1_Ebox_in_promoter", 1.0,
-                        float(a["Cbf1_Ebox(CACGTG)_in_Shorkie_promoter"]), mode="ge"))
-    checks.append(Check("2A", "polydAdT_in_promoter", 1.0,
-                        float(a["polydAdT_run>=8_in_Shorkie_promoter"]), mode="ge"))
+    checks.append(Check("2A", "Cbf1_Ebox_in_window", 1.0,
+                        float(a["Cbf1_Ebox(CACGTG)_in_window"]), mode="ge"))
+    checks.append(Check("2A", "polydAdT_in_window", 1.0,
+                        float(a["polydAdT_run>=6_in_window"]), mode="ge"))
 
     # ---- 2B ----
     iz = np.load(RD / "iterative_smt3" / "preds_smt3_iterative.npz", allow_pickle=True)

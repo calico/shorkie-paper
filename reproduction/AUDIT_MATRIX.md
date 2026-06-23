@@ -34,7 +34,7 @@ Package: [`figure_02/`](figure_02/)
 
 | Panel | Claim | Type | Generating script (repo) | Input + config key | GPU | Notebook | Data on disk | Status |
 |---|---|---|---|---|---|---|---|---|
-| A | SMT3 promoter prediction (chrIV:1,469,090-198) Shorkie-LM vs SpeciesLM; poly(dA:dT),Cbf1,Tye7,Reb1 | comp | `04_analysis/shorkie_lm/lm_SMT3_viz/2_viz_dna_pwm_shorkie_lm.py` | modisco `.h5` → `results.modisco_lm` | no | `fig07` | present (173M .h5) | ⚠️ partial |
+| A | SMT3 promoter logos over `SMT3_seq[690:800]`: SpeciesLM vs Shorkie-LM vs 15% iterative, all aligned; poly(dA:dt),Cbf1p,Tye7.1 | comp + regenerated external | `lm_SMT3_viz/0_compute_specieslm_smt3.py` (SpeciesLM) + `2_viz_dna_pwm_shorkie_lm.py`; render `figure_02/recheck/build_2A_logos.py` | `preds_smt3_unmasked.npz` + regenerated `all_prbs_SMT3.npy` + iterative npz | iter row | `fig07` | present (npz + regenerated PWM) | ✅ |
 | B | PPM reconstruction from DNA via Shorkie LM | comp | `04_analysis/shorkie_lm/motif_analysis/motif_lm/4_viz_motif.py` | modisco `.h5` → `results.modisco_lm` | no | `fig03` | present | ⚠️ GPU |
 | C | Motif summary across 6 datasets (TF-MoDISco: TATA, splice donor, branch pt, Cbf1p, Reb1.1, Snf1.1, Mcm1.1, Rap1.1, Sfp1.2, Abf1.1, Dot6) | comp | `…/motif_lm/{1_search_motif.py,2_modisco_script.sh,3_modisco_report.sh}` | modisco `.h5` + MEME DB → `results.modisco_lm`, `motif_db_dir` | no | `fig03`/`fig04` | present (report HTML) | ✅ |
 | D | Histograms: motif enrichment upstream of TSS + splice/branch within genes | comp | `…/motif_lm/4_motif_to_tss_dist/3_plot_tss_dist_freq.py` | `motif_tss_distances.csv`, `background_tss_distances.csv` (pipeline output) | no | none | present (~80 PNGs + CSVs) | ✅ |
