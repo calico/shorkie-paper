@@ -39,16 +39,18 @@ t0 = time.time()
 F2 = Path(config.repo_root()) / "reproduction" / "figure_02"
 RD = F2 / "reproduced"; RECHECK = F2 / "recheck"; RECHECK.mkdir(parents=True, exist_ok=True)
 
-# published palette + plot order (faithful to 2_viz_clusters_LM.py's feature ordering)
+# published palette + plot order, faithful to 2_viz_clusters_LM.py: the original derives
+# colors as palette=[blue,orange,green,red,purple] over the ordered feature list, i.e.
+# Transposable element=red and tRNA=purple (tRNA drawn last/on top).
 PAL = {"Promoter": "tab:blue", "Intergenic region": "tab:orange",
-       "Protein-coding gene": "tab:green", "tRNA": "tab:red",
-       "Transposable element": "tab:purple"}
-ORDER = ["Promoter", "Intergenic region", "Protein-coding gene", "tRNA", "Transposable element"]
+       "Protein-coding gene": "tab:green", "Transposable element": "tab:red",
+       "tRNA": "tab:purple"}
+ORDER = ["Promoter", "Intergenic region", "Protein-coding gene", "Transposable element", "tRNA"]
 
 
 def render(proj, mf, out_png):
-    """Faithful render: figsize (8,7), s=3, no title, no grid, spines top/right off."""
-    fig, ax = plt.subplots(figsize=(8, 7))
+    """Faithful render: figsize (6,5), s=3, no title, no grid, spines top/right off."""
+    fig, ax = plt.subplots(figsize=(6, 5))
     for f in ORDER:
         i = (mf["feature"] == f).values
         if i.any():
@@ -87,8 +89,14 @@ def main():
     mask = mdf["orig"].isin(inc) & ~mdf["feature"].isin(exc)
     nice = {"protein_coding": "Protein-coding gene", "intergenic": "Intergenic region",
             "tRNA": "tRNA", "transposable_element": "Transposable element", "promoter": "Promoter"}
-    ds = next(iter(emb_data))
+    # Published 2E uses the 1st self-attention layer (= the original script's
+    # _embeddings_multihead_attention_features.png), NOT the first h5 key (`embeddings_dense`,
+    # which is what next(iter(emb_data)) silently picked). Select it explicitly.
+    ds = "embeddings_multihead_attention"
+    assert ds in emb_data, f"{ds} not found; available: {list(emb_data)}"
     allemb = np.concatenate(emb_data[ds], axis=0)
+    assert allemb.shape[0] == len(mdf), \
+        f"embedding/metadata size mismatch for {ds}: {allemb.shape[0]} vs {len(mdf)}"
     emb = allemb[mask.values]
     mf = mdf.loc[mask].copy(); mf["feature"] = mf["feature"].map(lambda x: nice.get(x, x))
     mf = mf.reset_index(drop=True)

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Figure 2E — re-render from the cached full-16-chr t-SNE projection, faithful to the
-original `2_viz_clusters_LM.py` styling (figsize (8,7), s=3, no title, no grid,
+original `2_viz_clusters_LM.py` styling (figsize (6,5), s=3, no title, no grid,
 spines top/right off, legend top-center ncol=3 fontsize=11, dpi=300), with the
 published class palette (Promoter blue / Intergenic orange / Protein-coding green /
-tRNA red / Transposable element purple).
+Transposable element red / tRNA purple).
 
 Loads reproduced/panelE_tsne/{proj.npy,meta.csv} (computed by build_2E_tsne.py, which
 runs t-SNE directly on the full embeddings with NO PCA) — no t-SNE recompute. Keeps
@@ -31,14 +31,14 @@ mf = pd.read_csv(cache / "meta.csv")
 labels = mf["feature"].values
 
 PAL = {"Promoter": "tab:blue", "Intergenic region": "tab:orange",
-       "Protein-coding gene": "tab:green", "tRNA": "tab:red",
-       "Transposable element": "tab:purple"}
-ORDER = ["Promoter", "Intergenic region", "Protein-coding gene", "tRNA", "Transposable element"]
+       "Protein-coding gene": "tab:green", "Transposable element": "tab:red",
+       "tRNA": "tab:purple"}
+ORDER = ["Promoter", "Intergenic region", "Protein-coding gene", "Transposable element", "tRNA"]
 
 sil = float(silhouette_score(proj, labels))
 per = pd.Series(silhouette_samples(proj, labels), index=labels).groupby(level=0).mean()
 
-fig, ax = plt.subplots(figsize=(8, 7))
+fig, ax = plt.subplots(figsize=(6, 5))
 for f in ORDER:
     i = (mf["feature"] == f).values
     if i.any():

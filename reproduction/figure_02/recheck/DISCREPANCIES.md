@@ -65,8 +65,9 @@ CSVs (`fig2D_enrichment`, `fig2E_separation`, `fig2A_consistency`, `recheck_chec
   `build_2D_tss.py` asserts each motif's True hit count against the published n, so the
   panel both reproduces the figure and verifies the relabelling against the released data.
 - **2E — faithful to the original** (no PCA pre-reduction; sklearn-default t-SNE), all 16
-  chromosomes, published class palette (Promoter blue, Intergenic orange, Protein-coding
-  green, tRNA red, Transposable purple), no title, no grid, s=3. silhouette ≈ 0.08.
+  chromosomes, the **1st self-attention layer** (`embeddings_multihead_attention`), published
+  class palette (Promoter blue, Intergenic orange, Protein-coding green, **Transposable element
+  red, tRNA purple**), figsize **(6,5)**, no title, no grid, s=3. silhouette ≈ 0.10.
 
 ---
 
@@ -78,7 +79,7 @@ CSVs (`fig2D_enrichment`, `fig2E_separation`, `fig2A_consistency`, `recheck_chec
 | **2B** | GPU (iterative MLM) | **out of scope** | not reproduced | per-iteration matrix needs a GPU forward pass |
 | **2C** | computational (MoDISco) | **upstream scripts provided** | grid not re-derived in the notebook | depends on the full per-tier MoDISco `.h5` set |
 | **2D** | computational | **published 6-panel grid reproduced** | none (counts asserted) | relabel: start codon=MIG3.4, 5′SS=CHA4.11, branch=SWI5.7 |
-| **2E** | computational (t-SNE) | reproduced, faithful (no PCA) | t-SNE layout stochastic | seed/implementation (separation quantified) |
+| **2E** | computational (t-SNE) | reproduced, faithful (multihead layer, no PCA) | t-SNE layout stochastic | wrong layer/colors/figsize (fixed); seed/impl (separation quantified) |
 
 ---
 
@@ -135,17 +136,30 @@ CSVs (`fig2D_enrichment`, `fig2E_separation`, `fig2A_consistency`, `recheck_chec
   not part of this reproduction. (The 2A 15%-iterative row does not depend on it; it uses
   the precomputed 3-architecture ensemble.)
 
-### 2E — t-SNE made faithful to the original (was PCA-50 → capped t-SNE)
-- The committed reproduction inserted a **PCA-50 pre-reduction** + `init="pca"` (and an
-  earlier version capped at 2,500 points), which changed the t-SNE geometry so the layout
-  did not match the published scatter.
-- **Fix:** match the original `2_viz_clusters_LM.py` exactly —
-  `TSNE(n_components=2, random_state=42, verbose=1)` run **directly on the full
-  embeddings (no PCA)** over all qualifying intervals across the 16 chromosomes (≈16,384
-  points), published palette, no title, no grid, s=3. Cluster separation quantified by
-  **silhouette ≈ 0.08** (tRNA ~0.88, Transposable ~0.39, Promoter ~0.22 well separated;
-  Intergenic/Protein-coding overlap slightly — biologically sensible). t-SNE layout is
-  stochastic across sklearn versions, so the separation metric is the quantitative tie.
+### 2E — t-SNE made faithful to the original (two rounds of fixes)
+**Round 1 (PCA):** the committed reproduction inserted a **PCA-50 pre-reduction** + `init="pca"`
+(and an earlier version capped at 2,500 points), which changed the t-SNE geometry. Fixed by
+running `TSNE(n_components=2, random_state=42, verbose=1)` **directly on the full embeddings
+(no PCA)** over all qualifying intervals across the 16 chromosomes (≈16,384 points).
+
+**Round 2 (layer + colors + figsize):** a thorough re-scan of `2_viz_clusters_LM.py` and its
+on-disk renders (`embeddings_LM_sequence/viz_gene_intergenic/_embeddings_*_features.png`) found
+three further divergences — the figure still didn't match the published scatter:
+- **Wrong embedding layer (primary).** `build_2E_tsne.py` selected the layer with
+  `ds = next(iter(emb_data))`, which yields **`embeddings_dense`** (768-dim, the first h5 key).
+  The published panel uses **`embeddings_multihead_attention`** (384-dim, the *1st self-attention
+  layer*) — confirmed by matching the published scatter to the per-layer renders (the green blob's
+  far-right extent ~110, the two stacked red clusters at x≈40, and the blue/green crescent all match
+  `multihead_attention`, not `dense`). Now selected explicitly (with a presence + row-count guard).
+- **Swapped colors.** The original palette logic (`[blue,orange,green,red,purple]` over
+  `[Promoter, Intergenic, Protein-coding, Transposable element, tRNA]`) gives **Transposable
+  element = red, tRNA = purple**; the reproduction had them reversed. Fixed.
+- **figsize.** Original is `(6,5)` (the `(8,7)` is commented out); the reproduction used `(8,7)`.
+  Fixed.
+- Cluster separation now **silhouette ≈ 0.10** (tRNA ~0.85, Transposable element ~0.64,
+  Promoter ~0.19 well separated; Intergenic/Protein-coding overlap slightly — biologically
+  sensible). t-SNE layout is stochastic across sklearn versions, so the separation metric is the
+  quantitative tie; the qualitative match is confirmed in `recheck/panel_E_sidebyside.png`.
 
 ## Numbers
 `build_verify_fig02.py` → `verify_fig02.csv` / `recheck_checks_fig02.csv`: **all PASS**

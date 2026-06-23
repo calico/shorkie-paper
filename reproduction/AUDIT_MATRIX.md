@@ -38,7 +38,7 @@ Package: [`figure_02/`](figure_02/)
 | B | per-iteration 15%-masked PPM reconstruction matrix | gpu | LM forward pass (`use_bert=true`, `mask_rate=0.15`) | — | yes | — | — | — (out of scope) |
 | C | Motif summary across 6 datasets (TF-MoDISco: TATA, splice donor, branch pt, Cbf1p, Reb1.1, Snf1.1, Mcm1.1, Rap1.1, Sfp1.2, Abf1.1, Dot6) | comp | `…/motif_lm/4_viz_motif.py` + `…/motif_lm__unseen_species/4_viz_motif.py` (+ `.sh`) | modisco `.h5` per tier → `results.modisco_lm` (+ `results.modisco_unseen`) | no | — | present (per-tier `.h5`) | ✅ scripts provided (not re-rendered) |
 | D | Histograms: published 6-panel motif-vs-TSS grid (MIG3.4/ABF1.1/RAP1.1/Reb1p/CHA4.11/SWI5.7; 3 relabelled to start codon / 5′SS / branch) | comp | `…/motif_lm/4_motif_to_tss_dist/3_plot_tss_dist_freq.py`; render `figure_02/recheck/build_2D_tss.py` | `motif_tss_distances.csv`, `background_tss_distances.csv` (pipeline output) | no | in-notebook | present (CSVs) | ✅ |
-| E | t-SNE of genomic elements from 1st self-attention layer (faithful: no PCA) | comp | `04_analysis/shorkie_lm/umap_cluster_promoter/2_viz_clusters_LM.py`; precompute `figure_02/recheck/build_2E_tsne.py`, render `render_2E.py` | `embeddings_chr*.h5` (16) → `results.umap`, `genome.gtf` | no | `fig05` | present (~292M) | ✅ |
+| E | t-SNE of genomic elements from the 1st self-attention layer `embeddings_multihead_attention` (faithful: no PCA, TE=red/tRNA=purple, 6×5) | comp | `04_analysis/shorkie_lm/umap_cluster_promoter/2_viz_clusters_LM.py`; precompute `figure_02/recheck/build_2E_tsne.py`, render `render_2E.py` | `embeddings_chr*.h5` (16) → `results.umap`, `genome.gtf` | no | `fig05` | present (~292M) | ✅ |
 
 ---
 

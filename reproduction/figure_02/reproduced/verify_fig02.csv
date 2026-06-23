@@ -18,5 +18,5 @@ panel,metric,reported,reproduced,delta,rtol,atol,verdict
 2D,"5' splice site (donor site)_n≈published(603,±1%)",1.0,1.0,0.0,0.02,0.0,PASS
 2D,"branch point_n≈published(779,±1%)",1.0,1.0,0.0,0.02,0.0,PASS
 2E,feature_classes_present(==5),5.0,5.0,0.0,0.0,0.0,PASS
-2E,tSNE_silhouette_2d(>0),0.0,0.0816,0.0816,0.02,0.0,PASS
+2E,tSNE_silhouette_2d(>0),0.0,0.0964,0.0964,0.02,0.0,PASS
 2E,n_points_all_16_chr(>=10000),10000.0,16384.0,6384.0,0.02,0.0,PASS

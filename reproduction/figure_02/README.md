@@ -35,7 +35,7 @@ Figure 2 demonstrates that the masked DNA LM reconstructs canonical yeast TF mot
 `reproduce_figure_02.ipynb` reproduces panels **2A, 2D, 2E** in `reproduced/`:
 `Figure_2A_reproduced.png` (3 aligned SMT3 logos), `Figure_2D_reproduced.png` (the 6-panel TSS-distance grid), `Figure_2E_reproduced.png` (t-SNE). Panel 2C is a markdown skip-note pointing to the upstream scripts; panel 2B is omitted.
 
-The 2E t-SNE is precomputed by `recheck/build_2E_tsne.py` — **faithful to the original** `2_viz_clusters_LM.py`: `TSNE(n_components=2, random_state=42, verbose=1)` run **directly on the full embeddings (no PCA pre-reduction)** over all qualifying intervals across the 16 chromosomes; the notebook loads the cache and renders via `recheck/render_2E.py`. **Node note:** t-SNE thrashes without thread limits — run heavy steps with `OMP_NUM_THREADS=4` and via `reproduction/common/run_in_tmux.sh` so they survive disconnection.
+The 2E t-SNE is precomputed by `recheck/build_2E_tsne.py` — **faithful to the original** `2_viz_clusters_LM.py`: `TSNE(n_components=2, random_state=42, verbose=1)` run **directly on the full embeddings (no PCA pre-reduction)** of the **1st self-attention layer** (`embeddings_multihead_attention`) over all qualifying intervals across the 16 chromosomes; the notebook loads the cache and renders via `recheck/render_2E.py`. **Node note:** t-SNE thrashes without thread limits — run heavy steps with `OMP_NUM_THREADS=4` and via `reproduction/common/run_in_tmux.sh` so they survive disconnection.
 
 ## Phase 3 — Verification
 
@@ -47,7 +47,7 @@ The 2E t-SNE is precomputed by `recheck/build_2E_tsne.py` — **faithful to the 
 ### Panel notes (matching the published appearance)
 - **2A — three conservation DNA letter logos, all registered to `SMT3_seq[690:800]`** (A green / C blue / G orange / T red): **SpeciesLM** (regenerated `all_prbs_SMT3[690:800]`, argmax-vs-genome 0.946), **Shorkie LM** (gene-averaged upstream `[201:311]`, genome recon 0.955), **Shorkie 15% iterative** (`[201:311]`, **precomputed 3-architecture ensemble**, recon 0.61 / corr 0.81 to unmasked). The earlier reproduction plotted the wrong locus (the cached `all_prbs.npy` is a chrX:607,855-608,355 example) — fixed.
 - **2D — the published 6-panel grid in the exact `3_plot_tss_dist_freq.py` style** (seaborn whitegrid, 50 bins, xlim ±2500, flipped distance, green True / salmon Background, dashed TSS line). All six panels come from the released `motif_tss_distances.csv`; three are TF motifs the paper relabelled to the genic feature they mark — **start codon (ATG) = MIG3.4**, **5′ splice site (donor site) = CHA4.11**, **branch point = SWI5.7** — alongside Abf1.1 / Rap1.1 / Reb1p. (The previous reproduction plotted only the 3 promoter TFs and documented the genic features as unavailable; the relabelling closes that gap and the counts match the published panel exactly.)
-- **2E — faithful to the original** (no PCA pre-reduction; sklearn-default t-SNE), all 16 chromosomes, published class palette (Promoter blue, Intergenic orange, Protein-coding green, tRNA red, Transposable purple), no title, no grid, s=3. silhouette ≈ 0.08 (tRNA/TE/Promoter well separated).
+- **2E — faithful to the original** (no PCA pre-reduction; sklearn-default t-SNE) on the **1st self-attention layer** (`embeddings_multihead_attention`), all 16 chromosomes, published class palette (Promoter blue, Intergenic orange, Protein-coding green, **Transposable element red, tRNA purple**), figsize **(6,5)**, no title, no grid, s=3. silhouette ≈ 0.10 (tRNA 0.85 / TE 0.64 / Promoter 0.19 well separated).
 
 Per-panel `recheck/panel_{A,C,D,E}_sidebyside.png` (C is published-only) + `recheck/Figure_2_published_vs_reproduced.png`.
 
@@ -58,4 +58,4 @@ Per-panel `recheck/panel_{A,C,D,E}_sidebyside.png` (C is published-only) + `rech
 | 2B | **out of scope** | per-iteration 15%-masked matrix (GPU) — not reproduced |
 | 2C | **upstream scripts (not re-rendered)** | `motif_lm/4_viz_motif.py` + `motif_lm__unseen_species/4_viz_motif.py` (refactored, config-driven, `.sh` wrappers); grid not re-derived in the notebook |
 | 2D | **published 6-panel grid reproduced** | MIG3.4/ABF1.1/RAP1.1/Reb1p/CHA4.11/SWI5.7; 3 relabelled to start codon / 5′SS / branch; counts match published |
-| 2E | **reproduced (all 16 chr), faithful** | original t-SNE recipe (no PCA); silhouette-quantified separation; t-SNE layout stochastic |
+| 2E | **reproduced (all 16 chr), faithful** | original t-SNE recipe (multihead-attention layer, no PCA, TE=red/tRNA=purple, 6×5); silhouette-quantified separation; t-SNE layout stochastic |
