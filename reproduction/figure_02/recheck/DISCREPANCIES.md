@@ -37,8 +37,12 @@ per the user.
   upstream, **regenerated** by `scripts/04_analysis/shorkie_lm/lm_SMT3_viz/0_compute_specieslm_smt3.py`
   (`reproduced/specieslm_smt3/all_prbs_SMT3.npy`; argmax-vs-genome **0.946**), plot[690:800]. **Shorkie
   LM** row = SMT3 (YDR510W) gene-averaged 512 bp-upstream `x_pred` PWM, slice [201:311] (== SMT3_seq[690:800];
-  recovers the genome at **0.955**). **Shorkie 15% iterative** row = same averaging on the GPU iterative
-  reconstruction (corr **0.71** to unmasked). The window is the authors' own `dep_map[690:800]` zoom
+  recovers the genome at **0.955**). **Shorkie 15% iterative** row = the masked-LM 15%-iterative
+  reconstruction from the **precomputed 3-architecture ensemble** (`unet_small_bert_drop` + `retry_1` +
+  `retry_2`, `preds_train.npz`; the published source that `2_viz_dna_pwm_shorkie_lm.py` averages),
+  gene-averaged upstream via `6_extract_iterative_3arch.py` → `preds_smt3_iterative_3arch.npz`, slice
+  [201:311] — recovers the promoter at **0.61** (corr **0.81** to unmasked) vs the single-model GPU job's
+  **0.52**. The window is the authors' own `dep_map[690:800]` zoom
   (compute_SMT3_gene.ipynb cell 18) = `4_viz_smt3_logo_unmasked.py`'s `[203:311]` Shorkie slice; pixel-
   measured against the published PNG (Cbf1p `CACGTG`@frac 0.42 → bp 736, Tye7.1@0.80 → bp ~778). The three
   rows are genomically registered (`SMT3_seq[690]==upstream[201]`, string-verified); **SpeciesLM-vs-Shorkie
@@ -145,7 +149,10 @@ per the user.
   slice; `SMT3_seq[690]==Shorkie-upstream[201]` (string-verified), so all three rows are
   genomically registered and the motifs (**poly(dA:dt), Cbf1p, Tye7.1**) line up.
 - **Rows:** SpeciesLM `all_prbs_SMT3[690:800]`; Shorkie LM `x_pred` upstream `[201:311]`
-  (genome recon **0.955**); Shorkie 15% iterative `[201:311]` (corr **0.71** to unmasked).
+  (genome recon **0.955**); Shorkie 15% iterative `[201:311]` = the **precomputed 3-architecture
+  ensemble** (`preds_train.npz`, the published `2_viz` source; `6_extract_iterative_3arch.py` →
+  `preds_smt3_iterative_3arch.npz`) — recon **0.61** / corr **0.81** to unmasked, vs the single-model GPU
+  job's **0.52** (the GPU job `panels/run_iterative_smt3.py` is kept as a secondary artifact, not the figure source).
   **SpeciesLM-vs-Shorkie registered PWM correlation 0.95** (was the "0.17 not-alignable"
   residual). Verify checks (`fig2A_consistency.csv`): same width, SpeciesLM↔genome 0.946,
   registered corr 0.95, Cbf1 E-box + poly(dA:dt) present.

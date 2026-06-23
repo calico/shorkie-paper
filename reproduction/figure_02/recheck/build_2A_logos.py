@@ -11,8 +11,12 @@ promoter, **all registered to the same 110 bp window** `SMT3_seq[690:800]`, so t
                      0_compute_specieslm_smt3.py` -> `all_prbs_SMT3.npy`, plotted [690:800].
   Shorkie LM       — SMT3 (YDR510W) gene-averaged 512 bp-upstream x_pred PWM from
                      preds_smt3_unmasked.npz, slice [201:311] (== SMT3_seq[690:800]).
-  Shorkie 15% it.  — same averaging on this recheck's GPU iterative reconstruction
-                     (reproduced/iterative_smt3/preds_smt3_iterative.npz), slice [201:311].
+  Shorkie 15% it.  — the masked-LM 15%-iterative reconstruction from the PRECOMPUTED
+                     3-architecture ensemble (unet_small_bert_drop + retry_1 + retry_2,
+                     preds_train.npz), gene-averaged upstream via 6_extract_iterative_3arch.py
+                     -> preds_smt3_iterative_3arch.npz, slice [201:311]. (This is the published
+                     source — 2_viz_dna_pwm_shorkie_lm.py averages the same 3 archs; recovers the
+                     promoter at ~0.61 vs the single-model GPU job's ~0.52.)
 
 Region note: the published window is `SMT3_seq[690:800]` (matches the authors' dep_map[690:800]
 zoom and 4_viz_smt3_logo_unmasked.py's [203:311]); SMT3_seq[690] == Shorkie-upstream[201]
@@ -146,8 +150,17 @@ def main():
     uz = np.load(f"{WORK}/experiments/Shorkie_LM_SMT3_viz/inference_smt3_output/preds_smt3_unmasked.npz")
     sho_up, n_un = upstream_pwm(np.asarray(uz["x_pred"], float))
     true_up, _ = upstream_pwm(np.asarray(uz["x_true"], float))
-    iz = np.load(RD / "iterative_smt3" / "preds_smt3_iterative.npz", allow_pickle=True)
-    sho_iter_up, _ = upstream_pwm(np.asarray(iz["x_pred_iter"], float))
+    # iterative row = PRECOMPUTED 3-architecture LM ensemble (preds_train.npz via
+    # 6_extract_iterative_3arch.py) — the published source (2_viz_dna_pwm_shorkie_lm.py averages the
+    # 3 archs). The single-model GPU job (preds_smt3_iterative.npz) is a noisier fallback only.
+    it3 = RD / "iterative_smt3" / "preds_smt3_iterative_3arch.npz"
+    if it3.is_file():
+        sho_iter_up = np.asarray(np.load(it3, allow_pickle=True)["upstream_pwm"], float)  # already (512,4)
+        iter_src = "3arch-precomputed"
+    else:
+        iz = np.load(RD / "iterative_smt3" / "preds_smt3_iterative.npz", allow_pickle=True)
+        sho_iter_up, _ = upstream_pwm(np.asarray(iz["x_pred_iter"], float))
+        iter_src = "single-model-gpu(fallback)"
 
     # alignment self-check: the three rows must share the same genomic frame
     true_win = seq_of(true_up[SHO_S:SHO_E])              # genome truth over the window
@@ -185,6 +198,7 @@ def main():
         a = a[SHO_S:SHO_E]; b = b[SHO_S:SHO_E]
         return float(np.corrcoef(a.ravel(), b.ravel())[0, 1])
     recon = float((sho_up[SHO_S:SHO_E].argmax(1) == true_up[SHO_S:SHO_E].argmax(1)).mean())
+    iter_agree = float((sho_iter_up[SHO_S:SHO_E].argmax(1) == true_up[SHO_S:SHO_E].argmax(1)).mean())
     # SpeciesLM vs Shorkie are different arrays but now cover the SAME genomic window:
     spec_sho_corr = float(np.corrcoef(spec[SPEC_S:SPEC_E].ravel(), sho_up[SHO_S:SHO_E].ravel())[0, 1])
     rows_csv = [
@@ -192,6 +206,8 @@ def main():
         ("three_rows_same_width", int(width_ok)),
         ("SpeciesLM_argmax_vs_genome_agree", round(spec_agree, 4)),
         ("Shorkie_argmax_vs_genome_agree", round(sho_agree, 4)),
+        ("iterative_source", iter_src),
+        ("Shorkie_iter_argmax_vs_genome_agree", round(iter_agree, 4)),
         ("SpeciesLM_vs_Shorkie_registered_pwm_corr", round(spec_sho_corr, 4)),
         ("Shorkie_unmasked_vs_iter_pwm_corr", round(corr(sho_up, sho_iter_up), 4)),
         ("Shorkie_unmasked_recon_acc_vs_genome", round(recon, 4)),
