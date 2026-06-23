@@ -152,15 +152,10 @@ def main():
     true_up, _ = upstream_pwm(np.asarray(uz["x_true"], float))
     # iterative row = PRECOMPUTED 3-architecture LM ensemble (preds_train.npz via
     # 6_extract_iterative_3arch.py) — the published source (2_viz_dna_pwm_shorkie_lm.py averages the
-    # 3 archs). The single-model GPU job (preds_smt3_iterative.npz) is a noisier fallback only.
+    # 3 archs).
     it3 = RD / "iterative_smt3" / "preds_smt3_iterative_3arch.npz"
-    if it3.is_file():
-        sho_iter_up = np.asarray(np.load(it3, allow_pickle=True)["upstream_pwm"], float)  # already (512,4)
-        iter_src = "3arch-precomputed"
-    else:
-        iz = np.load(RD / "iterative_smt3" / "preds_smt3_iterative.npz", allow_pickle=True)
-        sho_iter_up, _ = upstream_pwm(np.asarray(iz["x_pred_iter"], float))
-        iter_src = "single-model-gpu(fallback)"
+    sho_iter_up = np.asarray(np.load(it3, allow_pickle=True)["upstream_pwm"], float)  # already (512,4)
+    iter_src = "3arch-precomputed"
 
     # alignment self-check: the three rows must share the same genomic frame
     true_win = seq_of(true_up[SHO_S:SHO_E])              # genome truth over the window

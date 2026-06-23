@@ -89,8 +89,7 @@ MANIFEST = {
     ], originals=[]),
     "02": dict(reproduced=[
         ("2A SMT3 logo (repro)", R("02", "Figure_2A_reproduced.png")),
-        ("2C TF-MoDISco motifs (repro)", R("02", "Figure_2C_reproduced.png")),
-        ("2D TSS-distance hist (repro)", R("02", "Figure_2D_reproduced.png")),
+        ("2D TSS-distance grid (repro)", R("02", "Figure_2D_reproduced.png")),
         ("2E t-SNE of attn (repro)", R("02", "Figure_2E_reproduced.png")),
     ], originals=[]),
     "03": dict(reproduced=[

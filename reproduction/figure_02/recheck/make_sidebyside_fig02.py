@@ -13,15 +13,14 @@ RD = F2 / "reproduced"
 RECHECK = F2 / "recheck"
 RECHECK.mkdir(parents=True, exist_ok=True)
 
+# 2B is removed; 2C is provided as upstream scripts (not re-rendered) -> published-only tile.
 PANELS = {
     "A": (PUB / "Figure_2_A_pub.png", RD / "Figure_2A_reproduced.png",
           "2A — SMT3 promoter logos: SpeciesLM / Shorkie LM / Shorkie 15% iterative"),
-    "B": (PUB / "Figure_2_B_pub.png", RD / "Figure_2B_reproduced.png",
-          "2B — iterative 15%-masked PPM reconstruction (ACGT x position)"),
-    "C": (PUB / "Figure_2_C_pub.png", RD / "Figure_2C_reproduced.png",
-          "2C — TF-MoDISco motif conservation across 6 fungal tiers"),
+    "C": (PUB / "Figure_2_C_pub.png", None,
+          "2C — TF-MoDISco motif conservation across 6 fungal tiers (reproduction skipped — see motif_lm[/__unseen_species]/4_viz_motif.py)"),
     "D": (PUB / "Figure_2_D_pub.png", RD / "Figure_2D_reproduced.png",
-          "2D — TF motif enrichment vs TSS (Abf1.1 / Rap1.1 / Reb1p)"),
+          "2D — motif enrichment vs TSS (published 6-panel grid: MIG3.4/Abf1.1/Rap1.1/Reb1p/CHA4.11/SWI5.7)"),
     "E": (PUB / "Figure_2_E_pub.png", RD / "Figure_2E_reproduced.png",
           "2E — t-SNE of 1st-attn LM embeddings by genomic element"),
 }
@@ -46,6 +45,15 @@ def fit_h(im, h):
 
 def compose(pub_p, repro_p, title, out_p):
     pub = fit_h(Image.open(pub_p), H)
+    if repro_p is None:                      # published-only tile (panel skipped)
+        W = PAD * 2 + pub.width
+        canvas = Image.new("RGB", (W, HEADER + H + PAD), "white")
+        d = ImageDraw.Draw(canvas)
+        d.text((PAD, 12), title, fill="black", font=_font(22))
+        d.text((PAD, HEADER - 6), "PUBLISHED (reproduction skipped)", fill=(150, 0, 0), font=_font(20))
+        canvas.paste(pub, (PAD, HEADER))
+        canvas.save(out_p)
+        return canvas
     repro = fit_h(Image.open(repro_p), H)
     W = PAD * 2 + pub.width + GAP + repro.width
     canvas = Image.new("RGB", (W, HEADER + H + PAD), "white")
@@ -64,7 +72,7 @@ def compose(pub_p, repro_p, title, out_p):
 def main():
     tiles = []
     for name, (pub_p, repro_p, title) in PANELS.items():
-        if not pub_p.exists() or not repro_p.exists():
+        if not pub_p.exists() or (repro_p is not None and not repro_p.exists()):
             print(f"[skip] {name}: missing {pub_p if not pub_p.exists() else repro_p}")
             continue
         out = RECHECK / f"panel_{name}_sidebyside.png"

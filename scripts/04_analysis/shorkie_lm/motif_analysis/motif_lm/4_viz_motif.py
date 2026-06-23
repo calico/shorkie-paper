@@ -106,7 +106,9 @@ if __name__ == "__main__":
         #############################
         results = {'pattern': [], 'num_seqlets': [], 'modisco_cwm_fwd': [], 'modisco_cwm_rev': []}
         img_path_suffix = 'self_modisco_logo'
-        output_dir=f'viz_self_modisco/{model_arch}'
+        # config-driven absolute output (alongside the modisco .h5), mirroring the
+        # cross-species variant so the logos land next to their source results.
+        output_dir=f'{WORK_ROOT}/experiments/motif_LM/saccharomycetales_viz_seq/{model_arch}/viz_self_modisco/'
 
         top_n_matches=3
         trim_threshold=0.3
