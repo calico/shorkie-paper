@@ -79,6 +79,10 @@ models:
   shorkie_lm_checkpoint: ${models.shorkie_lm}/train/model_best.h5
   # Supervised 8-fold models (each holds train/f0c0..f7c0/).
   shorkie_finetuned:     ${seq_experiment_root}/exp_histone__chip_exo__rna_seq_no_norm_5215_tracks/16bp/self_supervised_unet_small_bert_drop
+  # Shorkie_Random_Init: the from-scratch ablation used in the paper figures (lr 5e-4, 8-fold).
+  shorkie_random_init:   ${seq_experiment_root}/exp_histone__chip_exo__rna_seq_no_norm_5215_tracks/16bp/supervised_unet_small_bert_drop_variants/learning_rate_0.0005
+  # DEPRECATED: an earlier random-init run at lr 1e-4. The paper's Shorkie_Random_Init is
+  # models.shorkie_random_init (lr 5e-4) above; this key is kept only for back-compat.
   shorkie_scratch:       ${seq_experiment_root}/exp_histone__chip_exo__rna_seq_no_norm_5215_tracks/16bp/shorkie_models/shorkie_random_initialization
 
 # --- Datasets ---

@@ -50,10 +50,26 @@
         { "gs_uri": "gs://seqnn-share/shorkie/targets.txt", "https_uri": "https://storage.googleapis.com/seqnn-share/shorkie/targets.txt", "local_path": "models/shorkie_finetuned/targets.txt", "size_bytes": 781531, "md5": null }
       ]
     },
+    "shorkie_random_init": {
+      "description": "Shorkie_Random_Init: supervised 8-fold ensemble trained from random init (no LM pretraining, lr 5e-4); the from-scratch ablation baseline used in the paper figures (e.g. Figure 7 eQTL). Identical data/architecture to shorkie_finetuned, minus --restore. Model block byte-identical to shorkie_finetuned; differs only in train.{learning_rate,task}.",
+      "released": true,
+      "num_folds": 8,
+      "fold_subdir": "f{fold}c0",
+      "files": [
+        { "gs_uri": "gs://seqnn-share/shorkie_random_init/f0/model_best.h5", "https_uri": "https://storage.googleapis.com/seqnn-share/shorkie_random_init/f0/model_best.h5", "local_path": "models/shorkie_random_init/train/f0c0/train/model_best.h5", "size_bytes": 56870796, "md5": "e2462264f9892aaac5a4065f23bc31bd" },
+        { "gs_uri": "gs://seqnn-share/shorkie_random_init/f1/model_best.h5", "https_uri": "https://storage.googleapis.com/seqnn-share/shorkie_random_init/f1/model_best.h5", "local_path": "models/shorkie_random_init/train/f1c0/train/model_best.h5", "size_bytes": 56870796, "md5": "a8e4d67bd7787149b8408a8a69322914" },
+        { "gs_uri": "gs://seqnn-share/shorkie_random_init/f2/model_best.h5", "https_uri": "https://storage.googleapis.com/seqnn-share/shorkie_random_init/f2/model_best.h5", "local_path": "models/shorkie_random_init/train/f2c0/train/model_best.h5", "size_bytes": 56870796, "md5": "92a170b414584c43ed3a5a3b7af7bcab" },
+        { "gs_uri": "gs://seqnn-share/shorkie_random_init/f3/model_best.h5", "https_uri": "https://storage.googleapis.com/seqnn-share/shorkie_random_init/f3/model_best.h5", "local_path": "models/shorkie_random_init/train/f3c0/train/model_best.h5", "size_bytes": 56870796, "md5": "3efe987ea13d48383db5905a21d8b313" },
+        { "gs_uri": "gs://seqnn-share/shorkie_random_init/f4/model_best.h5", "https_uri": "https://storage.googleapis.com/seqnn-share/shorkie_random_init/f4/model_best.h5", "local_path": "models/shorkie_random_init/train/f4c0/train/model_best.h5", "size_bytes": 56870796, "md5": "1f96e22721ac66713530b13eee200649" },
+        { "gs_uri": "gs://seqnn-share/shorkie_random_init/f5/model_best.h5", "https_uri": "https://storage.googleapis.com/seqnn-share/shorkie_random_init/f5/model_best.h5", "local_path": "models/shorkie_random_init/train/f5c0/train/model_best.h5", "size_bytes": 56870796, "md5": "bd63b1e81492638d0e6dac4445f8575f" },
+        { "gs_uri": "gs://seqnn-share/shorkie_random_init/f6/model_best.h5", "https_uri": "https://storage.googleapis.com/seqnn-share/shorkie_random_init/f6/model_best.h5", "local_path": "models/shorkie_random_init/train/f6c0/train/model_best.h5", "size_bytes": 56870796, "md5": "bec491e374439fb60e20b68b4f12e1c2" },
+        { "gs_uri": "gs://seqnn-share/shorkie_random_init/f7/model_best.h5", "https_uri": "https://storage.googleapis.com/seqnn-share/shorkie_random_init/f7/model_best.h5", "local_path": "models/shorkie_random_init/train/f7c0/train/model_best.h5", "size_bytes": 56870796, "md5": "6b46abc4296ec749eda28d8ad4714756" },
+        { "gs_uri": "gs://seqnn-share/shorkie_random_init/params.json", "https_uri": "https://storage.googleapis.com/seqnn-share/shorkie_random_init/params.json", "local_path": "models/shorkie_random_init/params.json", "size_bytes": 2748, "md5": "21e4584758b1caffcc63040616ba34cb" }
+      ]
+    },
     "shorkie_scratch": {
-      "description": "Supervised 8-fold ensemble trained from random init (no LM pretraining); ablation baseline. Identical data/architecture to shorkie_finetuned, minus --restore (lr 1e-4 vs 2e-5).",
+      "description": "DEPRECATED ALIAS. An earlier random-init run at lr 1e-4 (shorkie_models/shorkie_random_initialization). The paper's Shorkie_Random_Init is the lr 5e-4 ensemble above (models.shorkie_random_init) — use that. Kept only to document the config models.shorkie_scratch key.",
       "released": false,
-      "note": "Not publicly released. Reproduce via scripts/02_train/shorkie_scratch/ (added in Phase 5).",
       "files": []
     }
   },
@@ -105,6 +121,23 @@
       "targets_sheet": "gs://seqnn-share/shorkie/targets.txt",
       "bigwigs": { "gs_uri": "gs://shorkie-paper/data/supervised/bigwigs/", "approx_size": "~93 GB", "md5": null },
       "tfrecords": { "gs_uri": "gs://shorkie-paper/data/supervised/processed/", "md5": null }
+    },
+    "eqtl": {
+      "description": "cis-eQTL variant-effect benchmark (Figure 7). Reproduction-minimal release: the per-SNP scored TSVs (Shorkie / Shorkie_LM / Shorkie_Random_Init) over 4 matched negative sets + the TSS/dist subsets, plus the DREAM-model eQTL baselines — enough to reproduce Figure 7 E-O on CPU without re-scoring. Requester-pays bucket.",
+      "studies": { "caudal_etal": 1901, "kita_etal": 683, "renganaath_etal": 142 },
+      "consumed_via": "config keys results.eqtl_scores (Shorkie family) + results.mpra_eval (DREAM)",
+      "scores":      { "gs_uri": "gs://shorkie-paper/eqtl/scores/",      "approx_size": "~51 MB", "md5": null },
+      "dream_eval":  { "gs_uri": "gs://shorkie-paper/eqtl/dream_eval/",  "approx_size": "~13 MB", "md5": null },
+      "external_raw": "The 1011-yeast-genomes GVCF (~51 GB) used to generate matched negative sets is NOT re-hosted; regenerate negatives via scripts/04_analysis/shorkie/eqtl/0_data_generation/1_generate_negs.py. Positive eQTL variant lists are from Caudal et al. 2024, Kita et al. 2017, Renganaath et al. 2020."
+    },
+    "mpra": {
+      "description": "MPRA promoter variant-effect benchmark (Figure 6). Reproduction-minimal release: ground-truth MAUDE expression, test-set subset indices, the cached Shorkie per-context logSED predictions, and the DREAM-RNN baseline output — enough to reproduce Figure 6 B-I on CPU without re-scoring. Requester-pays bucket.",
+      "consumed_via": "scripts/04_analysis/shorkie/mpra/ + reproduction/figure_06 (config key results.mpra_viz)",
+      "ground_truth":   { "gs_uri": "gs://shorkie-paper/mpra/ground_truth/filtered_test_data_with_MAUDE_expression.txt", "size_bytes": 9184998, "md5": null },
+      "test_subset_ids":{ "gs_uri": "gs://shorkie-paper/mpra/test_subset_ids/", "approx_size": "~21 MB", "md5": null },
+      "scores":         { "gs_uri": "gs://shorkie-paper/mpra/scores/", "approx_size": "~1.6 GB", "note": "single_measurement_stranded/all_seq_types/ cached Shorkie logSED + upstream_180bp_predictions.tsv", "md5": null },
+      "dream_rnn":      { "gs_uri": "gs://shorkie-paper/mpra/dream/DREAM-RNN_output.txt", "size_bytes": 9208725, "md5": null },
+      "external_raw": "The full DREAM Challenge 2022 random-promoter sequences (test_sequences.txt ~7.8 GB, train_sequences.txt) and the PrixFixe/DREAM-RNN model weights (~2.3 GB) are third-party and NOT re-hosted; obtain from the DREAM Challenge 2022 (https://www.synapse.org/#!Synapse:syn28469146)."
     }
   }
 }

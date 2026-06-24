@@ -9,9 +9,11 @@
 # Usage:
 #   data/download.sh --minimal                  # 8 fine-tuned folds -> ./my_shorkie
 #                                                #   (exactly what minimal_example expects)
-#   data/download.sh --models [lm|finetuned|all]# model weights -> <dest>/models/...
+#   data/download.sh --models [lm|finetuned|random_init|all]  # weights -> <dest>/models/...
 #   data/download.sh --lm-corpus <tier|all> -u PROJECT     # corpus genomes + TFRecords
 #   data/download.sh --supervised [bigwigs|tfrecords|all] -u PROJECT
+#   data/download.sh --eqtl -u PROJECT          # Figure-7 eQTL scores + DREAM baselines
+#   data/download.sh --mpra [meta|scores|all] -u PROJECT     # Figure-6 MPRA data
 #
 #   --dest DIR    base output dir (default: config release_root)
 #   -u PROJECT    GCP billing project for the requester-pays data bucket
@@ -30,9 +32,11 @@ MODE=""; SEL="all"; DEST=""; DEST_SET=0; PROJECT=""; DRY_RUN=0
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --minimal)     MODE=minimal; shift;;
-    --models)      MODE=models;     [[ "${2:-}" =~ ^(lm|finetuned|all)$ ]] && { SEL="$2"; shift; }; shift;;
+    --models)      MODE=models;     [[ "${2:-}" =~ ^(lm|finetuned|random_init|all)$ ]] && { SEL="$2"; shift; }; shift;;
     --lm-corpus)   MODE=lm_corpus;  SEL="${2:?--lm-corpus needs a tier or 'all'}"; shift 2;;
     --supervised)  MODE=supervised; [[ "${2:-}" =~ ^(bigwigs|tfrecords|all)$ ]] && { SEL="$2"; shift; }; shift;;
+    --eqtl)        MODE=eqtl; shift;;
+    --mpra)        MODE=mpra;       [[ "${2:-}" =~ ^(meta|scores|all)$ ]] && { SEL="$2"; shift; }; shift;;
     --dest)        DEST="$2"; DEST_SET=1; shift 2;;
     -u|--project)  PROJECT="$2"; shift 2;;
     --dry-run)     DRY_RUN=1; shift;;
@@ -40,7 +44,7 @@ while [[ $# -gt 0 ]]; do
     *) echo "unknown arg: $1" >&2; exit 2;;
   esac
 done
-[[ -n "$MODE" ]] || { echo "pick a mode: --minimal | --models | --lm-corpus | --supervised (see --help)" >&2; exit 2; }
+[[ -n "$MODE" ]] || { echo "pick a mode: --minimal | --models | --lm-corpus | --supervised | --eqtl | --mpra (see --help)" >&2; exit 2; }
 [[ -f "$MANIFEST" ]] || { echo "missing manifest: $MANIFEST" >&2; exit 1; }
 
 # Default dest = config release_root (falls back to ./data_local if config absent).
@@ -96,7 +100,8 @@ import json, sys
 manifest, sel, strip = sys.argv[1], sys.argv[2], sys.argv[3]
 m = json.load(open(manifest))["models"]
 names = {"lm": ["shorkie_lm"], "finetuned": ["shorkie_finetuned"],
-         "all": ["shorkie_lm", "shorkie_finetuned"]}[sel]
+         "random_init": ["shorkie_random_init"],
+         "all": ["shorkie_lm", "shorkie_finetuned", "shorkie_random_init"]}[sel]
 for n in names:
     for f in m[n]["files"]:
         lp = f["local_path"]
@@ -142,6 +147,28 @@ import json, sys
 s = json.load(open(sys.argv[1]))["datasets"]["supervised"]; sel = sys.argv[2]
 if sel in ("bigwigs", "all"):   print("\t".join([s["bigwigs"]["gs_uri"], "bigwigs/"]))
 if sel in ("tfrecords", "all"): print("\t".join([s["tfrecords"]["gs_uri"], "processed/"]))
+PY
+    ;;
+  eqtl)
+    echo "=== eqtl (Figure 7 scores + DREAM baselines) -> $DEST/eqtl/ (requester-pays) ==="
+    python - "$MANIFEST" <<'PY' | while IFS=$'\t' read -r gs sub; do get_prefix "$gs" "$DEST/eqtl/$sub"; done
+import json, sys
+e = json.load(open(sys.argv[1]))["datasets"]["eqtl"]
+print("\t".join([e["scores"]["gs_uri"], "scores/"]))
+print("\t".join([e["dream_eval"]["gs_uri"], "dream_eval/"]))
+PY
+    ;;
+  mpra)
+    echo "=== mpra ($SEL) -> $DEST/mpra/ (requester-pays) ==="
+    python - "$MANIFEST" "$SEL" <<'PY' | while IFS=$'\t' read -r gs sub; do get_prefix "$gs" "$DEST/mpra/$sub"; done
+import json, sys
+m = json.load(open(sys.argv[1]))["datasets"]["mpra"]; sel = sys.argv[2]
+if sel in ("meta", "all"):
+    print("\t".join([m["ground_truth"]["gs_uri"], "ground_truth/"]))
+    print("\t".join([m["test_subset_ids"]["gs_uri"], "test_subset_ids/"]))
+    print("\t".join([m["dream_rnn"]["gs_uri"], "dream/"]))
+if sel in ("scores", "all"):
+    print("\t".join([m["scores"]["gs_uri"], "scores/"]))
 PY
     ;;
 esac

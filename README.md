@@ -31,9 +31,10 @@ bash data/download.sh --minimal                                     # 8 finetune
 python -m ipykernel install --user --name yeast_ml                  # for the notebooks
 ```
 
-`data/download.sh` also takes `--models` (all 9 `.h5` + sidecars), `--lm-corpus <tier>`, and
-`--supervised` (verified against [`data/manifest.json`](./data/manifest.json)). All filesystem
-paths resolve through `config/paths.yaml` — there are no hardcoded machine paths in the scripts.
+`data/download.sh` also takes `--models [lm|finetuned|random_init|all]` (17 `.h5`: Shorkie LM +
+Shorkie 8-fold + Shorkie_Random_Init 8-fold, + sidecars), `--lm-corpus <tier>`, `--supervised`,
+`--eqtl`, and `--mpra` (all verified against [`data/manifest.json`](./data/manifest.json)). All
+filesystem paths resolve through `config/paths.yaml` — there are no hardcoded machine paths in the scripts.
 
 ### Repository layout
 
@@ -46,6 +47,7 @@ paths resolve through `config/paths.yaml` — there are no hardcoded machine pat
 | [`config/`](./config) | `paths.example.yaml`, `slurm.example.yaml` templates |
 | [`data/`](./data) | committed reference files + `manifest.json` + `download.sh` (large data is on GCS) |
 | [`external/`](./external) | pinned `baskerville-yeast` + `westminster` submodules |
+| [`examples/`](./examples) | how-to examples: load + run inference + variant effect for Shorkie/Shorkie_LM, and fine-tuning the LM on RNA-seq tracks |
 | [`minimal_example/`](./minimal_example) | self-contained logSED variant scorer • [`containers/`](./containers) scheduler-free image |
 
 ### Reproducibility matrix
@@ -54,7 +56,7 @@ paths resolve through `config/paths.yaml` — there are no hardcoded machine pat
 |---|---|---|---|---|
 | **Shorkie LM** (masked DNA LM) | [`01_data_build/lm_corpus/`](./scripts/01_data_build/lm_corpus) | [`02_train/shorkie_lm/`](./scripts/02_train/shorkie_lm) | [`03_eval/lm/`](./scripts/03_eval/lm) | [`04_analysis/shorkie_lm/`](./scripts/04_analysis/shorkie_lm) |
 | **Shorkie** (fine-tuned) | [`01_data_build/supervised_tracks/`](./scripts/01_data_build/supervised_tracks) | [`02_train/shorkie_finetuned/`](./scripts/02_train/shorkie_finetuned) | [`03_eval/supervised/`](./scripts/03_eval/supervised) | [`04_analysis/shorkie/`](./scripts/04_analysis/shorkie) |
-| **Shorkie scratch** (random-init ablation) | *(same supervised set)* | [`02_train/shorkie_scratch/`](./scripts/02_train/shorkie_scratch) | [`03_eval/supervised/`](./scripts/03_eval/supervised) | [`04_analysis/shorkie_scratch/`](./scripts/04_analysis/shorkie_scratch) |
+| **Shorkie_Random_Init** (random-init ablation, lr 5e-4, 8-fold; released) | *(same supervised set)* | [`02_train/shorkie_scratch/`](./scripts/02_train/shorkie_scratch) | [`03_eval/supervised/`](./scripts/03_eval/supervised) | [`04_analysis/shorkie_scratch/`](./scripts/04_analysis/shorkie_scratch) |
 
 The only difference between *finetuned* and *scratch* is the `--restore` flag + learning rate
 (see [`scripts/02_train/README.md`](./scripts/02_train/README.md)).
@@ -81,11 +83,19 @@ for the full artifact + `config` key index.
 
 ## Model Availability
 
-The model weights can be downloaded as .h5 files from the URLs below. We are releasing both Shorkie LM-DNA language model and Shorkie, fine-tuned with thousands of epigenomic and transcriptomic profiles. 
+The model weights can be downloaded as .h5 files from the URLs below (or with
+`data/download.sh --models all`). We release all three model variants — the Shorkie LM DNA language
+model, Shorkie (fine-tuned on thousands of epigenomic/transcriptomic profiles), and Shorkie_Random_Init
+(the from-scratch ablation).
 
 - [Shorkie LM](https://storage.googleapis.com/seqnn-share/shorkie_lm/train/model_best.h5)
 - Shorkie (`gs://seqnn-share/shorkie/`)
     - [f0](https://storage.googleapis.com/seqnn-share/shorkie/f0/model_best.h5) | [f1](https://storage.googleapis.com/seqnn-share/shorkie/f1/model_best.h5) | [f2](https://storage.googleapis.com/seqnn-share/shorkie/f2/model_best.h5) | [f3](https://storage.googleapis.com/seqnn-share/shorkie/f3/model_best.h5) | [f4](https://storage.googleapis.com/seqnn-share/shorkie/f4/model_best.h5) | [f5](https://storage.googleapis.com/seqnn-share/shorkie/f5/model_best.h5) | [f6](https://storage.googleapis.com/seqnn-share/shorkie/f6/model_best.h5) | [f7](https://storage.googleapis.com/seqnn-share/shorkie/f7/model_best.h5)
+- Shorkie_Random_Init (from-scratch ablation, lr 5e-4, 8-fold; `gs://seqnn-share/shorkie_random_init/`)
+    - [f0](https://storage.googleapis.com/seqnn-share/shorkie_random_init/f0/model_best.h5) | [f1](https://storage.googleapis.com/seqnn-share/shorkie_random_init/f1/model_best.h5) | [f2](https://storage.googleapis.com/seqnn-share/shorkie_random_init/f2/model_best.h5) | [f3](https://storage.googleapis.com/seqnn-share/shorkie_random_init/f3/model_best.h5) | [f4](https://storage.googleapis.com/seqnn-share/shorkie_random_init/f4/model_best.h5) | [f5](https://storage.googleapis.com/seqnn-share/shorkie_random_init/f5/model_best.h5) | [f6](https://storage.googleapis.com/seqnn-share/shorkie_random_init/f6/model_best.h5) | [f7](https://storage.googleapis.com/seqnn-share/shorkie_random_init/f7/model_best.h5)
+
+**New users → see [`examples/`](./examples)** for notebooks on loading each model, running inference,
+variant-effect prediction, and fine-tuning the LM on RNA-seq tracks.
 
 ---
 
@@ -123,6 +133,14 @@ Shorkie was fine-tuned from the Shorkie LM using large-scale transcriptomic and 
 ## Benchmark data availability
 
 This section lists external benchmark datasets used to evaluate **Shorkie**, along with their sources and primary references.
+
+> **Released for reproduction.** The reproduction-critical subsets — the per-SNP eQTL score TSVs
+> (Caudal/Kita/Renganaath, Shorkie / Shorkie_LM / Shorkie_Random_Init) and the MPRA ground-truth
+> expression + cached Shorkie/DREAM scores — are on `gs://shorkie-paper/{eqtl,mpra}/` and fetched with
+> `data/download.sh --eqtl` / `--mpra` (requester-pays; pass `-u PROJECT`). With these, Figures 6–7
+> reproduce on CPU without re-scoring. The large raw inputs (the 1011-genomes GVCF, the full DREAM
+> Challenge sequences, the DREAM-RNN/PrixFixe weights) are third-party and obtained from their original
+> sources below (not re-hosted).
 
 ### MPRA (Random Promoter DREAM Challenge)
 

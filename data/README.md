@@ -14,13 +14,19 @@ on GCS, catalogued in `manifest.json`, and fetched on demand by `download.sh`.
 ## Released artifacts
 
 - **Model weights — public** (`gs://seqnn-share`): LM `shorkie_lm/`, fine-tuned
-  8-fold `shorkie/f0..f7/`. Downloadable with gsutil or plain https.
+  8-fold `shorkie/f0..f7/`, and the random-init ablation 8-fold
+  `shorkie_random_init/f0..f7/` (lr 5e-4). Downloadable with gsutil or plain https.
 - **Datasets — requester-pays** (`gs://shorkie-paper`): LM corpora
-  `data/unsupervised/{genome,processed}/<tier>/` and supervised
-  `data/supervised/{bigwigs,processed}/`. Need gsutil + a billing project (`-u`).
+  `data/unsupervised/{genome,processed}/<tier>/`, supervised
+  `data/supervised/{bigwigs,processed}/`, and the benchmark scores
+  `eqtl/{scores,dream_eval}/` (Figure 7) + `mpra/{ground_truth,test_subset_ids,scores,dream}/`
+  (Figure 6). Need gsutil + a billing project (`-u`).
 
-`shorkie_scratch` (the random-init ablation) is **not** publicly released;
-reproduce it via `scripts/02_train/shorkie_scratch/`.
+The `eqtl`/`mpra` entries are the reproduction-minimal subsets (per-SNP scores + ground truth) that
+let Figures 6–7 reproduce on CPU; the large raw third-party inputs (1011-genomes GVCF, full DREAM
+sequences, DREAM-RNN/PrixFixe weights) are documented in `manifest.json` (`external_raw`) but not
+re-hosted. `models.shorkie_scratch` (an older lr-1e-4 random-init run) is a **deprecated alias** of
+`models.shorkie_random_init`.
 
 ## download.sh
 

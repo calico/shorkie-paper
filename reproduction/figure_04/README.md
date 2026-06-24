@@ -29,9 +29,8 @@ random-init checkpoint (`run_fig4_random_ism.sh`).
 >   exactly chrVII:346,669-347,169; the prior MMS2 row (2175, −strand) gave the wrong 16,384 bp
 >   masked-LM context.
 > All builders are driven by the unified `fig4_common.PANELS` registry. **Panels D & H are removed**
-> from the reproduction (their `build_4D.py`/`build_4H.py` scripts are kept on disk, not rendered).
-> See [`recheck/DISCREPANCIES.md`](recheck/DISCREPANCIES.md).
-> Panels **D** and **H** are unchanged (12-TF grid paired with TomTom — MEME 5.5.7 from source).
+> from the reproduction (their `build_4D.py`/`build_4H.py`/`run_tomtom.py`/`match_tfs.py` scripts are
+> kept on disk, not rendered). See [`recheck/DISCREPANCIES.md`](recheck/DISCREPANCIES.md).
 
 ---
 

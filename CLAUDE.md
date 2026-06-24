@@ -26,9 +26,9 @@ The model is two-stage: **Shorkie LM** (a masked DNA language model pretrained o
 |---|---|---|---|
 | **shorkie_lm** | masked DNA LM, multi-species fungal corpus (released tier = 165 Saccharomycetales), seq_len 16384 | `hound_train.py` (`loss=mlm`, `use_bert=true`, `unet_small_bert_drop`) | — (base) |
 | **shorkie_finetuned** | supervised, 5215 ChIP-exo/MNase/RNA-seq tracks, R64, 8-fold CV | `westminster_train_folds.py … --restore <LM .h5>` | `task=fine-tune`, `lr=2e-5` |
-| **shorkie_scratch** | **identical** supervised set, random init (ablation) | same command **without `--restore`** | `task=supervised`, `lr=1e-4` |
+| **shorkie_random_init** | **identical** supervised set, random init (ablation; the paper's "Shorkie_Random_Init") | same command **without `--restore`** | `task=supervised`, `lr=5e-4` |
 
-The only mechanistic difference between finetuned and scratch is the `--restore` flag + learning rate (verified: the two `params.json` differ in exactly those two `train` fields; model blocks are byte-identical). `scripts/02_train/README.md` documents the comparison.
+The only mechanistic difference between finetuned and random-init is the `--restore` flag + learning rate (verified: the two `params.json` differ in exactly those two `train` fields; model blocks are byte-identical). `scripts/02_train/README.md` documents the comparison. **Released models** (`data/manifest.json`, `gs://seqnn-share/`): `shorkie_lm`, `shorkie` (8-fold), and `shorkie_random_init` (8-fold, lr 5e-4 — `config models.shorkie_random_init`; the older lr-1e-4 `models.shorkie_scratch` is a deprecated alias).
 
 ## Execution model — read this before running or editing scripts
 
@@ -55,7 +55,7 @@ The only mechanistic difference between finetuned and scratch is the `--restore`
 - **`notebooks/`** — 7 figure-reproduction notebooks (`fig01_…`–`fig07_…`, one per main-text figure), each importing from `shorkie`, pinned to the `yeast_ml` kernel, and resolving paths via `shorkie.config.repo_root()` so they run from any cwd. Each delegates panel work to its figure's `reproduction/figure_NN/recheck/build_*.py` builders (single source of truth) — edit the builder, not a second notebook copy. `notebooks/README.md` is the figure→notebook→upstream-stage→artifact index; `reproduction/` is the deep audit counterpart (published crops + `verify_figNN.csv`).
 - **`config/`** — `paths.example.yaml`, `slurm.example.yaml` (templates; copy to the `.yaml` form).
 - **`data/`** — small committed reference files (`R64_annotations/`, `species_lists/`) + `manifest.json` + `download.sh`. Large data is **not** committed.
-- **`external/`** — the two pinned submodules. **`minimal_example/`** — self-contained logSED variant scorer (best place to learn model load + scoring). **`containers/`** — Dockerfile + Apptainer def (scheduler-free path).
+- **`external/`** — the two pinned submodules. **`examples/`** — user-facing how-to notebooks (load + inference + variant effect for Shorkie/Shorkie_LM; `5_finetune_lm_on_rnaseq.sh`). **`minimal_example/`** — self-contained logSED variant scorer (CLI). **`containers/`** — Dockerfile + Apptainer def (scheduler-free path).
 
 ## Conventions when editing or adding scripts
 
