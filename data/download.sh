@@ -102,6 +102,13 @@ m = json.load(open(manifest))["models"]
 names = {"lm": ["shorkie_lm"], "finetuned": ["shorkie_finetuned"],
          "random_init": ["shorkie_random_init"],
          "all": ["shorkie_lm", "shorkie_finetuned", "shorkie_random_init"]}[sel]
+# For "all", skip models not yet on the bucket (pending_upload) so the fetch never 404s;
+# an explicit selection (e.g. random_init) still attempts it — works once it is uploaded.
+if sel == "all":
+    names = [n for n in names if m[n].get("released", bool(m[n].get("files")))]
+elif any(m[n].get("pending_upload") for n in names):
+    sys.stderr.write(f"note: {sel} is prepared but NOT yet uploaded (manifest pending_upload); "
+                     f"this will 404 until the maintainer runs scripts/00_setup/upload_release.sh\n")
 for n in names:
     for f in m[n]["files"]:
         lp = f["local_path"]

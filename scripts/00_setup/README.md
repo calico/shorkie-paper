@@ -8,6 +8,9 @@ active and `config/paths.yaml` exists.
 | Step | What |
 |------|------|
 | `init_submodules.sh` | Init the pinned forks `external/baskerville-yeast` and `external/westminster`, print their pins, then echo the follow-up install/config commands. |
+| `verify_install.sh` | After `pip install -e .`: `import shorkie`, resolve the released model keys, run `pytest tests/`. |
+| `upload_release.sh` | **Maintainer-only.** Publish the catalogued-but-not-yet-uploaded artifacts (`shorkie_random_init` model → `gs://seqnn-share`; `eqtl`/`mpra` scores → `gs://shorkie-paper`). Idempotent (`gsutil cp -n`). Needs write access to both buckets. `--dry-run` prints the commands. |
+| `verify_release.py` | Audit `manifest.json` vs the buckets (`gsutil stat`/`ls`): size+md5 for models, non-empty prefixes for datasets. Run after `upload_release.sh` to confirm completeness. |
 
 ## Order of operations
 
@@ -23,11 +26,27 @@ pip install -e external/baskerville-yeast -e external/westminster -e .
 cp config/paths.example.yaml config/paths.yaml
 cp config/slurm.example.yaml config/slurm.yaml
 
-# 4. fetch released artifacts (manifest-driven; see data/README.md)
+# 4. (optional) sanity-check the install
+bash scripts/00_setup/verify_install.sh
+
+# 5. fetch released artifacts (manifest-driven; see data/README.md)
 data/download.sh --minimal                       # 8 fine-tuned folds -> ./my_shorkie
-data/download.sh --models all                    # LM + fine-tuned weights
+data/download.sh --models all                    # LM + fine-tuned weights (live now)
 data/download.sh --lm-corpus <tier|all> -u PROJECT   # requester-pays datasets
 data/download.sh --supervised [bigwigs|tfrecords|all] -u PROJECT
+data/download.sh --eqtl -u PROJECT               # Figure-7 eQTL scores (after release upload)
+data/download.sh --mpra all -u PROJECT           # Figure-6 MPRA data (after release upload)
+```
+
+### Maintainer: publishing the release
+
+`shorkie_random_init` + the `eqtl`/`mpra` scores are catalogued in `manifest.json` with
+`pending_upload: true` but not yet on the buckets. Publish them (needs write access to
+`gs://seqnn-share` + `gs://shorkie-paper`), then verify:
+
+```bash
+bash scripts/00_setup/upload_release.sh --all -u PROJECT      # gsutil cp -n (idempotent); --dry-run to preview
+python scripts/00_setup/verify_release.py -u PROJECT          # all green when complete
 ```
 
 ## Config & data

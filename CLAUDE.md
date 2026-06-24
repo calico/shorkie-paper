@@ -28,7 +28,7 @@ The model is two-stage: **Shorkie LM** (a masked DNA language model pretrained o
 | **shorkie_finetuned** | supervised, 5215 ChIP-exo/MNase/RNA-seq tracks, R64, 8-fold CV | `westminster_train_folds.py … --restore <LM .h5>` | `task=fine-tune`, `lr=2e-5` |
 | **shorkie_random_init** | **identical** supervised set, random init (ablation; the paper's "Shorkie_Random_Init") | same command **without `--restore`** | `task=supervised`, `lr=5e-4` |
 
-The only mechanistic difference between finetuned and random-init is the `--restore` flag + learning rate (verified: the two `params.json` differ in exactly those two `train` fields; model blocks are byte-identical). `scripts/02_train/README.md` documents the comparison. **Released models** (`data/manifest.json`, `gs://seqnn-share/`): `shorkie_lm`, `shorkie` (8-fold), and `shorkie_random_init` (8-fold, lr 5e-4 — `config models.shorkie_random_init`; the older lr-1e-4 `models.shorkie_scratch` is a deprecated alias).
+The only mechanistic difference between finetuned and random-init is the `--restore` flag + learning rate (verified: the two `params.json` differ in exactly those two `train` fields; model blocks are byte-identical). `scripts/02_train/README.md` documents the comparison. **Released models** (`data/manifest.json`, `gs://seqnn-share/`): `shorkie_lm` + `shorkie` (8-fold) are live; `shorkie_random_init` (8-fold, lr 5e-4 — `config models.shorkie_random_init`; the older lr-1e-4 `models.shorkie_scratch` is a deprecated alias) is catalogued with `pending_upload: true` — published by the maintainer via `scripts/00_setup/upload_release.sh` (along with the `eqtl`/`mpra` benchmark scores). `verify_release.py` audits manifest-vs-bucket.
 
 ## Execution model — read this before running or editing scripts
 
