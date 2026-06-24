@@ -18,18 +18,15 @@ PUB = F.REPRO / "published" / "Figure_4_full.png"
 RD = F.RD
 OUT = F.RECHECK
 
-# published vertical bands (l,t,r,b) in [0,1]
+# published vertical bands (l,t,r,b) in [0,1]. Panels D & H are removed from the
+# reproduction (scripts kept, not rendered), so only A/B/C + E/F/G are composited.
 BANDS = {
     "ABC": (0.0, 0.00, 1.0, 0.46),
-    "D":   (0.0, 0.46, 0.52, 0.625),
     "EFG": (0.0, 0.46, 1.0, 0.86),
-    "H":   (0.0, 0.86, 1.0, 1.0),
 }
 REPRO_PNG = {
     "ABC": RD / "Figure_4ABC_reproduced.png",
-    "D":   RD / "Figure_4D_reproduced.png",
     "EFG": RD / "Figure_4EFG_reproduced.png",
-    "H":   RD / "Figure_4H_reproduced.png",
 }
 
 

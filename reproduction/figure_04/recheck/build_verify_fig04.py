@@ -8,16 +8,16 @@ Validates the clean exact-window 3-model ISM panels:
   - 3-model panels A/B/C/F: LM + ISM + Random-Init rows all rendered, and
     Shorkie-ISM localization > Random-Init localization
   - panel F (MMS2) is a 3-row panel (LM+ISM+Random), not ISM-only
-  - panel H: TF-MoDISco pattern count + TomTom-matched reconstruction TFs
-  - panel D reconstruction rendered
   - clean ISM grid: png rendered, uniform box size, all rows full-coverage, localization
+
+(Panels D & H are removed from the reproduction — their build_4D.py/build_4H.py scripts are
+kept on disk but no longer rendered or verified.)
 
 Reads the per-panel metric CSVs the builders wrote.
 """
 import sys
 from pathlib import Path
 import pandas as pd
-import h5py
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "common"))
@@ -63,22 +63,7 @@ def main():
     if len(f_row):
         checks.append(Check("4F", "MMS2_is_3model_panel", 3.0, _num(f_row.iloc[0]["n_rows"]), atol=0))
 
-    # ---- panel H ----
-    nmod = 0
-    with h5py.File(F.modisco_h5("gene_exp_motif_test_RP"), "r") as f:
-        for g in ["pos_patterns", "neg_patterns"]:
-            if g in f:
-                nmod += len(f[g].keys())
-    checks.append(Check("4H", "n_TFMoDISco_patterns(>=6)", 6.0, float(nmod), mode="ge"))
-    hp = F.RECHECK / "fig4H_tomtom_pairs.csv"
-    if hp.exists():
-        h = pd.read_csv(hp)
-        checks.append(Check("4H", "panelH_TomTom_matched_TFs(>=8of12)", 8.0,
-                            float(int(h["modisco_pattern"].notna().sum())), mode="ge"))
-
-    # ---- panel D ----
-    checks.append(Check("4D", "panelD_reconstruction_rendered", 1.0,
-                        1.0 if (F.RD / "Figure_4D_reproduced.png").exists() else 0.0, atol=0))
+    # (Panels D & H removed from the reproduction — no checks; build_4D.py/build_4H.py kept on disk.)
 
     # ---- clean uniform ISM grid ----
     grid_csv = F.RECHECK / "fig4_ism_grid_metrics.csv"

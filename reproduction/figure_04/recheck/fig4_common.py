@@ -131,21 +131,26 @@ PUB_WIN = {
 # Published A,B,C,F = 3 model rows (LM+ISM+Random); E,G = ISM-only. (Boxes/TF text are
 # NOT drawn — clean logos, mirroring the original 2_modisco_DNA_logo.py --no_motif_annotation.)
 RANDOM_TREE = "motif_random_init_RP_TSS"
+# Shorkie_Random_Init = the lr=5e-4 scratch checkpoint (supervised_unet_small_bert_drop_variants/
+# learning_rate_0.0005), recomputed by run_fig4_random_ism.sh into one 4-entry scores.h5
+# (idx 0=RPL26A, 1=FUN12, 2=KRE33, 3=MMS2). The released RP/TSS/TSS_select random entries were the
+# OLD lr=1e-4 model and are NOT used. See scripts/.../2_lr_search/{2,3}_compare_lr_variants_*.py.
+RANDOM_SUB = "gene_exp_motif_test_fig4_lr5e4"
 PANELS = [
     dict(panel="A", gene="RPL26A", win=PUB_WIN["RPL26A"],
          lm=("RP", 90),   ism=("gene_exp_motif_test_RP", 4, 10),
-         random=(RANDOM_TREE, "gene_exp_motif_test_RP", 4, 10)),
+         random=(RANDOM_TREE, RANDOM_SUB, 0, 0)),
     dict(panel="B", gene="FUN12",  win=PUB_WIN["FUN12"],
          lm=("TSS", 39),  ism=("gene_exp_motif_test_TSS", 0, 39),
-         random=(RANDOM_TREE, "gene_exp_motif_test_TSS", 0, 39)),
+         random=(RANDOM_TREE, RANDOM_SUB, 0, 1)),
     dict(panel="C", gene="KRE33",  win=PUB_WIN["KRE33"],
          lm=("TSS", 5134), ism=("gene_exp_motif_test_RRB_targets", 11, 3),
-         random=(RANDOM_TREE, "gene_exp_motif_test_TSS_select", 0, 5)),
+         random=(RANDOM_TREE, RANDOM_SUB, 0, 2)),
     dict(panel="E", gene="DTD1",   win=PUB_WIN["DTD1"],
          lm=None,         ism=("gene_exp_motif_test_SS", 22, 0), random=None),
     dict(panel="F", gene="MMS2",   win=PUB_WIN["MMS2"],
-         lm=("TSS", 2175), ism=("gene_exp_motif_test_TSS", 33, 31),
-         random=(RANDOM_TREE, "gene_exp_motif_test_MMS2_panel", 0, 0)),
+         lm=("TSS", 2176), ism=("gene_exp_motif_test_TSS", 33, 31),
+         random=(RANDOM_TREE, RANDOM_SUB, 0, 3)),
     dict(panel="G", gene="HOP2",   win=PUB_WIN["HOP2"],
          lm=None,         ism=("gene_exp_motif_test_SS", 80, 0), random=None),
 ]

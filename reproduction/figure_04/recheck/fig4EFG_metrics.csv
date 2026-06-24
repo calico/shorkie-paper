@@ -1,4 +1,4 @@
 panel,gene,chrom,win_start,win_end,n_rows,has_LM,has_ISM,has_Random,ism_offset,ism_covered,random_covered,loc_LM,loc_ISM,loc_Random,aspect_w_over_h
 4E,DTD1,chrIV,65235,65431,1,0,1,0,-44,1.0,n/a,n/a,15.5,n/a,33.33
-4F,MMS2,chrVII,346669,347169,3,1,1,1,0,1.0,1.0,7.89,23.03,14.11,33.33
+4F,MMS2,chrVII,346669,347169,3,1,1,1,0,1.0,1.0,8.28,23.03,7.87,33.33
 4G,HOP2,chrVII,435625,436401,1,0,1,0,-52,1.0,n/a,n/a,17.5,n/a,33.33
