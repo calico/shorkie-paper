@@ -1,11 +1,19 @@
 # notebooks/ — figure-reproduction notebooks
 
-One notebook per major Shorkie-paper figure. Each notebook **imports from the
-installed `src/shorkie` package** (helpers, config, model ensemble) — it never
-redefines utilities or hardcodes machine paths — resolves every input through
-`shorkie.config`, and states at the top which figure it reproduces and which
-upstream `scripts/` stage must have run first. All are pinned to the `yeast_ml`
-kernel.
+**One notebook per main-text Shorkie-paper figure** (`fig01`–`fig07`, matching the
+paper's figure numbers). Each notebook **imports from the installed `src/shorkie`
+package** (helpers, config, model ensemble) — it never redefines utilities or
+hardcodes machine paths — resolves every input through `shorkie.config`, and states
+at the top which figure it reproduces and which upstream `scripts/` stage must have
+run first. All are pinned to the `yeast_ml` kernel.
+
+Each notebook is the **user-facing entry point** for its figure; it delegates the
+panel-by-panel work to that figure's builders under
+[`../reproduction/figure_NN/recheck/`](../reproduction). The
+[`../reproduction/`](../reproduction) tree is the **deep audit counterpart**: it adds
+the published-panel crops, the reproduced-vs-published verification (`verify_figNN.csv`),
+and per-figure `DISCREPANCIES.md`. Run the notebook to regenerate a figure; read
+`reproduction/figure_NN/` to audit how each number was checked.
 
 ## Setup
 
@@ -44,27 +52,22 @@ The `results.*` keys for the gated intermediates are defined and documented in
 
 | Notebook | Figure | Source data | Upstream stage (run first) | Inputs (via `config`) |
 |---|---|:---:|---|---|
-| `fig02_lm_genome_eval.ipynb` | LM perplexity / loss across corpus tiers & architectures | ⬚ | `scripts/03_eval/lm/lm_model_eval/` | `results.lm_eval_logs` |
-| `fig03_lm_motifs.ipynb` | LM TF-MoDISco motif logos | ⬚ | `scripts/04_analysis/shorkie_lm/motif_analysis/motif_lm/` (`1_search_motif`→`2_modisco_script`) | `results.modisco_lm`, `motif_db_dir` |
-| `fig04_cross_species_motifs.ipynb` | Cross-species motif generalization (5 held-out tiers) | ⬚ | `…/motif_analysis/motif_lm__unseen_species/` (per tier) | `results.modisco_unseen` |
-| `fig05_promoter_umap.ipynb` | Promoter / feature embedding clustering of LM representations | ⬚ | `…/umap_cluster_promoter/1_predict_seqs_LM.py` | `results.umap`, `genome.gtf` |
-| `fig06_attention_map.ipynb` | LM self-attention over a gene locus | ✅ GPU | — (recomputes from released LM weights) | `models.shorkie_lm`, `genome.fasta`, `genome.gtf` |
-| `fig07_smt3_dependency.ipynb` | SMT3 case study: PWM logo + nucleotide dependency maps | ⬚ | `…/motif_lm/` (PWM); dependency maps from the 3rd-party `…/lm_SMT3_viz/dependency_map/` notebook | `results.modisco_lm`, `models.shorkie_lm` |
-| `fig08_track_prediction.ipynb` | Supervised track prediction: predicted vs observed coverage | ✅ GPU | — (released ensemble + bigwig) | `models.shorkie_finetuned`, `datasets.bigwigs`, `datasets.targets_sheet`, `genome.{fasta,gtf}` |
-| `fig09_track_eval_metrics.ipynb` | Supervised eval: train/valid curves + bin/gene-level metrics | ⬚ | `scripts/02_train/` + `scripts/03_eval/supervised/track_prediction_eval/` | `results.train_logs` |
-| `fig10_variant_effect_logSED.ipynb` | Variant-effect logSED saliency track | ✅ GPU | — (released ensemble + R64 genome) | `models.shorkie_finetuned`, `genome.{fasta,gtf}`, `datasets.targets_sheet` |
-| `fig11_eqtl_benchmark.ipynb` | cis-eQTL variant-effect benchmark (ROC/PR, AUC by distance) | ⬚ | `scripts/04_analysis/shorkie/eqtl/` (scoring → `3_visualization/0_parse_eqtl_res.py`) | `results.eqtl_scores`, `results.mpra_eval` |
-| `fig12_mpra_benchmark.ipynb` | MPRA DREAM-Challenge benchmark (Shorkie logSED vs. observed) | ⬚ | `scripts/04_analysis/shorkie/mpra/` (`2_hound_mpra_run`→`3_process_hdf5_logsed`) | `results.mpra_viz`, `datasets.mpra` |
-| `fig13_ism_motifs.ipynb` | Shorkie ISM saliency + motif logos (RP/TSS genes) | ⬚ | `…/ism_motif/motif_shorkie__RP_TSS/ism_run/` + `2_modisco_analysis/` | `results.ism_scores`, `results.modisco_ism`, `genome.fasta`, `datasets.targets_sheet` |
-| `fig14_ablations.ipynb` | Ablations: LM-pretraining impact (scratch vs. finetuned; arch/lr search) | ⬚ | `scripts/02_train/{shorkie_finetuned,shorkie_scratch}/` + `scripts/04_analysis/shorkie_scratch/` | `results.train_logs` |
+| `fig01_fungal_lm_corpus_architecture.ipynb` | Fig 1 — fungal LM corpus, phylogeny, architecture & LM performance | ⬚ | `01_data_build/lm_corpus/` + `02_train/shorkie_lm/` + `03_eval/lm/lm_model_eval/`; heavy panels (phylogeny/MUMmer/Mash) via `reproduction/figure_01/panels/` | `lm_experiment_root`, `results.lm_eval_logs`, `datasets.lm_corpus_split_root` |
+| `fig02_lm_conserved_motifs.ipynb` | Fig 2 — conserved TF motifs (SMT3 logos, motif→TSS, t-SNE) | ⬚ | `04_analysis/shorkie_lm/{lm_SMT3_viz, motif_analysis/motif_lm, umap_cluster_promoter}/` | `results.modisco_lm`, `results.umap`, `genome.gtf` |
+| `fig03_supervised_rnaseq_prediction.ipynb` | Fig 3 — architecture + RNA-seq prediction (violin, scatter, coverage) | ⬚ / ✅ GPU | `03_eval/supervised/track_prediction_eval/`; coverage via `reproduction/figure_03/panels/run_coverage.py` (GPU) | `datasets.supervised_root`, `results.train_logs`, `models.shorkie_finetuned`, `datasets.bigwigs` |
+| `fig04_promoter_splicing_motifs.ipynb` | Fig 4 — promoter & splicing ISM motifs + TF-MoDISco | ⬚ | `04_analysis/shorkie/ism_motif/motif_shorkie__RP_TSS/` (`ism_run` + `2_modisco_analysis`) | `results.ism_scores`, `results.modisco_ism`, `genome.fasta`, `datasets.targets_sheet` |
+| `fig05_timecourse_tf_induction.ipynb` | Fig 5 — time-course MSN2/MSN4 TF induction | ⬚ | `04_analysis/shorkie/ism_motif/motif_shorkie__time_series/`; ATG42 ISM via `reproduction/figure_05/panels/run_atg42_ism.sbatch` (GPU) | `results.ism_scores`, `genome.fasta`, `datasets.targets_sheet` |
+| `fig06_mpra_variant_effects.ipynb` | Fig 6 — MPRA promoter variant effects (Shorkie vs DREAM) | ⬚ | `04_analysis/shorkie/mpra/` (`2_hound_mpra_run`→`3_process_hdf5_logsed`→`5_mpra_viz`) | `results.mpra_viz`, `datasets.mpra` |
+| `fig07_eqtl_variant_effects.ipynb` | Fig 7 — cis-eQTL variant effects (ROC/PR, AUPRC-by-distance, ISM) | ⬚ / ✅ GPU | `04_analysis/shorkie/eqtl/` (scoring → `3_visualization/`); ISM/coverage via `reproduction/figure_07/panels/` (GPU) | `results.eqtl_scores`, `results.mpra_eval`, `models.shorkie_finetuned`, `datasets.eqtl` |
 
 ## Conventions (for adding notebooks)
 
-- Name `figNN_<topic>.ipynb`; one figure / panel group per notebook.
+- Name `figNN_<topic>.ipynb`; **one main-text figure per notebook** (figure number = paper number).
 - Import helpers from `shorkie` (`shorkie.config`, `shorkie.models.ensemble`,
   `shorkie.helpers.yeast_helpers`, `shorkie.viz.load_cov`) — do **not** copy code
-  or hardcode paths.
+  or hardcode paths. Resolve the repo root with `shorkie.config.repo_root()` so the
+  notebook runs from any working directory.
 - Top markdown cell: **Reproduces / Upstream / Requires / Source script** lines.
-- Cite the `scripts/…` file the plotting logic was ported from; these notebooks
-  add a narrative layer and do not replace the pipeline scripts.
+- Delegate panel work to the figure's `reproduction/figure_NN/recheck/build_*.py`
+  builders (the single source of truth); the notebook adds the narrative + display layer.
 - Some gated notebooks additionally need `logomaker` (`pip install logomaker`).
