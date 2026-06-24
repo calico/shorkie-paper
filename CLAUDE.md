@@ -52,7 +52,7 @@ The only mechanistic difference between finetuned and scratch is the `--restore`
   - `03_eval/{lm,supervised}/` — LM perplexity / genome eval / arch comparison, and track-prediction metrics.
   - `04_analysis/{shorkie_lm,shorkie,shorkie_scratch,others}/` — eQTL, MPRA, motif/MoDISco, ISM, attention, UMAP, SMT3, dependency maps, phylogeny, arch viz, ablations.
   - `common/` — `env.sh` (exports config roots), `submit.sh`/`slurm_header.sh` (portable `#SBATCH` + local/container fallback).
-- **`notebooks/`** — 14 figure-reproduction notebooks (`figNN_<topic>.ipynb`), each importing from `shorkie`, pinned to the `yeast_ml` kernel; `notebooks/README.md` is the figure→notebook→upstream-stage→artifact index.
+- **`notebooks/`** — 13 figure-reproduction notebooks (`figNN_<topic>.ipynb`), each importing from `shorkie`, pinned to the `yeast_ml` kernel; `notebooks/README.md` is the figure→notebook→upstream-stage→artifact index.
 - **`config/`** — `paths.example.yaml`, `slurm.example.yaml` (templates; copy to the `.yaml` form).
 - **`data/`** — small committed reference files (`R64_annotations/`, `species_lists/`) + `manifest.json` + `download.sh`. Large data is **not** committed.
 - **`external/`** — the two pinned submodules. **`minimal_example/`** — self-contained logSED variant scorer (best place to learn model load + scoring). **`containers/`** — Dockerfile + Apptainer def (scheduler-free path).

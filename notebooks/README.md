@@ -44,7 +44,6 @@ The `results.*` keys for the gated intermediates are defined and documented in
 
 | Notebook | Figure | Source data | Upstream stage (run first) | Inputs (via `config`) |
 |---|---|:---:|---|---|
-| `fig01_lm_architecture.ipynb` | Shorkie-LM architecture schematic (`unet_small_bert_drop`) | ✅ CPU | — (reads released params) | `models.shorkie_lm` |
 | `fig02_lm_genome_eval.ipynb` | LM perplexity / loss across corpus tiers & architectures | ⬚ | `scripts/03_eval/lm/lm_model_eval/` | `results.lm_eval_logs` |
 | `fig03_lm_motifs.ipynb` | LM TF-MoDISco motif logos | ⬚ | `scripts/04_analysis/shorkie_lm/motif_analysis/motif_lm/` (`1_search_motif`→`2_modisco_script`) | `results.modisco_lm`, `motif_db_dir` |
 | `fig04_cross_species_motifs.ipynb` | Cross-species motif generalization (5 held-out tiers) | ⬚ | `…/motif_analysis/motif_lm__unseen_species/` (per tier) | `results.modisco_unseen` |

@@ -10,11 +10,11 @@ released FASTAs to confirm determinism, and two stale errors were corrected.
 re-derived); 1F tied to the published legend; **1G provenance closed** by a bar-height
 fit (R²=0.999998); heavy panels B/C/D **byte-identical** on re-run; the 1C strain
 representative **corrected to YJM195** (now an exact match); schematics A/E are
-schematic by design.
+**skipped** (hand-drawn in the paper — not reproduced).
 
 Recheck artifacts (this directory): `recompute_fig01.py`, `recheck_checks_fig01.csv`,
 `recompute_fig01_table.csv`, `restyle_panels_DFG.py` (D/F/G builders),
-`build_panels_ABCE.py` (A/B/C/E builders), `measure_panelG.py`,
+`build_panels_BC.py` (B/C builders; A/E are skipped schematics), `measure_panelG.py`,
 `panelG_barheight_fit.csv`, `rerun_heavy_panels.sh`, `diff_heavy_panels.py`,
 `determinism_fig01.csv`, `make_sidebyside_fig01.py`,
 `panel_{B,C,D,F,G}_sidebyside.png`, `Figure_1_published_vs_reproduced.png`.
@@ -25,11 +25,11 @@ Recheck artifacts (this directory): `recompute_fig01.py`, `recheck_checks_fig01.
 
 | Panel | Type | Match to published | Residual / note | Root cause |
 |---|---|---|---|---|
-| **1A** | schematic | conceptual | programmatic block-stack, not the illustrator art | hand-drawn schematic (out of scope) |
+| **1A** | schematic | **skipped** (not reproduced) | hand-drawn architecture diagram; defined by `params.json` | hand-drawn schematic (out of scope) |
 | **1B** | heavy (ete4) | topology + highlighted clade faithful; **newick byte-identical on re-run** | 987 leaves vs 1361 input taxids; final tree iTOL-styled | NCBI taxonomy versioning (merged/retired taxids; 2023 order split); iTOL styling not script-reproducible |
 | **1C** | heavy (MUMmer) | **exact** — strain rep now YJM195; **all coords byte-identical on re-run** | layout/box-color cosmetic | *fixed*: was wrong strain (see below) |
 | **1D** | heavy (mash) | **exact** — **both tables byte-identical on re-run**; now rendered in the published style | broken-axis/braces were a manual enhancement (see "Exact-render pass") | rendering choice only |
-| **1E** | schematic | conceptual | worked one-hot + loss-weight example | hand-drawn schematic (out of scope) |
+| **1E** | schematic | **skipped** (not reproduced) | hand-drawn preprocessing pipeline; transforms in `01_data_build/lm_corpus/` | hand-drawn schematic (out of scope) |
 | **1F** | computational | **exact (Δ=0)** vs published legend; panel aspect now matches | x-axis "discrepancy" was a crop mis-read | resolved (see below) |
 | **1G** | computational | **exact (Δ=0)**; **provenance closed**; panel aspect now matches | numbers only in the figure, not the text | bar-height fit ties them (see below) |
 
@@ -87,7 +87,7 @@ A later strict pass (user-requested) re-rendered **D, F, G** to match the publis
 style **and** panel proportions — a **pure render** of byte-identical cached data (no GPU, no recompute;
 all 12 numbers unchanged). The three panels are now built by a single source of truth,
 `restyle_panels_DFG.py`, which the notebook D/F/G cells import and call (they return `FIG1F_MIN` /
-`FIG1G_GENE` / `FIG1G_INTER`, so the verify cell stays **12/12**). Panels A, B, C, E were left as-is.
+`FIG1G_GENE` / `FIG1G_INTER`, so the verify cell stays **12/12**). Panels B, C were left as-is; A/E removed (schematics).
 
 - **1D — full published styling reproduced.** Matches `published/Figure_1_D_pub.png` (1329×1659 px,
   portrait ~0.80 w/h): two stacked panels (top = 165_Saccharomycetales, linear y 0–1; bottom = 80_Strains

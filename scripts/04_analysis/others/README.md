@@ -22,11 +22,9 @@ outputs are for [iTOL](https://itol.embl.de/).
 
 ## Architecture schematic (Figure 1A)
 
-There is no standalone script here for the Shorkie-LM architecture schematic. It is
-reproduced directly in the figure-reproduction code from the released `params.json`
-(no TensorFlow/Keras/Graphviz needed): `reproduction/figure_01/` →
-`recheck/build_panels_ABCE.py::build_1A()` (loads `models.shorkie_lm/params.json` and
-renders the trunk block-stack with matplotlib). The earlier
-`viz_shorkie_lm_arch/{viz_lm.py,viz_lm.sh}` fragments (a non-functional Keras
-`plot_model` / baskerville `hound_model_viz.py` wrapper) were removed in favor of that
-self-contained, CPU-only reproduction.
+There is no script here for the Shorkie-LM architecture schematic, and it is **not
+reproduced**: Figure 1A is a hand-drawn schematic in the paper. The architecture itself is
+fully specified by the released LM `params.json` (`models.shorkie_lm`): `unet_small_bert_drop`
+= a multi-resolution U-Net trunk + transformer blocks + masked-token (MLM) head. The earlier
+`viz_shorkie_lm_arch/{viz_lm.py,viz_lm.sh}` fragments (a non-functional Keras `plot_model` /
+baskerville `hound_model_viz.py` wrapper) were removed.

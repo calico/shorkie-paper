@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Figure 1 panels A / B / C / E builders — single source of truth, mirroring
+"""Figure 1 data-driven panel builders (B / C) — single source of truth, mirroring
 `restyle_panels_DFG.py` (D/F/G). The reproduction notebook cells delegate to these
 so the rendering lives in one place (no inline duplication; e.g. panel C's dot-plot
 code previously lived in both the notebook and a separate `regen_panelC.py`).
@@ -7,16 +7,16 @@ code previously lived in both the notebook and a separate `regen_panelC.py`).
 These are faithful ports of the original notebook cells — the figures are unchanged
 (approved); this is a refactor, not a re-style.
 
-  build_1A  Shorkie-LM trunk block-stack schematic from the released params.json
+Panels 1A (architecture) and 1E (preprocessing) are hand-drawn schematics in the
+paper; they are skipped (not reproduced), so they have no builder here.
+
   build_1B  circular NCBI-taxonomy cladogram (ete4); ensures species_tree.nwk first
   build_1C  MUMmer dot plots R64 vs one representative genome per dataset
-  build_1E  data-preprocessing illustration (one-hot + region loss weight) on one R64 window
 
 Run (env yeast_ml):
-    python reproduction/figure_01/recheck/build_panels_ABCE.py
+    python reproduction/figure_01/recheck/build_panels_BC.py
 """
 from __future__ import annotations
-import json
 import subprocess
 from pathlib import Path
 
@@ -41,44 +41,6 @@ def _run_panel(script, *args):
     cmd = ["bash", str(PANELS / script), *args]
     print("[run]", " ".join(cmd))
     subprocess.run(cmd, check=True, cwd=str(config.repo_root()))
-
-
-# --------------------------------------------------------------------------- #
-# Panel A — Shorkie-LM architecture schematic
-# --------------------------------------------------------------------------- #
-def build_1A():
-    from collections import Counter
-    params_file = Path(config.path("models.shorkie_lm")) / "params.json"
-    with open(params_file) as f:
-        P = json.load(f)
-    m = P["model"]
-    trunk = m.get("trunk", [])
-    block_counts = Counter(b.get("name", "?") for b in trunk)
-    print("Architecture (LM params.json):")
-    print(f"  seq_length      = {m.get('seq_length')}")
-    print(f"  trunk blocks    = {len(trunk)}  ->", dict(block_counts))
-    print(f"  transformer towers = {block_counts.get('transformer_tower',0)}")
-    print(f"  task/head       = MLM (masked token), use_bert={P['train'].get('use_bert')}, "
-          f"mask_rate={P['train'].get('mask_rate')}")
-
-    # simple block-stack diagram
-    fig, ax = plt.subplots(figsize=(8.5, 2.6))
-    ax.axis("off")
-    x = 0
-    for b in trunk[:18]:
-        name = b.get("name", "?")
-        ax.add_patch(plt.Rectangle((x, 0), 0.9, 1, facecolor="#bcd", edgecolor="k", lw=0.6))
-        ax.text(x + 0.45, 0.5, name.replace("_", "\n"), ha="center", va="center", fontsize=5.5)
-        x += 1
-    ax.set_xlim(0, max(18, len(trunk)))
-    ax.set_ylim(0, 1)
-    ax.set_title("Figure 1A (reproduced) — Shorkie-LM trunk block stack "
-                 "(multi-res U-Net + transformers; MLM head)", fontsize=10)
-    fig.tight_layout()
-    out = RD / "Figure_1A_reproduced.png"
-    fig.savefig(out, dpi=140, bbox_inches="tight")
-    plt.close(fig)
-    print("[OK]", out)
 
 
 # --------------------------------------------------------------------------- #
@@ -236,51 +198,7 @@ def build_1C():
     return cstats
 
 
-# --------------------------------------------------------------------------- #
-# Panel E — data-preprocessing illustration
-# --------------------------------------------------------------------------- #
-def build_1E():
-    import pysam
-    SEQ_LEN, STRIDE = 16384, 4096
-    fa = config.path("genome.fasta")
-    fasta = pysam.Fastafile(str(fa))
-    chrom = fasta.references[0]
-    clen = fasta.get_reference_length(chrom)
-    n_windows = max(0, (clen - SEQ_LEN) // STRIDE + 1)
-    print(f"R64 {chrom}: {clen:,} bp -> {n_windows} windows of {SEQ_LEN} bp @ stride {STRIDE}")
-    # one-hot a small slice for illustration
-    sl = fasta.fetch(chrom, 1000, 1000 + 60).upper()
-    mp = {"A": 0, "C": 1, "G": 2, "T": 3}
-    oh = np.zeros((4, len(sl)))
-    for i, b in enumerate(sl):
-        if b in mp:
-            oh[mp[b], i] = 1
-    fig, axes = plt.subplots(2, 1, figsize=(11, 3.2), gridspec_kw={"height_ratios": [3, 1]})
-    axes[0].imshow(oh, aspect="auto", cmap="Greys", interpolation="nearest")
-    axes[0].set_yticks(range(4))
-    axes[0].set_yticklabels(list("ACGT"))
-    axes[0].set_title(f"Figure 1E (reproduced) — one-hot of {chrom}:1000-1060 (input channels 0-3)")
-    axes[0].set_xticks([])
-    # region loss weight cartoon: repeat=0, gene/intergenic=1
-    w = np.ones(len(sl))
-    w[20:30] = 0.0  # pretend repeat-masked stretch
-    axes[1].fill_between(range(len(sl)), 0, w, step="mid", color="tab:green", alpha=0.5)
-    axes[1].set_ylim(0, 1.2)
-    axes[1].set_yticks([0, 1])
-    axes[1].set_ylabel("loss\nweight", fontsize=8)
-    axes[1].set_xlabel("position (bp)")
-    axes[1].set_title("region loss weight (repeat-masked positions -> 0; example)", fontsize=9)
-    fig.tight_layout()
-    out = RD / "Figure_1E_reproduced.png"
-    fig.savefig(out, dpi=140)
-    plt.close(fig)
-    print("Pipeline: chunk(16384/4096) -> one-hot(4ch)+species(166ch) -> homolog removal "
-          "-> 7% repeat threshold -> chr split (test chrXI/XIII/XV, valid chrXII/XIV/XVI)")
-
-
 if __name__ == "__main__":
-    build_1A()
     build_1B()
     build_1C()
-    build_1E()
-    print("[OK] built 1A/1B/1C/1E -> reproduced/")
+    print("[OK] built 1B/1C -> reproduced/")

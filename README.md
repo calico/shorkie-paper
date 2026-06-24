@@ -41,7 +41,7 @@ paths resolve through `config/paths.yaml` — there are no hardcoded machine pat
 |---|---|
 | [`src/shorkie/`](./src/shorkie) | installable helper package — `config` (paths), `models.ensemble` (8-fold loader + `logSED`), `helpers.yeast_helpers`, `viz.load_cov` |
 | [`scripts/`](./scripts) | all pipelines, staged `00_setup → 01_data_build → 02_train → 03_eval → 04_analysis` (+ `common/`) |
-| [`notebooks/`](./notebooks) | 14 figure-reproduction notebooks (import from `shorkie`, pinned to the `yeast_ml` kernel) |
+| [`notebooks/`](./notebooks) | 13 figure-reproduction notebooks (import from `shorkie`, pinned to the `yeast_ml` kernel) |
 | [`config/`](./config) | `paths.example.yaml`, `slurm.example.yaml` templates |
 | [`data/`](./data) | committed reference files + `manifest.json` + `download.sh` (large data is on GCS) |
 | [`external/`](./external) | pinned `baskerville-yeast` + `westminster` submodules |
@@ -66,7 +66,6 @@ See [`notebooks/README.md`](./notebooks/README.md) for the full artifact + `conf
 
 | Notebook | Figure | Runs from released data? | Upstream `scripts/` stage |
 |---|---|:--:|---|
-| `fig01_lm_architecture` | LM architecture schematic | ✅ | — (built from released `params.json`; see `04_analysis/others/README.md`) |
 | `fig02_lm_genome_eval` | LM perplexity / loss | ⬚ | `03_eval/lm/lm_model_eval/` |
 | `fig03_lm_motifs` | LM MoDISco motif logos | ⬚ | `04_analysis/shorkie_lm/motif_analysis/motif_lm/` |
 | `fig04_cross_species_motifs` | cross-species motifs | ⬚ | `…/motif_lm__unseen_species/` |
