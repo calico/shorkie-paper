@@ -11,14 +11,18 @@ Reproduction package for **main-text Figure 7**. Published reference: [`../../pa
 - **Match-published refinement (J–O, pass 4):** the ISM logos now show the published **grey padding bands on both sides** (Shorkie 112 bp = 80 bp core + 18/14 pad; DREAM 110 bp = 80 + 17/13), and the coverage track is the **8-fold ensemble PREDICTED Ref/Alt** RNA-Seq(T0) coverage (`panels/run_cov_eqtl_jo.py` → `reproduced/ism/cov_<panel>.npz`) drawn as overlapping **Ref (blue) + Alt (orange)** bars — so both the **x and y axis limits match the published predicted scale** (e.g. M 0–7.5, N 0–27, O 0–6). Observed RNA-seq (a different, ~11–17× smaller scale) is only a fallback.
 - **GPU panels:** `panels/run_ism_eqtl.{py,sbatch}` (8-fold ensemble logSED-ISM for the OMA1/LAP3 eQTL SNPs) and `panels/run_cov_eqtl_jo.{py,sbatch}` (8-fold ensemble predicted Ref/Alt coverage for the six J–O loci). J–O Shorkie ISM logos are rebuilt from the released ISM cache (no GPU rerun).
 
-The headline result: ensemble **AUROC/AUPRC matches the published Figure 7E/F/G** (Caudal/Kita to 3 decimals; Renganaath within 0.4–0.7 %, see below), the GPU ISM reproduces the released per-SNP logSED **bit-exactly** (OMA1 −0.2198, LAP3 +0.2344), and the J–O Shorkie ISM saliency logos are recomputed bit-for-bit from cache.
+The headline result: ensemble **AUROC/AUPRC matches the published Figure 7E/F/G** (Caudal/Kita to 3 decimals; Renganaath now to ±0.000–0.001, see below), the GPU ISM reproduces the released per-SNP logSED **bit-exactly** (OMA1 −0.2198, LAP3 +0.2344), and the J–O Shorkie ISM saliency logos are recomputed bit-for-bit from cache.
 
-> **Deep-recheck correction (this pass).** The earlier reproduction matched intermediate
+> **Deep-recheck correction (panel G).** The earlier reproduction matched intermediate
 > reference PNGs and reported **Shorkie 0.536/0.555 on Renganaath (panel G)**, concluding "DREAM
 > beats Shorkie." Reading the **published PDF** shows panel G plots **Shorkie 0.618/0.629** — the
-> top model — consistent with the body text. Root cause: panel G uses the **142-variant**
-> `viz_new/results_subset_tss/` set (= the "142 causal core-promoter variants"), not the full
-> 395-variant `viz_new/results/` set. Corrected here; details in `recheck/DISCREPANCIES.md`.
+> top model — consistent with the body text. Root cause: panel G is scored on the **142-variant**
+> `results_subset_tss/` set (= the "142 causal core-promoter variants"), not the full 395-variant
+> `results/` set. Final fix (pass 5) follows the source plotter exactly — a **uniform 6-way
+> inner-join on `results_subset_tss` for all six models**, with DREAM from the matching subset DREAM
+> dir `eQTL_MPRA_models_eval_Renganaath_etal/results_subset_tss/` — so all six G lines reproduce to
+> **±0.000–0.001** and the curves overlay the published with no per-model shift. Details in
+> `recheck/DISCREPANCIES.md`.
 
 ---
 
@@ -38,7 +42,7 @@ The headline result: ensemble **AUROC/AUPRC matches the published Figure 7E/F/G*
 | **H/I** | AUROC/AUPRC by TSS-distance | `3_visualization/2_AUROC_AUPRC_by_dsitance.py` | same | CPU ✅ |
 | **J–O** | eQTL-SNP ISM saliency | `2_variant_scoring/` + ensemble ISM | `models.shorkie_finetuned` | GPU ✅ |
 
-**Data (under `work_root`):** per-SNP scored TSVs `revision_experiments/eQTL/viz_new/results/negset_{1..4}/{exp}_Shorkie{,_LM,_Random_Init}_scores.tsv` (`results.eqtl_scores`); DREAM baselines under `results.mpra_eval` (Caudal/Kita) and `revision_experiments/eQTL/eQTL_MPRA_models_eval_Renganaath_etal/results` (Renganaath — a **different path**, handled in `get_mpra_base`). Reference ensemble PNGs at `viz_new/results/{exp}/combined_plots/`. The eQTL SNPs come from the released positive-variant CSVs (`{exp}_Shorkie/positive/results/*.csv`). The A/B/J–O ISM `scores.h5` were **not** on disk → regenerated here on GPU.
+**Data (under `work_root`):** per-SNP scored TSVs `revision_experiments/eQTL/viz_new/results/negset_{1..4}/{exp}_Shorkie{,_LM,_Random_Init}_scores.tsv` (`results.eqtl_scores`); DREAM baselines under `results.mpra_eval` (Caudal/Kita) and `revision_experiments/eQTL/eQTL_MPRA_models_eval_Renganaath_etal/results` (Renganaath — a **different path**, handled in `get_mpra_base`). **Panel G is scored on the 142-variant TSS subset for all six models** — Shorkie family from `viz_new/results_subset_tss/` and DREAM from the matching `eQTL_MPRA_models_eval_Renganaath_etal/results_subset_tss/` (the subset-specific DREAM run). Reference ensemble PNGs at `viz_new/results{,_subset_tss}/{exp}/combined_plots/`. The eQTL SNPs come from the released positive-variant CSVs (`{exp}_Shorkie/positive/results/*.csv`). The A/B/J–O ISM `scores.h5` were **not** on disk → regenerated here on GPU.
 
 ### Reproduction approach
 - **C/D/E/F/G/H/I (CPU)** — ported verbatim from `1_roc_pr_shorkie_fold.py` and `2_AUROC_AUPRC_by_dsitance.py` (the script's `args.root_dir` → `shorkie.config`). 6-model inner-join on `Position_Gene` per negset; ensemble mean±SEM over 4 negsets.
@@ -52,7 +56,7 @@ The headline result: ensemble **AUROC/AUPRC matches the published Figure 7E/F/G*
 
 | Block | Checks | Result |
 |---|---|---|
-| **E/F/G match published figure** | 36 (3 datasets × 6 models × {AUROC, AUPRC}) | all PASS (Caudal/Kita Δ≤0.001; Renganaath via `results_subset_tss`, max \|Δ\|=0.0074) |
+| **E/F/G match published figure** | 36 (3 datasets × 6 models × {AUROC, AUPRC}) | all PASS (Caudal/Kita Δ≤0.001; Renganaath via the uniform 6-way `results_subset_tss` join, Δ≤0.001; whole grid max \|Δ\|=0.0005) |
 | **E/F/G direction** | 18 (Shorkie > Random_Init, > LM, > best-DREAM — all 3 datasets) | all PASS (incl. Shorkie > best-DREAM on **Renganaath**, now correct) |
 | **H/I bin dominance** | 2 (Shorkie ≥ DREAM-RNN in **all** TSS-distance bins, Caudal & Kita) | all PASS (5/5 and 4/4 bins) |
 | **A/B direction + coverage** | 4 (OMA1 logSED<0, LAP3 logSED>0; ref-pred vs obs R≥0.8) | PASS (−0.220 / +0.234; R 0.965 / 0.996) |
@@ -71,7 +75,7 @@ Published Figure 7 legend (AUROC | AUPRC); reproduced values in `recheck/fig7EFG
 | DREAM-CNN | 0.529 \| 0.537 | 0.539 \| 0.567 | 0.596 \| 0.593 |
 | DREAM-RNN | 0.525 \| 0.538 | 0.533 \| 0.564 | 0.590 \| 0.596 |
 
-Caudal & Kita reproduce to 3 decimals; the whole 36-cell E/F/G grid reproduces with **max |Δ| = 0.0074**. **Shorkie is the top model on all three datasets**, including Renganaath (0.618/0.629 > every DREAM ≈0.59) — consistent with the body text.
+Caudal & Kita reproduce to 3 decimals; Renganaath (panel G) now reproduces to ±0.000–0.001 (uniform 6-way `results_subset_tss` join), so the whole 36-cell E/F/G grid reproduces with **max |Δ| = 0.0005**. **Shorkie is the top model on all three datasets**, including Renganaath (0.618/0.629 > every DREAM ≈0.59) — consistent with the body text.
 
 The **GPU ISM** reproduces the released per-SNP logSED **bit-exactly**: OMA1 (chrXI:604356 A>G) = **−0.2198** (= positive CSV −0.2198; alt reduces expr.), LAP3 (chrXIV:200328 G>A) = **+0.2344** (= CSV +0.2344; alt increases expr.) — both directions match the caption.
 
@@ -79,7 +83,7 @@ The **GPU ISM** reproduces the released per-SNP logSED **bit-exactly**: OMA1 (ch
 
 | Item | Note |
 |---|---|
-| **Renganaath (panel G) — corrected** | The published Figure 7G plots **Shorkie 0.618/0.629**, the *top* model (beating DREAM ≈0.59), consistent with the body text. The previous reproduction matched an intermediate full-set reference PNG (Shorkie 0.536/0.555) and wrongly concluded "DREAM beats Shorkie." Root cause: panel G uses the **142-variant** `viz_new/results_subset_tss/` set, not the full 395-variant `results/` set. Recompute on the subset → 0.614/0.624 (within 0.4–0.7 % of published). See `recheck/DISCREPANCIES.md`. |
+| **Renganaath (panel G) — corrected, now exact** | The published Figure 7G plots **Shorkie 0.618/0.629**, the *top* model (beating DREAM ≈0.59), consistent with the body text. The previous reproduction matched an intermediate full-set reference PNG (Shorkie 0.536/0.555) and wrongly concluded "DREAM beats Shorkie." Root cause: panel G is scored on the **142-variant** `results_subset_tss/` set, not the full 395-variant `results/` set. Final fix (pass 5) mirrors the source plotter — a **uniform 6-way inner-join on `results_subset_tss` for all six models** (DREAM from the matching subset DREAM dir) — reproducing every G line to **±0.000–0.001** with curves overlaying the published (no per-model shift). See `recheck/DISCREPANCIES.md`. |
 | **Dataset sizes** | Scored positives (post inner-join) ≈ Caudal 1712, Kita 655, Renganaath 142 (subset, = body text) / 395 (full) vs body text 1901 / 683 / 142. Differences reflect post-filter inclusion + the Position_Gene intersection. H/I per-bin Pos/Neg counts reproduce the published figure exactly. |
 | **A/B SNPs vs display windows** | The dominant-effect eQTL SNP for each gene sits just **outside** the gene-body display window (OMA1 SNP 604356; LAP3 SNP 200328) — promoter-proximal, as expected for a cis-regulatory eQTL. |
 | **J–O (6 panels)** | All six published ISM panels are reproduced (J YER080W, K YLR036C, L YKL078W, M YKR087C/OMA1, N YNL239W/LAP3, O YGR046W). Shorkie ISM REF/ALT logos are recomputed from the released ISM cache; **DREAM-RNN ISM now renders for all 6/6 loci** (K/O from the targeted `eQTL_MPRA_models_ISM_additional` run, byte-identical to the main run where they overlap); **panel N's Ref-DB motif is reverse-complemented** (CGGGTAA — its Reb1.1 site is on the (−) strand); the ISM logos show the published **grey padding bands on both sides** (Shorkie 112 bp, DREAM 110 bp); the **coverage track** is the **8-fold ensemble predicted Ref/Alt** RNA-Seq(T0) coverage (`run_cov_eqtl_jo.py`), gene-windowed and drawn as overlapping Ref(blue)+Alt(orange) bars with **x/y axis limits matching the published predicted scale**. Ref DB motif logos are embedded from the project motif DB; Avg-logSED/quantile annotations are carried from the released scoring. |

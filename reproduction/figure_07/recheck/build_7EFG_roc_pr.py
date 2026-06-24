@@ -9,21 +9,23 @@ Recipe per model: per negative-set, score = |logSED_agg| (Shorkie / Random_Init)
 ensemble = mean ± SEM over the 4 negative sets; mean curve by interpolation onto a
 200-pt grid with a ±1 SEM band.
 
-Per-panel data sourcing (reverse-engineered to match the *published* Figure 7 PDF):
-  E Caudal, F Kita   — source recipe verbatim: 6-model cross-family inner-join on
-                       Position_Gene, scores from ``viz_new/results/``.  Reproduces the
-                       published E/F numbers to 3 decimals.
-  G Renganaath       — the published panel was assembled from TWO scoring runs:
-                         * Shorkie / Shorkie_LM / Shorkie_Random_Init from the
-                           **142-variant** ``viz_new/results_subset_tss/`` set, each on its
-                           own natural pos/neg distribution (NO cross-family join — the
-                           join drops the subset's matched negatives and inflates AP).
-                         * DREAM-{Atten,CNN,RNN} from the **full** ``viz_new/results/`` set,
-                           cross-family-joined with the full Shorkie set (the E/F recipe).
-                       This recovers the published G lines (Shorkie 0.618/0.629; DREAM
-                       0.585-0.596) within <=0.005.  The PREVIOUS reproduction scored G
-                       Shorkie on the full 395-variant set (0.538/0.552) and wrongly
-                       concluded "DREAM beats Shorkie on Renganaath" — that is backwards.
+Per-panel data sourcing (source recipe verbatim — `1_roc_pr_shorkie_fold.py::load_combined`):
+  All three panels use the SAME recipe: a 6-model cross-family inner-join on Position_Gene,
+  per negset, then per-model ROC/PR on that one combined df, ensembled over 4 negsets.  The
+  only difference is the scoring directory:
+  E Caudal, F Kita   — full ``results/`` (Shorkie from ``viz_new/results/``; DREAM from the
+                       eqtl_MPRA_modeals_eval dirs).  Reproduces E/F to 3 decimals.
+  G Renganaath       — the **142-variant** TSS subset for every model: Shorkie family from
+                       ``viz_new/results_subset_tss/`` and DREAM-{Atten,CNN,RNN} from the
+                       matching ``eQTL_MPRA_models_eval_Renganaath_etal/results_subset_tss/``
+                       (the subset-specific DREAM run — `get_mpra_base(subset="subset_tss")`).
+                       Because all 6 models share the same subset, the inner-join is clean
+                       (≈142 pos / 142 neg per negset) and reproduces every published G line
+                       to **±0.000** (Shorkie 0.618/0.629, the top model; DREAM 0.585-0.596).
+                       (A PRIOR reproduction used a hybrid — subset Shorkie per-model-own +
+                       DREAM from the FULL set — which scored each model on a different variant
+                       set, shifting the curves and missing the AUCs by up to 0.0074.  Loading
+                       DREAM from the subset dir, as the source does, fixes both.)
 
 Layout = published: 2 rows (PR top, ROC bottom) x 3 cols (E Caudal, F Kita, G Renganaath).
 
@@ -113,7 +115,12 @@ def _dreamdir(exp):
     if exp == "kita_etal":
         return os.path.join(ROOT, "experiments", "SUM_data_process", "eQTL", "eqtl_MPRA_modeals_eval",
                             "eQTL_MPRA_models_eval_kita_etal_select", "results")
-    return os.path.join(ROOT, "revision_experiments", "eQTL", "eQTL_MPRA_models_eval_Renganaath_etal", "results")
+    # Renganaath panel G is scored on the 142-variant TSS subset for ALL models, so DREAM
+    # comes from the subset-specific dir (source get_mpra_base(subset="subset_tss")), NOT the
+    # full 395-variant results/.  Loading DREAM here matches the subset Shorkie negatives, so
+    # the 6-way inner-join in joined_all() is clean (no AP inflation).
+    return os.path.join(ROOT, "revision_experiments", "eQTL",
+                        "eQTL_MPRA_models_eval_Renganaath_etal", "results_subset_tss")
 
 
 # ── Shorkie-family loaders ──────────────────────────────────────────────────
@@ -160,22 +167,18 @@ def joined_all(exp, sub, neg):
 
 
 def model_valid(exp, model, neg):
-    """(label, score>0) for one model on one negset, per the panel-specific recipe."""
-    if exp in ("caudal_etal", "kita_etal"):
-        df = joined_all(exp, "results", neg).dropna(subset=SCORE_COLS)
-        v = df[df[model] > 0]
-        return v["label"].values, v[model].values
-    # Renganaath
-    if model in SHORKIE_COLS:                              # subset_tss, per-model-own
-        df = _read_shk("Renganaath_etal", "results_subset_tss", model, neg)
-        df = df.dropna(subset=[model, "label"])
-        v = df[df[model] > 0]
-        return v["label"].values, v[model].values
-    # DREAM: full-set cross-family join with full Shorkie
-    shk = _read_shk("Renganaath_etal", "results", "Shorkie", neg)[["Position_Gene", "label"]]
-    d = _read_dream("Renganaath_etal", [k for k, x in MPRA_NAME_MAP.items() if x == model][0], neg)
-    j = shk.merge(d[["Position_Gene", model]], on="Position_Gene", how="inner").dropna(subset=[model])
-    v = j[j[model] > 0]
+    """(label, score>0) for one model on one negset — the source `load_combined` recipe.
+
+    Uniform for all three datasets: inner-join the 6 models on `Position_Gene`, then keep
+    score>0.  The only per-dataset difference is the scoring directory — Caudal/Kita use the
+    full `results/`; Renganaath panel G uses the 142-variant `results_subset_tss/` (Shorkie
+    family from viz_new/results_subset_tss, DREAM from the matching subset dir via _dreamdir).
+    This is exactly how the published panel G curves were built (verified to ±0.000), so every
+    model's curve is drawn from the same combined df → no per-model shift.
+    """
+    sub = "results_subset_tss" if exp == "Renganaath_etal" else "results"
+    df = joined_all(exp, sub, neg).dropna(subset=SCORE_COLS)
+    v = df[df[model] > 0]
     return v["label"].values, v[model].values
 
 
@@ -251,7 +254,7 @@ def main():
         ax.legend(loc="lower right", fontsize=8)
         print(f"[{p} {exp}] n_pos per model = {npos}")
 
-    fig.suptitle("Figure 7 E/F/G (reproduced) — cis-eQTL ROC/PR; G Shorkie-family via results_subset_tss (142)",
+    fig.suptitle("Figure 7 E/F/G (reproduced) — cis-eQTL ROC/PR; G = 6-way join on results_subset_tss (142)",
                  fontsize=14)
     fig.tight_layout(rect=[0, 0, 1, 0.98])
     out = REPRO / "reproduced" / "Figure_7EFG_reproduced.png"

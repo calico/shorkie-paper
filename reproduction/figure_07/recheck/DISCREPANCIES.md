@@ -102,6 +102,24 @@ A fourth pass (this session) matched the remaining J-O details to the published 
   x-axis (bin window) already matched. `coverage_track` falls back to observed only if a predicted npz
   is absent. `verify_fig7JO.csv` = **24/24** (ref/alt/ISM-recomputed + DREAM-present per locus).
 
+## Refinement pass 5 (panel G curve-shape fix — uniform 6-way subset join)
+The user reported the panel-G (Renganaath) PR/ROC **curves were shifted for all six models** vs the
+published, even though the legend AUCs were close (max |Δ| = 0.0074). Root cause: the pass-3 build used a
+**hybrid** sourcing for G — Shorkie family from the 142-variant `viz_new/results_subset_tss/`
+**per-model-own** (no join), DREAM from the **full 395-variant** `…/eQTL_MPRA_models_eval_Renganaath_etal/
+results/` joined with the full Shorkie set. Each model's curve was therefore built on a **different variant
+set** → the shifts (and the residual AUC error).
+
+The source plotter `1_roc_pr_shorkie_fold.py` does **no such hybrid**: `get_mpra_base(subset="subset_tss")`
+loads DREAM from a **subset-specific** dir `…/eQTL_MPRA_models_eval_Renganaath_etal/**results_subset_tss/**`
+(which the prior reproduction never used), and `load_combined` does a **uniform 6-way inner-join on
+`Position_Gene`** so all six models share the *same* 142-variant subset. The build now mirrors this exactly:
+`_dreamdir(Renganaath)` → the subset DREAM dir; `model_valid` → one `joined_all(exp, "results_subset_tss"
+if Renganaath else "results", neg)` path for all three datasets. The inner-join is clean (≈149 pos / 149
+neg per negset — the earlier "AP inflates to ~0.99" worry came only from joining the subset Shorkie with the
+*full* DREAM dir). Result: every published G line reproduces to **±0.000–0.001**, the whole 36-cell E/F/G
+grid is **max |Δ| = 0.0005** (was 0.0074), and the curves overlay the published with no per-model shift.
+
 ---
 
 ## Per-panel findings
@@ -114,7 +132,7 @@ A fourth pass (this session) matched the remaining J-O details to the published 
 | **D** | schematic | **plot type fixed** | rendered the pos/neg-eQTL cartoon | prior showed an ECDF (wrong plot); kept ECDF as support |
 | **E** Caudal | ROC/PR | **exact (Δ≤0.001)** | transposed to published grid (cols=datasets, rows=PR/ROC) | layout transposed |
 | **F** Kita | ROC/PR | **exact (Δ≤0.001)** | same | same |
-| **G** Renganaath | ROC/PR | **fixed: 0.618/0.629** (was 0.536/0.555) | scored Shorkie-family on the 142-variant `results_subset_tss` | **wrong scoring dir** (see below) |
+| **G** Renganaath | ROC/PR | **exact: 0.618/0.629** (was 0.536/0.555) | uniform 6-way inner-join on the 142-variant `results_subset_tss` (incl. subset DREAM dir); Δ≈0.000 | **wrong scoring dir + hybrid sourcing** (see below) |
 | **H** Caudal | AUPRC/dist | **exact incl. per-bin counts** | AUPRC-only, 4 models, Pos/Neg x-labels | prior was a 2×2 AUROC+AUPRC grid |
 | **I** Kita | AUPRC/dist | **exact incl. per-bin counts** | same | same |
 | **J–O** | ISM logos | structure + Shorkie ISM exact | **6 correctly-labeled** logo stacks from cache | prior had 2 bar charts mislabeled "J-K"/"N-O" |
@@ -139,13 +157,20 @@ body-text "142 causal core-promoter variants." Recomputing Shorkie on that subse
 **ROC 0.614 / PR 0.624** (within 0.4–0.5 % of the published 0.618/0.629). Only Renganaath has
 subset dirs; Caudal/Kita correctly use the full `results/` set (and reproduce to 3 decimals).
 
-The corrected builder (`build_7EFG_roc_pr.py`) therefore sources panel G as the published panel
-was assembled: **Shorkie / Shorkie_LM / Shorkie_Random_Init from `results_subset_tss`** (each on
-its own natural pos/neg distribution — the cross-family inner join cannot be used on the subset:
-its matched negatives are not shared with the DREAM negative sets, which would inflate AP to
-~0.99 while ROC stays rank-stable), and **DREAM-Atten/CNN/RNN from the full-set cross-family
-join**. All six published G lines are recovered within **≤0.007** (`fig7EFG_auc.csv`). The whole
-36-cell E/F/G grid reproduces with **max |Δ| = 0.0074, zero cells off by >0.01**.
+The corrected builder (`build_7EFG_roc_pr.py`) sources panel G exactly as the source plotter
+`1_roc_pr_shorkie_fold.py` does (refinement pass 5): a **uniform 6-way inner-join on the
+142-variant `results_subset_tss` set for ALL six models** — Shorkie family from
+`viz_new/results_subset_tss/` and **DREAM-Atten/CNN/RNN from the matching subset DREAM dir**
+`eQTL_MPRA_models_eval_Renganaath_etal/results_subset_tss/` (`get_mpra_base(subset="subset_tss")`).
+Because every model shares the same subset, the join is clean (≈149 pos / 149 neg per negset) and
+every published G line reproduces to **±0.000–0.001** (`fig7EFG_auc.csv`). The whole 36-cell E/F/G
+grid reproduces with **max |Δ| = 0.0005, zero cells off by >0.01**.
+
+*(An interim pass-3 build used a hybrid — subset Shorkie per-model-own + DREAM from the FULL
+395-variant set — believing the subset's matched negatives weren't shared with the DREAM negsets.
+That belief was wrong: the subset-specific DREAM dir exists and its negatives DO match, so the
+uniform join is correct and exact. The hybrid scored each model on a different variant set, which
+is what shifted the G curves.)*
 
 The stale claim has been corrected in `README.md` and `reproduction/VERIFICATION_REPORT.md`.
 
@@ -153,11 +178,12 @@ The stale claim has been corrected in `README.md` and `reproduction/VERIFICATION
 
 ## Honest residuals (documented, not fabricated)
 
-1. **Renganaath ~0.4–0.7 %.** Recompute 0.614/0.624 vs published 0.618/0.629 (and the DREAM-G
-   lines ~0.003–0.006 below published). The published G panel mixes a subset-Shorkie scoring with
-   a full-set DREAM scoring (an internal assembly inconsistency not fully specified by the released
-   artifacts); the coherent recompute keeps the **ranking exact** (Shorkie > all DREAM) and matches
-   every legend number within rounding. Passed with `atol=0.01`, not gated to the stale 0.536/0.555.
+1. **Renganaath — now exact (≤0.001), no residual.** (Resolved in refinement pass 5.) Panel G
+   reproduces to **±0.000–0.001** for all six models (Shorkie 0.618/0.629, the top model; DREAM
+   0.585–0.596) via the source's uniform 6-way inner-join on the 142-variant `results_subset_tss`
+   set — including DREAM from the subset-specific DREAM dir. The earlier "~0.4–0.7 % / subset-Shorkie
+   + full-DREAM assembly inconsistency" note was an artifact of the prior hybrid sourcing and no
+   longer applies: the published panel uses a single coherent subset for every model, and we match it.
 
 2. **Dataset sizes.** Scored positives (post inner-join, neg-set 1): Caudal ≈1712, Kita ≈655,
    Renganaath 142 (subset) / 395 (full) vs body text 1901 / 683 / 142. The differences reflect
