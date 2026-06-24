@@ -1,7 +1,7 @@
 panel,gene,region,snp,ref,ref_pub,ref_ok,alt,alt_pub,alt_ok,motif,shorkie_ism_recomputed,shorkie_ism_maxabs,dream_ism_on_disk,avg_logsed_published,q_logsed_published,q_delta_published
 J,YER080W,"chrV:321,861-321,941",chrV:321901,G,G,True,T,T,True,Polyadenylation efficiency elements,True,0.01267,True,0.145,99.10%,97.62%
-K,YLR036C,"chrXII:221,336-221,416",chrXII:221376,A,A,True,G,G,True,Polyadenylation efficiency elements,True,0.01579,False,-0.269,99.92%,89.41%
+K,YLR036C,"chrXII:221,336-221,416",chrXII:221376,A,A,True,G,G,True,Polyadenylation efficiency elements,True,0.01579,True,-0.269,99.92%,89.41%
 L,YKL078W,"chrXI:288,734-288,814",chrXI:288774,G,G,True,A,A,True,PAC motif (Dot6),True,0.01044,True,0.273,99.97%,98.64%
 M,YKR087C,"chrXI:604,316-604,396",chrXI:604356,A,A,True,G,G,True,Reb1.1,True,0.01722,True,-0.271,99.95%,92.95%
-N,YNL239W,"chrXIV:200,288-200,368",chrXIV:200328,G,G,True,A,A,True,Reb1.1,True,0.01359,True,0.177,99.44%,91.44%
-O,YGR046W,"chrVII:584,643-584,723",chrVII:584683,C,C,True,G,G,True,Reb1.1,True,0.02406,False,0.163,99.72%,18.10%
+N,YNL239W,"chrXIV:200,288-200,368",chrXIV:200328,G,G,True,A,A,True,Reb1.1 (rev-comp),True,0.01359,True,0.177,99.44%,91.44%
+O,YGR046W,"chrVII:584,643-584,723",chrVII:584683,C,C,True,G,G,True,Reb1.1,True,0.02406,True,0.163,99.72%,18.10%

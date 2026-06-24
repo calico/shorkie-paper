@@ -30,8 +30,9 @@ A second pass tightened three panel groups to the published rendering exactly:
 - **J–O Shorkie ISM logos** now use the **exact source recipe** — `plot_seq_scores` semantics
   (per-position argmax-|·| base scaled by the row-sum) on the **raw** cached `pred_ism_wt/mut` over the
   80 bp window (`center±40`); the prior `(pred_ism − rowmean)×onehot` was ~0.75× scaled. A new
-  `verify_fig7JO.csv` confirms **18/18 PASS** (region, SNP, ref/alt allele, motif, ISM-recomputed for
-  all 6 loci). DREAM-RNN ISM is confirmed on disk for 4/6 loci (K, O genuinely absent).
+  `verify_fig7JO.csv` confirms PASS (region, SNP, ref/alt allele, motif, ISM-recomputed for all 6 loci).
+  DREAM-RNN ISM was confirmed on disk for 4/6 loci here (K, O appeared absent) — **corrected in pass 3:
+  all 6/6, K/O sourced from the targeted `_additional` run.**
 
 ## Refinement pass 2 (height + per-subplot limits + DREAM alignment)
 - **A/B "not scaled" (height/aspect).** Reading the published A/B at 300+ dpi: each subplot **auto-scales
@@ -52,7 +53,36 @@ A second pass tightened three panel groups to the published rendering exactly:
   (SNP at index 40), and by setting the Shorkie window to `[ci-40:ci+40)` (80 bp, SNP at index 40) so the
   two are the same width and SNP-aligned; a light-blue SNP highlight is drawn at the column. After the
   fix, Shorkie and DREAM motif peaks coincide (J 39/40, L 38/36, M 44/41, N 34/35 — within model noise,
-  no systematic offset). K & O still have no DREAM ISM on disk.
+  no systematic offset). K & O still had no DREAM ISM on disk *here* (resolved in pass 3).
+
+## Refinement pass 3 (E/F/G exact limits + J–O: K/O DREAM, N rev-comp, gene-windowed coverage)
+A third pass (this session) matched the remaining E/F/G axis scaling and completed J–O:
+- **E/F/G exact limits/scale.** Re-reading `1_roc_pr_shorkie_fold.py::plot_ensemble_roc_pr`: PR sets
+  **only** `plt.ylim(0.45,1.05)` and leaves x to autoscale; ROC sets **neither** axis. With matplotlib's
+  default 5 % data margin the published limits are therefore **PR x≈(−0.05,1.05) y(0.45,1.05)** and
+  **ROC x≈(−0.05,1.05) y≈(−0.05,1.05)** — the curves sit *inset* from the frame (the 0.0/1.0 ticks are
+  not on the spines). The prior build forced `xlim(0,1)` / ROC `(0,1)×(0,1)` + `set_box_aspect(1)`, which
+  is exactly why the scale read as "off". Fixed: drop the hard limits (autoscale + `margins(0.05)`), drop
+  `box_aspect`, and use a `(16.5,10)` grid so each cell is `5.5×5` (the source per-subplot figsize). AUCs
+  unchanged (max |Δ|=0.0074). *(This supersedes the pass-2 note that read the limits as a hard
+  `0–1`/`0.45–1.05` square — that was the prior build's forcing, not the published autoscale.)*
+- **J–O K & O DREAM-RNN ISM — now on disk (6/6).** The main `eQTL_MPRA_models_ISM/results` TSV lacks
+  K (YLR036C) and O (YGR046W), but the targeted **`eQTL_MPRA_models_ISM_additional/results`** run holds
+  all six loci — and is byte-identical to the main run where they overlap (panel N: corr 1.0, max|Δ|=0).
+  Both use the same 110 bp / SNP-at-`pos=57` convention, so `dream_logos` simply falls back to `_additional`
+  for K/O. All six panels now render DREAM-RNN ISM (REF+ALT); `verify_fig7JO.csv` = **24/24** (adds a
+  "DREAM-RNN ISM present" check per locus).
+- **Panel N reference motif — reverse-complemented.** N's Reb1.1 site is on the (−) genomic strand, so the
+  published N Ref-DB logo is **CGGGTAA** (rev-comp of the M/O `TTACCCG`), matching N's own data-derived
+  Shorkie ISM (which already reads CGGGTAA). The Ref-DB row now embeds `viz_self_motif_db/REB1.1_rc.png`
+  for N (forward `REB1.1.png` retained for M/O).
+- **J–O coverage centred on the gene.** Replaced the SNP-centred ±1024 bp track with the published zoomed
+  renderer's window — `[min(SNP,gene_start)−100, max(SNP,gene_end)+100]` snapped to the 16 bp model-bin grid
+  (`plot_coverage_track_pair_bins_w_ref_zoomed`) — with SNP / Variant / gene-start (green) / gene-end (red) /
+  ±40 bp-ISM-region (grey) markers and a `chrom:region_start-region_end bp` xlabel. R64 gene spans
+  (0-based start = GTF_start−1) reproduce the published ranges exactly (M `chrXI:603094-604456`,
+  N `chrXIV:200228-202033`, O `chrVII:584583-586152`, …). Coverage signal remains the observed RNA-seq
+  proxy (predicted Ref/Alt needs the GPU ensemble; not cached).
 
 ---
 
@@ -116,10 +146,11 @@ The stale claim has been corrected in `README.md` and `reproduction/VERIFICATION
    post-filter inclusion and the cross-family Position_Gene intersection; **142 = the subset the
    figure's panel G uses.** H/I per-bin Pos/Neg counts reproduce the published figure exactly.
 
-3. **J–O DREAM-RNN ISM: 4 of 6 loci on disk.** `ism_{ref,alt}_results.tsv` contain the SNPs for
-   J/L/M/N but **not K (YLR036C) or O (YGR046W)** — those DREAM rows are labeled "not on disk".
-   DREAM-RNN is an external baseline; its ISM is rendered from cached deltas (ref-averaged,
-   sign-negated), not re-run.
+3. **J–O DREAM-RNN ISM: all 6 of 6 loci on disk** (resolved in refinement pass 3). J/L/M/N come from
+   `eQTL_MPRA_models_ISM/results`; K (YLR036C) and O (YGR046W) — absent there — come from the targeted
+   `eQTL_MPRA_models_ISM_additional/results` run (byte-identical to the main run where they overlap).
+   DREAM-RNN is an external baseline; its ISM is rendered from cached deltas (ref-averaged, sign-negated),
+   not re-run.
 
 4. **J–O Ref DB motif logos** are embedded from the project motif DB
    (`experiments/motif_DB/…`: `REB1.1`, `PAC_motif`, `TATATA`), the authentic "Ref DB" source,
@@ -129,8 +160,10 @@ The stale claim has been corrected in `README.md` and `reproduction/VERIFICATION
    shown in J–O (−0.271 / 0.177), which is a per-track/per-gene average. The **Shorkie ISM REF/ALT
    saliency logos themselves (rows 2–3) are recomputed bit-for-bit from the released ISM cache.**
 
-5. **J–O Shorkie Coverage** track uses observed RNA-seq coverage as a faithful proxy for the
-   model's predicted-coverage track (the two correlate R>0.96 at these loci; cf. A/B).
+5. **J–O Shorkie Coverage** is now **gene-windowed** (centred on the gene, with the published
+   range/markers — refinement pass 3) but the signal is still observed RNA-seq coverage as a faithful
+   proxy for the model's predicted-coverage track (the two correlate R>0.96 at these loci; cf. A/B).
+   Predicted Ref/Alt coverage needs the 8-fold GPU ensemble and is not cached.
 
 6. **C/D are schematics** (cartoons), reproduced to match the published illustrations conceptually.
    The panel-D TSS-distance ECDF (genuine evidence the negatives are distance-matched) is retained

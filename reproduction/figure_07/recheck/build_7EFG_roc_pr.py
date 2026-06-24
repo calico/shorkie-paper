@@ -200,7 +200,10 @@ def ensemble(exp):
 
 
 def main():
-    fig, axes = plt.subplots(2, 3, figsize=(16.5, 11))
+    # Per-subplot canvas matches the published source (1_roc_pr_shorkie_fold.py uses a
+    # separate figsize=(5.5,5) figure for every PR/ROC plot). A 3x2 grid of 5.5x5 cells
+    # reproduces that aspect exactly (16.5 = 3x5.5, 10 = 2x5).
+    fig, axes = plt.subplots(2, 3, figsize=(16.5, 10))
     rows = []
     for j, exp in enumerate(EXPS):
         roc, pr, npos = ensemble(exp)
@@ -217,9 +220,12 @@ def main():
             ax.fill_between(COMMON_REC, np.clip(mp - sp, 0, 1), np.clip(mp + sp, 0, 1), alpha=0.15, color=c)
             rows.append(dict(panel=p, dataset=exp, model=col, metric="PR",
                              auc_mean=round(ma, 4), auc_sem=round(sa, 4), published=PUB_PR[exp][col]))
-        ax.set_xlim(0, 1); ax.set_ylim(0.45, 1.05)
+        # EXACT published limits (source = 1_roc_pr_shorkie_fold.py::plot_ensemble_roc_pr):
+        # PR fixes only y to (0.45,1.05); x is left to autoscale, so matplotlib's default 5%
+        # margin on the [0,1] recall data yields x ~ (-0.05,1.05). No set_box_aspect (the
+        # per-subplot 5.5x5 figsize sets the scale, reproduced via the grid cell size above).
+        ax.set_ylim(0.45, 1.05); ax.margins(x=0.05); ax.autoscale(enable=True, axis="x", tight=False)
         ax.xaxis.set_major_locator(MultipleLocator(0.2)); ax.yaxis.set_major_locator(MultipleLocator(0.1))
-        ax.set_box_aspect(1)
         ax.set_xlabel("Recall"); ax.set_ylabel("Precision")
         ax.set_title(f"{p}  PR Ensemble ({exp}, 4 neg sets)", fontsize=12)
         ax.legend(loc="upper right", fontsize=8)
@@ -236,9 +242,10 @@ def main():
             ax.fill_between(COMMON_FPR, np.clip(mt - st, 0, 1), np.clip(mt + st, 0, 1), alpha=0.15, color=c)
             rows.append(dict(panel=p, dataset=exp, model=col, metric="ROC",
                              auc_mean=round(ma, 4), auc_sem=round(sa, 4), published=PUB_ROC[exp][col]))
-        ax.set_xlim(0, 1); ax.set_ylim(0, 1)
+        # EXACT published limits: ROC sets NEITHER xlim nor ylim, so both autoscale on the
+        # [0,1] data with the default 5% margin -> (-0.05,1.05) x (-0.05,1.05). No box_aspect.
+        ax.margins(0.05); ax.autoscale(enable=True, tight=False)
         ax.xaxis.set_major_locator(MultipleLocator(0.2)); ax.yaxis.set_major_locator(MultipleLocator(0.2))
-        ax.set_box_aspect(1)
         ax.set_xlabel("FPR"); ax.set_ylabel("TPR")
         ax.set_title(f"{p}  ROC Ensemble ({exp}, 4 neg sets)", fontsize=12)
         ax.legend(loc="lower right", fontsize=8)

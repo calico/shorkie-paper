@@ -3,17 +3,22 @@
 
 Each panel stacks, top to bottom (matching the published layout):
   1. Ref DB        — the known motif logo (Reb1.1 / PAC-Dot6 / polyA efficiency element),
-                     embedded from the project motif DB (experiments/motif_DB/...).
+                     embedded from the project motif DB (experiments/motif_DB/...). Panel N's
+                     Reb1.1 site is on the (-) strand, so its Ref DB logo is the REVERSE
+                     COMPLEMENT (REB1.1_rc.png) — matching the published N (CGGGTAA).
   2. Shorkie ISM (REF) — per-base ISM saliency of the *reference* sequence, recomputed
                      from the cached 8-fold ensemble ISM (pred_ism_wt, mean-normalized x
                      ref one-hot), 80 bp around the SNP.
   3. Shorkie ISM (ALT) — same from the *alt* allele context (pred_ism_mut x alt one-hot).
   4. DREAM-RNN ISM (REF) — per-base saliency from the cached DREAM-RNN ISM TSV
-                     (ref-average of the substitution deltas). [4/6 loci on disk.]
+                     (ref-average of the substitution deltas). All 6/6 loci on disk:
+                     K (YLR036C) and O (YGR046W) come from the targeted _additional run.
   5. DREAM-RNN ISM (ALT) — same from the alt-context DREAM ISM TSV.
-  6. Shorkie Coverage — observed RNA-seq coverage over the gene neighbourhood (a faithful
-                     proxy for the model's predicted coverage track; cf. panels A/B where
-                     predicted vs observed correlate R>0.96), with the ISM window shaded.
+  6. Shorkie Coverage — gene-windowed observed RNA-seq coverage (faithful proxy for the
+                     model's predicted track; cf. A/B where predicted vs observed correlate
+                     R>0.96), centred on the gene over [min(SNP,gene_start)-100,
+                     max(SNP,gene_end)+100] with SNP / Variant / gene-start / gene-end /
+                     ISM-region markers — matching the published zoomed coverage renderer.
 
 The Shorkie ISM logos (rows 2-3) — the scientifically central, model-derived content — are
 recomputed bit-for-bit from the released ISM cache. Rows 1/4/5 are rendered from cached
@@ -51,26 +56,43 @@ RECHECK = REPRO / "recheck"
 RECHECK.mkdir(parents=True, exist_ok=True)
 
 ISM_DIR = f"{ROOT}/experiments/SUM_data_process/eQTL/eQTL_Shorkie_ISM_notebook/ism_results"
-DREAM_DIR = f"{ROOT}/experiments/SUM_data_process/eQTL/eQTL_MPRA_models_ISM/results"
+# DREAM-RNN MPRA ISM: the main run covers J/L/M/N; the targeted "_additional" run covers the
+# loci absent from the main TSV (K=YLR036C, O=YGR046W) — it is byte-identical where they overlap
+# (e.g. panel N: corr 1.0, max|Δ|=0). dream_logos() falls back to it so all 6/6 panels render.
+DREAM_DIRS = [
+    f"{ROOT}/experiments/SUM_data_process/eQTL/eQTL_MPRA_models_ISM/results",
+    f"{ROOT}/experiments/SUM_data_process/eQTL/eQTL_MPRA_models_ISM_additional/results",
+]
 MOTIF_DIR = f"{ROOT}/experiments/motif_DB"
 WIN_HALF = 40
 NT = "ACGT"
 NTI = {b: i for i, b in enumerate(NT)}
 
-# published Avg logSED + |logSED|/|Δ| quantiles (from the released scoring; annotation only)
+# Per-locus metadata. gstart/gend/strand are the R64 gene span (0-based start = GTF_start-1,
+# end = GTF_end), used to window the coverage track on the gene (cf. the published renderer
+# plot_coverage_track_pair_bins_w_ref_zoomed). N's Reb1.1 site is on the (-) genomic strand,
+# so its reference-DB motif is the REVERSE COMPLEMENT (REB1.1_rc.png) — matching the published
+# panel N (CGGGTAA) and the data-derived Shorkie ISM, which already reads CGGGTAA there.
+# avg_logSED + |logSED|/|Δ| quantiles come from the released scoring (annotation only).
 LOCI = [
-    dict(panel="J", gene="YER080W", chrom="chrV",  pos=321901, motif="Polyadenylation efficiency elements",
-         refdb="TATATA.png",     avg_logsed=0.145, q_logsed="99.10%", q_delta="97.62%"),
-    dict(panel="K", gene="YLR036C", chrom="chrXII", pos=221376, motif="Polyadenylation efficiency elements",
-         refdb="TATATA.png",     avg_logsed=-0.269, q_logsed="99.92%", q_delta="89.41%"),
-    dict(panel="L", gene="YKL078W", chrom="chrXI", pos=288774, motif="PAC motif (Dot6)",
-         refdb="PAC_motif.png",  avg_logsed=0.273, q_logsed="99.97%", q_delta="98.64%"),
-    dict(panel="M", gene="YKR087C", chrom="chrXI", pos=604356, motif="Reb1.1",
-         refdb="viz_self_motif_db/REB1.1.png", avg_logsed=-0.271, q_logsed="99.95%", q_delta="92.95%"),
-    dict(panel="N", gene="YNL239W", chrom="chrXIV", pos=200328, motif="Reb1.1",
-         refdb="viz_self_motif_db/REB1.1.png", avg_logsed=0.177, q_logsed="99.44%", q_delta="91.44%"),
-    dict(panel="O", gene="YGR046W", chrom="chrVII", pos=584683, motif="Reb1.1",
-         refdb="viz_self_motif_db/REB1.1.png", avg_logsed=0.163, q_logsed="99.72%", q_delta="18.10%"),
+    dict(panel="J", gene="YER080W", chrom="chrV",  pos=321901, gstart=319962, gend=321846, strand="+",
+         motif="Polyadenylation efficiency elements", refdb="TATATA.png",
+         avg_logsed=0.145, q_logsed="99.10%", q_delta="97.62%"),
+    dict(panel="K", gene="YLR036C", chrom="chrXII", pos=221376, gstart=221520, gend=222132, strand="-",
+         motif="Polyadenylation efficiency elements", refdb="TATATA.png",
+         avg_logsed=-0.269, q_logsed="99.92%", q_delta="89.41%"),
+    dict(panel="L", gene="YKL078W", chrom="chrXI", pos=288774, gstart=288844, gend=291052, strand="+",
+         motif="PAC motif (Dot6)", refdb="PAC_motif.png",
+         avg_logsed=0.273, q_logsed="99.97%", q_delta="98.64%"),
+    dict(panel="M", gene="YKR087C", chrom="chrXI", pos=604356, gstart=603194, gend=604232, strand="-",
+         motif="Reb1.1", refdb="viz_self_motif_db/REB1.1.png",
+         avg_logsed=-0.271, q_logsed="99.95%", q_delta="92.95%"),
+    dict(panel="N", gene="YNL239W", chrom="chrXIV", pos=200328, gstart=200568, gend=201933, strand="+",
+         motif="Reb1.1 (rev-comp)", refdb="viz_self_motif_db/REB1.1_rc.png",
+         avg_logsed=0.177, q_logsed="99.44%", q_delta="91.44%"),
+    dict(panel="O", gene="YGR046W", chrom="chrVII", pos=584683, gstart=584894, gend=586052, strand="+",
+         motif="Reb1.1", refdb="viz_self_motif_db/REB1.1.png",
+         avg_logsed=0.163, q_logsed="99.72%", q_delta="18.10%"),
 ]
 
 # Published ref>alt + 80bp window per panel (for deep-verification PASS/MISMATCH).
@@ -139,17 +161,36 @@ DREAM_LEFT_PAD = 17          # 80bp ISM core is pos[17:97); SNP at 17 + 80//2 = 
 DREAM_CORE = 80
 
 
+_DREAM_TSV_CACHE = {}
+
+
+def _dream_tsv(path):
+    if path not in _DREAM_TSV_CACHE:
+        _DREAM_TSV_CACHE[path] = pd.read_csv(path, sep="\t")
+    return _DREAM_TSV_CACHE[path]
+
+
 def dream_logos(L):
     """Exact DREAM-RNN ISM recipe (eQTL_MPRA_models_ISM/2_plot_DNA_logo.py):
     build the (110,4) delta-matrix (ref base = 0), negate it, subtract the GLOBAL mean, then form
     the ref-base-average matrix (each position's ref base = mean of its 3 substitution values).
     Crop the 80bp ISM core pos[17:97) so the SNP (pos 57) lands at index 40 — aligned to Shorkie.
-    Returns (ref_logo, alt_logo) each (80,4), or None for a locus absent from the released TSV."""
+    The locus is looked up across DREAM_DIRS (main run, then the targeted _additional run that
+    supplies K=YLR036C and O=YGR046W). Returns (ref_logo, alt_logo) each (80,4), or None if the
+    locus is in none of the released TSVs."""
     out = {}
     for which, fn in [("ref", "ism_ref_results.tsv"), ("alt", "ism_alt_results.tsv")]:
-        df = pd.read_csv(f"{DREAM_DIR}/{fn}", sep="\t")
-        sub = df[df["ChrPos"] == L["pos"]]
-        if len(sub) == 0:
+        sub = None
+        for d in DREAM_DIRS:
+            path = f"{d}/{fn}"
+            if not os.path.exists(path):
+                continue
+            s = _dream_tsv(path)
+            s = s[s["ChrPos"] == L["pos"]]
+            if len(s) > 0:
+                sub = s
+                break
+        if sub is None:
             out[which] = None
             continue
         mat = np.zeros((DREAM_SEQ_LEN, 4), dtype=float)
@@ -174,32 +215,63 @@ def dream_logos(L):
 
 
 def coverage_track(ax, L):
-    base = f"{ROOT}/seq_experiment/exp_histone__chip_exo__rna_seq_no_norm_5215_tracks/16bp"
+    """Gene-windowed coverage, matching the published renderer
+    plot_coverage_track_pair_bins_w_ref_zoomed: x-window =
+    [min(SNP, gene_start) - 100, max(SNP, gene_end) + 100] snapped to the 16 bp model-bin grid,
+    drawn on a bin-index x-axis with the SNP / Variant / gene-start (green) / gene-end (red) /
+    ±40 bp ISM-region (grey) markers and a `chrom:region_start-region_end bp` xlabel.
+    (Predicted Ref/Alt coverage needs the 8-fold GPU ensemble and is not cached, so this plots
+    the observed RNA-seq T0 track — the faithful proxy used across Fig 7 J-O; cf. panels A/B
+    where predicted vs observed coverage correlate R>0.96.)"""
     from shorkie.viz.load_cov import read_coverage
+    base = f"{ROOT}/seq_experiment/exp_histone__chip_exo__rna_seq_no_norm_5215_tracks/16bp"
     sheet = pd.read_csv(f"{base}/cleaned_sheet_RNA-Seq_T0.txt", sep="\t", index_col=0)
     files = sheet["file"].iloc[::max(1, len(sheet) // 12)].head(12).tolist()
-    half = 1024
-    g0, g1 = L["pos"] - half, L["pos"] + half
+
+    pos, gs, ge, strand = L["pos"], L["gstart"], L["gend"], L["strand"]
+    margin, bin_size, pad = 100, 16, 64
+    start = pos - 8192                              # SNP-centred 16384 bp ISM window start
+    region_start, region_end = min(pos, gs) - margin, max(pos, ge) + margin
+    plot_start_bin = (region_start - start) // bin_size - pad
+    plot_end_bin   = (region_end   - start) // bin_size - pad
+    g0 = start + (plot_start_bin + pad) * bin_size  # bin-grid-snapped genomic edges
+    g1 = start + (plot_end_bin   + pad) * bin_size
+    nb = plot_end_bin - plot_start_bin
+
     covs = []
     for f in files:
         try:
             cv = np.asarray(read_coverage(f, L["chrom"], g0, g1), dtype="float32")
-            if len(cv) == 2 * half:
+            if len(cv) == nb * bin_size:
                 covs.append(cv)
         except Exception:
             continue
-    cov = np.mean(covs, axis=0) if covs else np.zeros(2 * half)
-    # bin to 16 bp for a smoother track
-    nb = len(cov) // 16
-    cov = cov[:nb * 16].reshape(nb, 16).mean(axis=1)
-    x = np.linspace(g0, g1, nb)
-    ax.fill_between(x, 0, cov, color="#d9a066", lw=0)
-    ax.axvspan(L["pos"] - WIN_HALF, L["pos"] + WIN_HALF, color="0.6", alpha=0.3)
-    ax.axvline(L["pos"], color="black", ls=":", lw=0.7)
-    ax.set_ylim(bottom=0)
+    cov = np.mean(covs, axis=0) if covs else np.zeros(nb * bin_size)
+    cov = cov.reshape(nb, bin_size).mean(axis=1)
+    x = np.arange(plot_start_bin, plot_end_bin)
+    ymax = max(float(cov.max()), 1e-6)
+
+    center_bin = (pos - start) // bin_size - pad
+    gstart_bin = (gs - start) // bin_size - pad
+    gend_bin   = (ge - start) // bin_size - pad
+    hs = (pos - 40 - start) // bin_size - pad        # ±40 bp ISM region (6 bins, as the source)
+    he = hs + 6
+
+    ax.axvspan(hs, he, color="lightgrey", alpha=0.6, zorder=0, label="±(40bp) ISM region")
+    ax.bar(x, cov, width=1.0, color="#d9a066", alpha=0.9, lw=0, label="RNA-seq (observed)")
+    ax.scatter([center_bin], [0.05 * ymax], s=55, marker="*", color="k", zorder=5, label="SNP")
+    ax.axvline(center_bin, color="k", ls=":", lw=0.8, label=f"Variant ({pos})")
+    s_line, e_line = (gstart_bin, gend_bin) if strand == "+" else (gend_bin, gstart_bin)
+    ax.axvline(s_line, color="g", ls="--", lw=0.9, label=f"{L['gene']} start ({gs})")
+    ax.axvline(e_line, color="r", ls="-.", lw=0.9, label=f"{L['gene']} end ({ge})")
+    ax.set_xlim(plot_start_bin, plot_end_bin)
+    ax.set_ylim(0, ymax * 1.08)
     ax.set_yticks([])
-    ax.set_xticks([g0, L["pos"], g1])
-    ax.set_xticklabels([f"{g0}", f"{L['pos']}", f"{g1}"], fontsize=6)
+    ax.tick_params(axis="x", labelsize=6)
+    ax.set_xlabel(f"{L['chrom']}:{region_start}-{region_end}bp", fontsize=6)
+    loc = "upper right" if pos > ge else "upper left"
+    ax.legend(loc=loc, fontsize=4.6, frameon=True, framealpha=0.6,
+              handlelength=1.2, borderpad=0.25, labelspacing=0.25)
 
 
 def add_refdb(ax, L):
@@ -276,6 +348,8 @@ def main():
         checks.append(Check(p, f"alt allele=={r['alt_pub']} [{r['gene']}]", 1.0, 1.0 if r["alt_ok"] else 0.0, atol=0.0))
         checks.append(Check(p, f"Shorkie ISM recomputed from cache [{r['gene']}]", 0.0,
                             r["shorkie_ism_maxabs"], mode="gt"))
+        checks.append(Check(p, f"DREAM-RNN ISM present [{r['gene']}]", 1.0,
+                            1.0 if r["dream_ism_on_disk"] else 0.0, atol=0.0))
     write_verdicts(checks, RECHECK / "verify_fig7JO.csv")
     n_pass = sum(1 for c in checks if c.verdict == "PASS")
     print(f"Figure 7 J-O deep-verify: {n_pass}/{len(checks)} PASS  "
