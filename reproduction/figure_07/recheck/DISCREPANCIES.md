@@ -44,7 +44,8 @@ A second pass tightened three panel groups to the published rendering exactly:
   own observed max — independent scales, as published.
 - **E/F/G per-subplot check.** Cropped all six published subplots (300+ dpi) and confirmed each uses
   identical limits — **PR x 0–1, y 0.45–1.05; ROC x 0–1, y 0–1** (no per-subplot deviation), matching the
-  uniform limits `build_7EFG_roc_pr.py` already enforces.
+  uniform limits `build_7EFG_roc_pr.py` already enforces. *(The PR lower limit was later corrected to 0.25
+  in pass 6 — this 0.45 reading was a PDF-crop misjudgment.)*
 - **J–O DREAM-RNN ISM shift — fixed.** The DREAM MPRA ISM window is **110 bp** with `left_pad=17`,
   `right_pad=13` (`2_plot_DNA_logo.py`), so the 80 bp core is `pos[17:97)` and the **SNP is at `pos=57`**
   (verified: `orig_base@57` == the ref allele for all loci; M shows `GTTACCC`). The prior build centered
@@ -59,7 +60,8 @@ A second pass tightened three panel groups to the published rendering exactly:
 A third pass (this session) matched the remaining E/F/G axis scaling and completed J–O:
 - **E/F/G exact limits/scale.** Re-reading `1_roc_pr_shorkie_fold.py::plot_ensemble_roc_pr`: PR sets
   **only** `plt.ylim(0.45,1.05)` and leaves x to autoscale; ROC sets **neither** axis. With matplotlib's
-  default 5 % data margin the published limits are therefore **PR x≈(−0.05,1.05) y(0.45,1.05)** and
+  default 5 % data margin the published limits are therefore **PR x≈(−0.05,1.05) y(0.45,1.05)** [PR lower
+  limit corrected to **0.25** in pass 6] and
   **ROC x≈(−0.05,1.05) y≈(−0.05,1.05)** — the curves sit *inset* from the frame (the 0.0/1.0 ticks are
   not on the spines). The prior build forced `xlim(0,1)` / ROC `(0,1)×(0,1)` + `set_box_aspect(1)`, which
   is exactly why the scale read as "off". Fixed: drop the hard limits (autoscale + `margins(0.05)`), drop
@@ -119,6 +121,17 @@ if Renganaath else "results", neg)` path for all three datasets. The inner-join 
 neg per negset — the earlier "AP inflates to ~0.99" worry came only from joining the subset Shorkie with the
 *full* DREAM dir). Result: every published G line reproduces to **±0.000–0.001**, the whole 36-cell E/F/G
 grid is **max |Δ| = 0.0005** (was 0.0074), and the curves overlay the published with no per-model shift.
+
+## Refinement pass 6 (E/F/G PR y-axis lower limit 0.45 → 0.25)
+The user noted the published panel-G PR y-axis goes **down to 0.3 and below**, while the reproduction
+bottomed at 0.45. The source `1_roc_pr_shorkie_fold.py::plot_ensemble_roc_pr` sets **`plt.ylim(0.25, 1.05)`**
+for the PR ensemble — uniform for E/F/G, not 0.45. Confirmed against the original's own saved PR renders
+(`viz_new/results/caudal_etal/combined_plots/pr_ensemble_all_sets.png` and the Renganaath subset render):
+y-ticks run **0.3 → 1.0** with the axis bottoming at ~0.25 where the Random_Init curve spikes down. The
+build now uses `ax.set_ylim(0.25, 1.05)` (lowest tick 0.3, `MultipleLocator(0.1)`). This affects all three
+PR panels (E/F were equally truncated; the user noticed it on G, where Random_Init dips to ~0.3). **This
+supersedes the pass-2 / pass-3 notes below that read the PR lower limit as 0.45** — that was a misread of the
+PDF crop; the source and the published renders are 0.25. AUCs/curves unchanged (limit-only).
 
 ---
 

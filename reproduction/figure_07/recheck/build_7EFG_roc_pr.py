@@ -224,10 +224,12 @@ def main():
             rows.append(dict(panel=p, dataset=exp, model=col, metric="PR",
                              auc_mean=round(ma, 4), auc_sem=round(sa, 4), published=PUB_PR[exp][col]))
         # EXACT published limits (source = 1_roc_pr_shorkie_fold.py::plot_ensemble_roc_pr):
-        # PR fixes only y to (0.45,1.05); x is left to autoscale, so matplotlib's default 5%
+        # PR fixes y to (0.25,1.05) [source `plt.ylim(0.25, 1.05)`, uniform for E/F/G — verified
+        # against the published renders: y-ticks 0.3..1.0, axis bottoms ~0.25 where the
+        # Random_Init curve spikes down]; x is left to autoscale, so matplotlib's default 5%
         # margin on the [0,1] recall data yields x ~ (-0.05,1.05). No set_box_aspect (the
         # per-subplot 5.5x5 figsize sets the scale, reproduced via the grid cell size above).
-        ax.set_ylim(0.45, 1.05); ax.margins(x=0.05); ax.autoscale(enable=True, axis="x", tight=False)
+        ax.set_ylim(0.25, 1.05); ax.margins(x=0.05); ax.autoscale(enable=True, axis="x", tight=False)
         ax.xaxis.set_major_locator(MultipleLocator(0.2)); ax.yaxis.set_major_locator(MultipleLocator(0.1))
         ax.set_xlabel("Recall"); ax.set_ylabel("Precision")
         ax.set_title(f"{p}  PR Ensemble ({exp}, 4 neg sets)", fontsize=12)
