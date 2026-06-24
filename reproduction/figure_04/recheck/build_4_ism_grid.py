@@ -53,28 +53,21 @@ def _row(gene, panel, source, sal):
 
 
 def gather_rows():
-    """All saliency rows whose precomputed data exists, in published panel order."""
+    """All saliency rows present on disk, in published panel order — driven by the unified
+    PANELS registry (exact windows; Random-Init for A/B/C/F where it exists)."""
     rows = []
-    for spec in F.PROM:
-        gene = spec["gene"]
-        # Shorkie LM (preds.npz via per-row cache) — its window == the published window
-        lm = F.lm_saliency(spec["lm_set"], spec["lm_row"])
-        rows.append(_row(gene, spec["panel"], "Shorkie LM", lm))
-        # Shorkie ISM (fine-tuned logSED)
-        ism = F.ism_saliency("motif_shorkie_RP_TSS", spec["sub"], spec["part"], spec["idx"])
+    for spec in F.PANELS:
+        gene, panel = spec["gene"], spec["panel"]
+        if spec.get("lm"):                                   # Shorkie LM (preds.npz cache; windowed)
+            rows.append(_row(gene, panel, "Shorkie LM", F.lm_saliency(*spec["lm"], win=spec["win"])))
+        sub, part, idx = spec["ism"]                         # Shorkie ISM (fine-tuned logSED)
+        ism = F.ism_saliency(F.SHORKIE_TREE, sub, part, idx)
         if ism is not None:
-            rows.append(_row(gene, spec["panel"], "Shorkie ISM", ism))
-        # Shorkie Random_Init ISM (only the RP sub is released -> RPL26A)
-        if spec["random"]:
-            rnd = F.ism_saliency("motif_random_init_RP_TSS", "gene_exp_motif_test_RP",
-                                 spec["part"], spec["idx"])
+            rows.append(_row(gene, panel, "Shorkie ISM", ism))
+        if spec.get("random"):                               # Random-Init (scratch) ISM
+            rnd = F.ism_saliency(*spec["random"])
             if rnd is not None:
-                rows.append(_row(gene, spec["panel"], "Shorkie Random_Init ISM", rnd))
-    for spec in F.SPLICE:
-        gene = spec["gene"]
-        ism = F.ism_saliency("motif_shorkie_RP_TSS", "gene_exp_motif_test_SS", spec["part"], 0)
-        if ism is not None:
-            rows.append(_row(gene, spec["panel"], "Shorkie ISM", ism))
+                rows.append(_row(gene, panel, "Shorkie Random-Init ISM", rnd))
     return rows
 
 
@@ -95,7 +88,7 @@ def draw_row(ax, r, first_of_gene, last_of_gene):
             ha="right", va="center", fontsize=7.5)
     # compact coord + coverage, top-left inside the box
     cov = r["covered_frac"]
-    covnote = "" if cov >= 0.999 else f"   (covered {cov:.0%})"
+    covnote = "" if cov >= 0.995 else f"   (covered {cov:.0%})"
     ax.text(0.004, 0.96, f"{r['chrom']}:{ps:,}-{pe:,}{covnote}", transform=ax.transAxes,
             ha="left", va="top", fontsize=6.3, color="#555555")
     # genomic x ticks only on the last row of each gene (rows share the gene's window)

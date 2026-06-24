@@ -97,37 +97,59 @@ def t0_tracks():
 # ======================================================================================
 # Panel-gene registry
 # ======================================================================================
-# Promoter genes (A/B/C): ISM scores.h5 (tree/sub/part/idx) + LM preds (dataset/bed row).
-PROM = [
-    dict(panel="A", gene="RPL26A", sub="gene_exp_motif_test_RP",          part=4,  idx=10,
-         lm_set="RP",  lm_row=90,   random=True,  ref_tfs=["FHL1", "RAP1"]),
-    dict(panel="B", gene="FUN12",  sub="gene_exp_motif_test_RRB_targets", part=15, idx=3,
-         lm_set="TSS", lm_row=39,   random=False, ref_tfs=["ABF1", "STB3", "DOT6"]),
-    dict(panel="C", gene="KRE33",  sub="gene_exp_motif_test_RRB_targets", part=11, idx=3,
-         lm_set="TSS", lm_row=5134, random=False, ref_tfs=["RAP1", "STB3", "DOT6"]),
-]
 # display label for the Reference-DB / TF boxes (RRPE=Stb3, PAC=Dot6 per the manuscript)
 TF_DISPLAY = {"FHL1": "Fhl1", "RAP1": "Rap1", "ABF1": "Abf1",
               "STB3": "RRPE (Stb3)", "DOT6": "PAC (Dot6)"}
-# Splicing genes (E/F/G): ISM SS sub, idx 0.
+# Splicing genes used by panel D (donor/branch reconstruction from the SS ISM PWM) — left
+# as-is (panel D is out of scope). NOTE: this is *not* the ISM-logo panel registry; the
+# clean per-gene ISM logos are driven by PANELS (below).
 SPLICE = [
     dict(panel="E", gene="DTD1", part=22),
     dict(panel="F", gene="MMS2", part=57),
     dict(panel="G", gene="HOP2", part=80),
 ]
-# Exact genomic window shown in each published Figure-4 panel header (read off
-# published/Figure_4_full.png and cross-checked against the LM 450/50 TSS window for
-# A/B/C). The clean ISM grid slices each saliency logo to these windows; for FUN12 &
-# MMS2 the released ISM scores.h5 window is offset, so only the covered intersection is
-# drawn (see slice_to_window's covered_frac).
+# Exact genomic window shown in each published Figure-4 panel header (PDF titles). Every
+# row of a panel is drawn over this window. The correct on-disk ISM/Random entries (see
+# PANELS) match these windows exactly (RPL26A/FUN12/MMS2), to the base (KRE33 −1 bp), or
+# fully contain them (DTD1/HOP2 SS windows → cropped via slice_to_window).
 PUB_WIN = {
-    "RPL26A": ("chrXII", 818862, 819362),   # A — == ISM data window (full)
-    "FUN12":  ("chrI",   75977,  76477),    # B — ISM data is chrI:76,101-76,601 (~124 bp offset)
-    "KRE33":  ("chrXIV", 374871, 375371),   # C — == ISM data window (full)
-    "DTD1":   ("chrIV",  65235,  65431),    # E — within SS data window (full)
-    "MMS2":   ("chrVII", 346669, 347169),   # F — ISM data is chrVII:346,354-346,954 (partial)
-    "HOP2":   ("chrVII", 435625, 436401),   # G — within SS data window (full)
+    "RPL26A": ("chrXII", 818862, 819362),   # A — Shorkie-ISM _RP part4 idx10 (exact)
+    "FUN12":  ("chrI",   75977,  76477),    # B — Shorkie-ISM _TSS part0 idx39 (exact)
+    "KRE33":  ("chrXIV", 374871, 375371),   # C — Shorkie-ISM _RRB part11 idx3 (−1 bp)
+    "DTD1":   ("chrIV",  65235,  65431),    # E — within SS data window (full crop)
+    "MMS2":   ("chrVII", 346669, 347169),   # F — Shorkie-ISM _TSS part33 idx31 (exact; MMS2/MAD1 locus)
+    "HOP2":   ("chrVII", 435625, 436401),   # G — within SS data window (full crop)
 }
+
+# ---------------------------------------------------------------------------------------
+# PANELS — the clean per-gene ISM-logo registry (single source of truth for the saliency
+# rows). Each gene declares the exact on-disk entry for every model row it has:
+#   win    : published window (chrom, start, end) — drives every row's x-range
+#   lm     : (lm_set, lm_row) for the Shorkie-LM masked-prediction row, or None
+#   ism    : (sub, part, idx) Shorkie-ISM entry in tree motif_shorkie_RP_TSS
+#   random : (tree, sub, part, idx) Random-Init (scratch) ISM entry, or None
+# Published A,B,C,F = 3 model rows (LM+ISM+Random); E,G = ISM-only. (Boxes/TF text are
+# NOT drawn — clean logos, mirroring the original 2_modisco_DNA_logo.py --no_motif_annotation.)
+RANDOM_TREE = "motif_random_init_RP_TSS"
+PANELS = [
+    dict(panel="A", gene="RPL26A", win=PUB_WIN["RPL26A"],
+         lm=("RP", 90),   ism=("gene_exp_motif_test_RP", 4, 10),
+         random=(RANDOM_TREE, "gene_exp_motif_test_RP", 4, 10)),
+    dict(panel="B", gene="FUN12",  win=PUB_WIN["FUN12"],
+         lm=("TSS", 39),  ism=("gene_exp_motif_test_TSS", 0, 39),
+         random=(RANDOM_TREE, "gene_exp_motif_test_TSS", 0, 39)),
+    dict(panel="C", gene="KRE33",  win=PUB_WIN["KRE33"],
+         lm=("TSS", 5134), ism=("gene_exp_motif_test_RRB_targets", 11, 3),
+         random=(RANDOM_TREE, "gene_exp_motif_test_TSS_select", 0, 5)),
+    dict(panel="E", gene="DTD1",   win=PUB_WIN["DTD1"],
+         lm=None,         ism=("gene_exp_motif_test_SS", 22, 0), random=None),
+    dict(panel="F", gene="MMS2",   win=PUB_WIN["MMS2"],
+         lm=("TSS", 2175), ism=("gene_exp_motif_test_TSS", 33, 31),
+         random=(RANDOM_TREE, "gene_exp_motif_test_MMS2_panel", 0, 0)),
+    dict(panel="G", gene="HOP2",   win=PUB_WIN["HOP2"],
+         lm=None,         ism=("gene_exp_motif_test_SS", 80, 0), random=None),
+]
+SHORKIE_TREE = "motif_shorkie_RP_TSS"
 # Panel H curated TF order (figure label -> meme motif name / cached asset).
 FIG4H_TFS = [
     ("Rap1", "RAP1"), ("Fhl1", "FHL1"), ("Sfp1.1", "SFP1"), ("TATA Box", "@TATATA"),
@@ -255,20 +277,26 @@ def _lm_row_cache(lm_set, row):
     return xt, xp
 
 
-def lm_saliency(lm_set, row, up=450, dn=50):
+def lm_saliency(lm_set, row, up=450, dn=50, win=None):
     """Return (v[Lwin,4], chrom, region_start, region_end) for the LM masked-prediction
-    IC logo over a TSS-anchored window, matching 2_modisco_DNA_logo.py."""
+    IC logo, matching 2_modisco_DNA_logo.py (xp*log(xp/mean) over the full 16,384 window).
+
+    If `win=(pub_start, pub_end)` is given, the logo is sliced to that exact genomic
+    window (by coordinate within the 16,384 bp prediction). Otherwise it falls back to the
+    TSS-anchored 450up/50dn window. The explicit-window form is required for genes whose
+    published window is not the gene-midpoint 450/50 (e.g. MMS2 chrVII:346,669-347,169)."""
     x_true_row, x_pred_row = _lm_row_cache(lm_set, row)
     bed = _lm_bed(lm_set).iloc[row]
     contig, bstart, bend, strand = bed["contig"], int(bed["start"]), int(bed["end"]), bed["strand"]
     xp = x_pred_row.astype("float64") + 1e-4                    # (16384,4)
     mean_pred = xp.mean(axis=0, keepdims=True)                  # genome-window base comp
     xp = xp * np.log(xp / mean_pred)                            # IC-like transform
-    tss = (bstart + bend) // 2
-    if strand == "+":
-        rs, re_ = tss - up, tss + dn
+    if win is not None:
+        rs, re_ = int(win[1]), int(win[2])
+    elif strand == "+":
+        rs, re_ = (bstart + bend) // 2 - up, (bstart + bend) // 2 + dn
     else:
-        rs, re_ = tss - dn, tss + up
+        rs, re_ = (bstart + bend) // 2 - dn, (bstart + bend) // 2 + up
     ls, le = rs - bstart, re_ - bstart
     return xp[ls:le].astype("float32"), contig, rs, re_
 
@@ -488,3 +516,96 @@ def splice_annotations(gene):
         ann.append(("Branch point", branch))
         ann.append(("3' Splice site\n(acceptor site)", acceptor))
     return ann
+
+
+# ======================================================================================
+# Clean per-gene ISM panel renderer (PANELS-driven; no boxes/text — matches the original
+# 2_modisco_DNA_logo.py --no_motif_annotation, at the published ~33:1 per-row aspect)
+# ======================================================================================
+# Each logo row is an identical physical box (≈33:1 wide/thin, the original figsize=(100,3)
+# ratio, scaled); the gene-model track is a short row beneath. bp/inch varies per gene
+# (windows are 197/500/776 bp) — same convention as the published.
+BOX_W, BOX_H = 20.0, 0.60                 # logo row (≈33:1)
+GENE_H = 0.34                             # gene-model track
+PANEL_LEFT, PANEL_RIGHT, PANEL_TOP, PANEL_BOT = 2.6, 0.35, 0.55, 0.5
+ROW_GAP, GENE_GAP = 0.14, 0.22
+
+
+def panel_rows(spec):
+    """Return the present model rows for a gene as dicts, each saliency vector sliced to the
+    published window. Rows: Shorkie LM / Shorkie ISM / Shorkie Random-Init ISM (where on disk)."""
+    chrom, ps, pe = spec["win"]
+    out = []
+    if spec.get("lm"):
+        v, _, rs, _ = lm_saliency(*spec["lm"], win=spec["win"])
+        out.append(dict(label="Shorkie LM", v=v, x0=rs, cov=1.0, off=0, loc=localization(v)))
+    sub, part, idx = spec["ism"]
+    ism = ism_saliency(SHORKIE_TREE, sub, part, idx)
+    if ism is not None:
+        v, _, ds, _ = ism
+        vs, x0, cov = slice_to_window(v, ds, ps, pe)
+        out.append(dict(label="Shorkie ISM", v=vs, x0=x0, cov=cov, off=ds - ps, loc=localization(v)))
+    if spec.get("random"):
+        rnd = ism_saliency(*spec["random"])
+        if rnd is not None:
+            v, _, ds, _ = rnd
+            vs, x0, cov = slice_to_window(v, ds, ps, pe)
+            out.append(dict(label="Shorkie Random-Init ISM", v=vs, x0=x0, cov=cov,
+                            off=ds - ps, loc=localization(v)))
+    return out
+
+
+def render_ism_panel(spec, dpi=150):
+    """Render one clean per-gene ISM panel (stacked logo rows + gene-model track) to
+    reproduced/Figure_4{panel}_reproduced.png. No red/purple boxes, TF/splice text, TSS
+    dividers, '450/50' labels or Reference-DB insets. Returns a metrics dict."""
+    panel, gene = spec["panel"], spec["gene"]
+    chrom, ps, pe = spec["win"]
+    rows = panel_rows(spec)
+    n = len(rows)
+    fig_w = PANEL_LEFT + BOX_W + PANEL_RIGHT
+    fig_h = PANEL_TOP + n * BOX_H + (n - 1) * ROW_GAP + GENE_GAP + GENE_H + PANEL_BOT
+    fig = plt.figure(figsize=(fig_w, fig_h))
+
+    y = fig_h - PANEL_TOP
+    for r in rows:
+        y -= BOX_H
+        ax = fig.add_axes([PANEL_LEFT / fig_w, y / fig_h, BOX_W / fig_w, BOX_H / fig_h])
+        if r["v"].shape[0]:
+            draw_logo(ax, r["v"], x0=r["x0"])
+        else:
+            ax.axhline(0, color="black", lw=0.8); ax.set_ylim(-1, 1)
+        ax.set_xlim(ps, pe); ax.set_yticks([]); ax.set_xticks([])
+        for s in ("top", "right", "left"):
+            ax.spines[s].set_visible(False)
+        lbl = r["label"] + ("" if r["cov"] >= 0.995 else f"\n(covered {r['cov']:.0%})")
+        ax.text(-0.010, 0.5, lbl, transform=ax.transAxes, ha="right", va="center", fontsize=8)
+        y -= ROW_GAP
+    # gene-model track (kept — strand-aware exons/introns + gene name; not a "box/text annotation")
+    y -= (GENE_GAP - ROW_GAP) + GENE_H
+    axg = fig.add_axes([PANEL_LEFT / fig_w, y / fig_h, BOX_W / fig_w, GENE_H / fig_h])
+    draw_gene_model(axg, gene, ps, pe)
+    for s in ("top", "right", "left"):
+        axg.spines[s].set_visible(False)
+    ticks = np.linspace(ps, pe, 4)
+    axg.set_xticks(ticks); axg.set_xticklabels([f"{int(t):,}" for t in ticks], fontsize=7)
+    axg.text(-0.010, 0.5, "gene model", transform=axg.transAxes, ha="right", va="center", fontsize=8)
+    fig.text((PANEL_LEFT + BOX_W / 2) / fig_w, 1 - 0.16 / fig_h,
+             f"4{panel}  —  {gene}  ({chrom}:{ps:,}-{pe:,})", ha="center", va="top", fontsize=11)
+
+    out = RD / f"Figure_4{panel}_reproduced.png"
+    fig.savefig(out, dpi=dpi)                                  # no bbox_inches='tight' -> exact box
+    plt.close(fig)
+    by = {r["label"]: r for r in rows}
+    return dict(panel=f"4{panel}", gene=gene, chrom=chrom, win_start=ps, win_end=pe,
+                n_rows=n, has_LM=int("Shorkie LM" in by), has_ISM=int("Shorkie ISM" in by),
+                has_Random=int("Shorkie Random-Init ISM" in by),
+                ism_offset=by.get("Shorkie ISM", {}).get("off", "n/a"),
+                ism_covered=round(by.get("Shorkie ISM", {}).get("cov", float("nan")), 4),
+                random_covered=(round(by["Shorkie Random-Init ISM"]["cov"], 4)
+                                if "Shorkie Random-Init ISM" in by else "n/a"),
+                loc_LM=round(by["Shorkie LM"]["loc"], 2) if "Shorkie LM" in by else "n/a",
+                loc_ISM=round(by["Shorkie ISM"]["loc"], 2) if "Shorkie ISM" in by else "n/a",
+                loc_Random=(round(by["Shorkie Random-Init ISM"]["loc"], 2)
+                            if "Shorkie Random-Init ISM" in by else "n/a"),
+                aspect_w_over_h=round(BOX_W / BOX_H, 2), out=str(out))

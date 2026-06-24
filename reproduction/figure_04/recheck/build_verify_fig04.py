@@ -1,21 +1,21 @@
 #!/usr/bin/env python3
 """Figure 4 verification (recheck) — rebuild reproduced/verify_fig04.csv.
 
-Keeps the rigorous correctness checks of the original reproduction and adds the
-panel-completeness checks for the recheck upgrade:
-  - 6x window-overlap (each panel's ISM window covers the claimed R64 gene)
-  - 6x localization >= 5x (Shorkie ISM peak/median per-site saliency)
-  - Shorkie > Random_Init localization at panel A
-  - n TF-MoDISco patterns >= 6
-  - rows rendered for A/B/C (Shorkie LM / ISM / Random / Reference DB)  [from fig4ABC_metrics]
-  - panel-H TomTom-matched reconstruction TFs >= 8 of 12               [from fig4H pairs]
-  - panel-D donor + branch reconstruction rendered
+Validates the clean exact-window 3-model ISM panels:
+  - per panel: Shorkie-ISM window matches the published window (exact for
+    RPL26A/FUN12/MMS2, |off|<=1 for KRE33, full crop for DTD1/HOP2)
+  - per panel: Shorkie-ISM localization >= 5x (peak/median per-site saliency)
+  - 3-model panels A/B/C/F: LM + ISM + Random-Init rows all rendered, and
+    Shorkie-ISM localization > Random-Init localization
+  - panel F (MMS2) is a 3-row panel (LM+ISM+Random), not ISM-only
+  - panel H: TF-MoDISco pattern count + TomTom-matched reconstruction TFs
+  - panel D reconstruction rendered
+  - clean ISM grid: png rendered, uniform box size, all rows full-coverage, localization
 
-Reads the per-panel metric CSVs the builders wrote, recomputes the modisco count.
+Reads the per-panel metric CSVs the builders wrote.
 """
 import sys
 from pathlib import Path
-import numpy as np
 import pandas as pd
 import h5py
 
@@ -25,31 +25,43 @@ import fig4_common as F
 from compare import Check, write_verdicts, summary
 
 LOC_MIN = 5.0
+EXACT_GENES = {"RPL26A", "FUN12", "MMS2"}          # Shorkie-ISM window == published, to the base
+THREE_MODEL = {"4A", "4B", "4C", "4F"}             # published 3-row panels
+
+
+def _num(x):
+    try:
+        return float(x)
+    except (TypeError, ValueError):
+        return float("nan")
 
 
 def main():
     checks = []
-    abc = pd.read_csv(F.RECHECK / "fig4ABC_metrics.csv") if (F.RECHECK / "fig4ABC_metrics.csv").exists() else None
-    efg = pd.read_csv(F.RECHECK / "fig4EFG_metrics.csv") if (F.RECHECK / "fig4EFG_metrics.csv").exists() else None
-    h = pd.read_csv(F.RECHECK / "fig4H_tomtom_pairs.csv") if (F.RECHECK / "fig4H_tomtom_pairs.csv").exists() else None
+    frames = [F.RECHECK / "fig4ABC_metrics.csv", F.RECHECK / "fig4EFG_metrics.csv"]
+    metrics = pd.concat([pd.read_csv(p) for p in frames if p.exists()], ignore_index=True)
 
-    # ---- promoter panels A/B/C ----
-    if abc is not None:
-        for _, r in abc.iterrows():
-            p = r["panel"]
-            checks.append(Check(p, f"window_overlaps_{r['gene']}", 1.0, float(r["window_overlaps_gene"]), rtol=0, atol=0))
-            checks.append(Check(p, f"Shorkie_ISM_localization(>={LOC_MIN}x)", LOC_MIN, float(r["loc_ISM"]), mode="ge"))
-            checks.append(Check(p, "ShorkieLM_row_rendered", 1.0, 1.0 if r["loc_LM"] == r["loc_LM"] else 0.0, rtol=0, atol=0))
-        # Shorkie > Random at panel A
-        a = abc[abc["panel"] == "4A"].iloc[0]
-        if str(a["loc_Random"]) not in ("n/a", "nan"):
-            checks.append(Check("4A", "Shorkie_loc>Random_loc", float(a["loc_Random"]), float(a["loc_ISM"]), mode="gt"))
+    for _, r in metrics.iterrows():
+        p, gene = r["panel"], r["gene"]
+        # window exactness / coverage
+        if gene in EXACT_GENES:
+            checks.append(Check(p, f"ism_window_exact_{gene}(off==0)", 0.0, _num(r["ism_offset"]), atol=0))
+        elif gene == "KRE33":
+            checks.append(Check(p, f"ism_window_{gene}(|off|<=1)", 0.0, _num(r["ism_offset"]), atol=1))
+        checks.append(Check(p, f"ism_coverage_{gene}(>=0.99)", 0.99, _num(r["ism_covered"]), mode="ge"))
+        # localization
+        checks.append(Check(p, f"Shorkie_ISM_localization_{gene}(>={LOC_MIN}x)", LOC_MIN, _num(r["loc_ISM"]), mode="ge"))
+        # 3-model panels: all rows + Shorkie>Random
+        if p in THREE_MODEL:
+            checks.append(Check(p, "three_model_rows(LM+ISM+Random)", 3.0, _num(r["n_rows"]), atol=0))
+            checks.append(Check(p, "Random_Init_row_rendered", 1.0, _num(r["has_Random"]), atol=0))
+            checks.append(Check(p, "ShorkieLM_row_rendered", 1.0, _num(r["has_LM"]), atol=0))
+            checks.append(Check(p, "Shorkie_loc>Random_loc", _num(r["loc_Random"]), _num(r["loc_ISM"]), mode="gt"))
 
-    # ---- splicing panels E/F/G ----
-    if efg is not None:
-        for _, r in efg.iterrows():
-            checks.append(Check(r["panel"], f"window_overlaps_{r['gene']}", 1.0, float(r["window_overlaps_gene"]), rtol=0, atol=0))
-            checks.append(Check(r["panel"], f"splicing_ISM_localization(>={LOC_MIN}x)", LOC_MIN, float(r["localization"]), mode="ge"))
+    # panel F is now a 3-model panel (was ISM-only in the prior reproduction)
+    f_row = metrics[metrics["panel"] == "4F"]
+    if len(f_row):
+        checks.append(Check("4F", "MMS2_is_3model_panel", 3.0, _num(f_row.iloc[0]["n_rows"]), atol=0))
 
     # ---- panel H ----
     nmod = 0
@@ -58,30 +70,27 @@ def main():
             if g in f:
                 nmod += len(f[g].keys())
     checks.append(Check("4H", "n_TFMoDISco_patterns(>=6)", 6.0, float(nmod), mode="ge"))
-    if h is not None:
-        nmatch = int(h["modisco_pattern"].notna().sum())
-        checks.append(Check("4H", "panelH_TomTom_matched_TFs(>=8of12)", 8.0, float(nmatch), mode="ge"))
+    hp = F.RECHECK / "fig4H_tomtom_pairs.csv"
+    if hp.exists():
+        h = pd.read_csv(hp)
+        checks.append(Check("4H", "panelH_TomTom_matched_TFs(>=8of12)", 8.0,
+                            float(int(h["modisco_pattern"].notna().sum())), mode="ge"))
 
     # ---- panel D ----
     checks.append(Check("4D", "panelD_reconstruction_rendered", 1.0,
-                        1.0 if (F.RD / "Figure_4D_reproduced.png").exists() else 0.0, rtol=0, atol=0))
+                        1.0 if (F.RD / "Figure_4D_reproduced.png").exists() else 0.0, atol=0))
 
-    # ---- clean uniform ISM grid (build_4_ism_grid.py) ----
+    # ---- clean uniform ISM grid ----
     grid_csv = F.RECHECK / "fig4_ism_grid_metrics.csv"
     if grid_csv.exists():
         g = pd.read_csv(grid_csv)
         checks.append(Check("4grid", "ISM_grid_png_rendered", 1.0,
-                            1.0 if (F.RD / "Figure_4_ISM_grid_reproduced.png").exists() else 0.0, rtol=0, atol=0))
-        checks.append(Check("4grid", "n_saliency_logos(==10)", 10.0, float(len(g)), rtol=0, atol=0))
-        # every logo drawn at the identical physical box size (uniform scale)
+                            1.0 if (F.RD / "Figure_4_ISM_grid_reproduced.png").exists() else 0.0, atol=0))
+        # rows: A=3 B=3 C=3 E=1 F=3 G=1 = 14 (3-model promoter/MMS2 panels + ISM-only DTD1/HOP2)
+        checks.append(Check("4grid", "n_saliency_logos(==14)", 14.0, float(len(g)), atol=0))
         uniform = 1.0 if (g["box_w_in"].nunique() == 1 and g["box_h_in"].nunique() == 1) else 0.0
-        checks.append(Check("4grid", "uniform_box_size(all_equal)", 1.0, uniform, rtol=0, atol=0))
-        # exact region match: full coverage for RPL26A/KRE33/DTD1/HOP2, partial for FUN12/MMS2 ISM
-        full = g[g["gene"].isin(["RPL26A", "KRE33", "DTD1", "HOP2"])]
-        checks.append(Check("4grid", "full_coverage_genes(>=0.99)", 0.99, float(full["covered_frac"].min()), mode="ge"))
-        part = g[(g["gene"].isin(["FUN12", "MMS2"])) & (g["source"] == "Shorkie ISM")]
-        checks.append(Check("4grid", "FUN12/MMS2_ISM_partial(<=0.99)", 0.99, float(part["covered_frac"].max()), mode="le"))
-        # every ISM logo localizes (peak/median per-site saliency)
+        checks.append(Check("4grid", "uniform_box_size(all_equal)", 1.0, uniform, atol=0))
+        checks.append(Check("4grid", "all_rows_full_coverage(>=0.99)", 0.99, float(g["covered_frac"].min()), mode="ge"))
         ism = g[g["source"] == "Shorkie ISM"]
         checks.append(Check("4grid", f"all_ISM_localization(>={LOC_MIN}x)", LOC_MIN, float(ism["localization"].min()), mode="ge"))
 
@@ -89,6 +98,7 @@ def main():
     write_verdicts(checks, F.RD / "verify_fig04.csv")
     npass = sum(c.verdict == "PASS" for c in checks)
     print(f"\n{npass}/{len(checks)} checks PASS")
+    assert npass == len(checks), "some Figure-4 checks FAILED"
 
 
 if __name__ == "__main__":

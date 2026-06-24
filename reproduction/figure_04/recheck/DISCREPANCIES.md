@@ -4,59 +4,78 @@ Figure 4 = **"Shorkie uses promoter and splicing motifs learned during pretraini
 Strict per-panel recheck of `reproduction/figure_04/` against the published figure
 (`paper/Figures/Figure_4.pdf` → `published/Figure_4_full.png`).
 
-The earlier reproduction passed 14/14 *correctness* checks (coordinate-overlap +
-localization ratio) but **rendered far fewer elements than the published panels**. This
-recheck closes the substantive gaps (user-approved **focused upgrade**) and documents
-what remains irreducibly manual. All panels are CPU-reproducible from cached numeric
-data — **no GPU**. Builders live in `recheck/build_4*.py` (shared `fig4_common.py`).
+This pass makes the per-gene **ISM saliency logos match the published figure exactly**:
+the published windows, the published ~33:1 per-row aspect, and **all three model rows**
+(Shorkie LM / Shorkie ISM / Shorkie Random-Init ISM) where the published shows them. The
+logos are rendered **clean** — no red/purple TF boxes, TF/splice-site text, TSS dividers,
+"450/50 nt" labels, or Reference-DB insets — mirroring the original
+`2_modisco_DNA_logo.py --no_motif_annotation` mode (the boxes/labels in the published
+panels were a manual Illustrator overlay; the user asked for the clean logos). The
+gene-model track (strand-aware exons/introns + gene name) is kept. CPU-only except a
+single GPU ISM re-run for MMS2's Random-Init row.
 
-## What the published figure actually contains (confirmed this session)
+## What the published figure contains (confirmed)
+- **A/B/C** (RPL26A / FUN12 / KRE33) and **F** (MMS2): a 500 bp window with **three stacked
+  DNA-letter-logo rows — Shorkie LM, Shorkie ISM, Shorkie Random-Init ISM** — over a gene
+  model (the published also overlays a "Reference DB" row + curated TF boxes; those are the
+  manual annotations the user asked to drop).
+- **E** (DTD1) and **G** (HOP2): a single **Shorkie ISM** logo row + gene model (ISM-only).
+- **D**: splicing schematic + DB-vs-reconstruction. **H**: 12-TF DB-vs-reconstruction grid.
 
-- **A/B/C** (RPL26A / FUN12 / KRE33): a single **500 bp window = 450 bp upstream + 50 bp
-  downstream of the TSS** (the published "450 nt / 50 nt" split — *not* a separate zoom
-  inset), with **four stacked DNA-letter-logo rows**: **Shorkie LM**, **Shorkie ISM**,
-  **Shorkie_Random_Init ISM**, **Reference DB**, plus curated TF boxes (Fhl1/Rap1 …), a
-  strand-aware gene model, and the TSS divider.
-- **D**: splicing schematic (GUAUGU / UACUAAC / YAG) + **Database Motifs** row + **Shorkie
-  reconstruction from ISM PWM** row (donor GTATGT, branch TACTAAC).
-- **E/F/G** (DTD1 / MMS2 / HOP2): one **Shorkie ISM** logo row + gene model + dashed boxes
-  (Start Codon / 5′ donor / Branch point / 3′ acceptor / Stop Codon).
-- **H**: 12-TF two-row grid (Database Motifs over Shorkie reconstruction) for Rap1, Fhl1,
-  Sfp1.1, TATA Box, Reb1, Abf1, Tbf1.1, Cbf1, Ume6.2, Dot6p, PAC motif (Dot6), RRPE (Stb3).
+## Root-cause fix — the reproduction read the wrong scores.h5 subdirectories
+The published windows are exact; the prior reproduction picked offset/ISM-only entries. The
+exact-window data exists on disk (`results.ism_scores/.../{motif_shorkie_RP_TSS,motif_random_init_RP_TSS}`):
 
-## Per-panel: status, fix, and residuals
+| Panel | Gene | Published window | Shorkie LM | Shorkie ISM | Random-Init ISM | Prior repro bug |
+|---|---|---|---|---|---|---|
+| A | RPL26A | chrXII:818,862-819,362 | eval_RP r90 | `_RP` p4 i10 (exact) | `_RP` p4 i10 (exact) | — (was already ok) |
+| B | FUN12 | chrI:75,977-76,477 | eval_TSS r39 | `_TSS` p0 i39 (exact) | `_TSS` p0 i39 (exact) | used `_RRB` p15 i3 → **+124 bp**; claimed "no Random_Init" |
+| C | KRE33 | chrXIV:374,871-375,371 | eval_TSS r5134 | `_RRB` p11 i3 (−1 bp) | `_TSS_select` p0 i5 (exact) | claimed "no Random_Init" |
+| E | DTD1 | chrIV:65,235-65,431 | — | `_SS` p22 i0 → crop | — (ISM-only) | — |
+| F | MMS2 | chrVII:346,669-347,169 | eval_TSS r2175 → slice | `_TSS` p33 i31 (exact) | **GPU-recomputed** | used `_SS` gene-body → **57% coverage**, ISM-only |
+| G | HOP2 | chrVII:435,625-436,401 | — | `_SS` p80 i0 → crop | — (ISM-only) | — |
 
-| Panel | Published | Old reproduction | Recheck fix | Residual / root cause |
-|---|---|---|---|---|
-| **A/B/C** | 4 rows (LM/ISM/Random/RefDB) + TF boxes + gene model | 2 rows (ISM + Random) at 20″ width, no LM, no RefDB, no gene model | `build_4ABC.py`: adds **Shorkie LM** row (LM masked-prediction IC logo from cached `preds.npz`), Reference-DB row (PWM scan of the panel's published TFs) + curated TF boxes (Fhl1/Rap1; Abf1/RRPE/PAC; Rap1/RRPE/PAC), gene model, 450/50 divider; rows aligned by **genomic coordinate** | (i) B/C have **no Random_Init tree** on disk (only the RP sub exists) → row labelled, not fabricated. (ii) The LM window (TSS±450/50) and the ISM `scores.h5` window differ by ~124 bp for FUN12/KRE33 → rows aligned by genomic coordinate (RPL26A aligns exactly). (iii) The TF-box set is the published author curation, placed at their best PWM-scan position. |
-| **D** | schematic + DB + reconstruction | text print only | `build_4D.py`: schematic bar + DB consensus logos (GTATGT/TACTAAC) + **reconstruction from the SS-ISM PWM** at the actual donor/branch sites (averaged over DTD1/MMS2/HOP2, rev-comp for − strand) | No **SS-MoDISco** exists on disk → reconstruction is taken directly from the SS-ISM saliency PWM around the splice sites (documented), not a MoDISco motif. |
-| **E/F/G** | ISM + gene model + 5 dashed splice boxes | 1 ISM logo row, no gene model, no annotations | `build_4EFG.py`: ISM logo + strand-aware gene model + dashed boxes (Start/donor/branch/acceptor/Stop) from GTF intron boundaries | Branch point is placed ~30 bp upstream of the acceptor (yeast consensus) — approximate, since the exact branch A is not in the GTF. |
-| **H** | 12-TF DB-vs-reconstruction grid | vertical stack of 6 unnamed modisco logos | `build_4H.py`: 12-TF grid in published order; DB logo (IC-weighted, trimmed) over the Shorkie reconstruction = RP-MoDISco pattern matched to each TF | Matching uses TomTom (MEME 5.5.7 built from source) on the RP-MoDISco patterns; TFs unmatched by TomTom fall back to Pearson correlation with the DB motif (flagged in `fig4H_tomtom_pairs.csv`). |
+Notes:
+- **MMS2 = the MMS2/MAD1 divergent-promoter locus.** The published window chrVII:346,669-347,169
+  is the `_TSS` part33 idx31 entry (BED-labelled MAD1; MMS2 is the − strand neighbour). All
+  three MMS2 rows are drawn over this exact window; the LM row is the eval_TSS MMS2 row sliced
+  to it by coordinate (the gene-midpoint 450/50 rule gives the wrong 346,854-347,354).
+- **MMS2 Random-Init** was never in the released ISM set, so it was recomputed with the same
+  scratch checkpoint + flags the other random-init entries used
+  (`recheck/run_mms2_random_ism.sh` → `hound_ism_bed.py` on a 1-row BED at the exact window).
 
-## Numeric reproduction (unchanged correctness checks — all reproduce exactly)
-
-| Panel | gene | localization (peak/median per-site |saliency|) |
+## Per-panel: status & residuals
+| Panel | Match | Residual / root cause |
 |---|---|---|
-| 4A | RPL26A | Shorkie ISM **16.3×**  (LM 7.1×, Random 7.2× → Shorkie > Random) |
-| 4B | FUN12 | 18.2× |
-| 4C | KRE33 | 28.0× |
-| 4E | DTD1 | 15.5× |
-| 4F | MMS2 | 10.0× |
-| 4G | HOP2 | 17.5× |
+| **A RPL26A** | 3 clean rows (LM/ISM/Random) + gene model, **exact window** | — |
+| **B FUN12** | 3 clean rows, **exact window** (Random recovered from `_TSS`) | — |
+| **C KRE33** | 3 clean rows, window **−1 bp** on the Shorkie-ISM row | only an exact-window `_RRB` entry exists for the finetuned ISM (−1 bp, sub-base; aligned by genomic coordinate). LM + Random are exact. |
+| **E DTD1** | ISM-only clean row + gene model, full crop | ISM-only by design (no LM/Random in published) |
+| **F MMS2** | 3 clean rows (LM/ISM/Random) + gene model, **exact window** | Random-Init row is GPU-recomputed (not in the released set) |
+| **G HOP2** | ISM-only clean row + gene model, full crop | ISM-only by design |
 
-All six ISM windows provably overlap their R64 gene (coordinate-audited). `n` TF-MoDISco
-patterns recovered on the Shorkie RP ISM ≥ 6 (105 patterns).
+## Aspect ratio
+Each logo row is drawn at the original `2_modisco_DNA_logo.py` proportion — `figsize=(100,3)`
+≈ 33:1 wide/thin — scaled to a practical box (`fig4_common.BOX_W×BOX_H = 20×0.6 in`). bp/inch
+varies per gene (windows 197/500/776 bp), as in the published.
 
-## Tooling note (Step 0)
-`tomtom`/MEME is not in the `yeast_ml` env and the conda solver failed to install it (OOM /
-solver crash, even on a 32 GB compute node). MEME **5.5.7 was therefore built from source**
-to `~/tools/meme` (matching the DB header `MEME version 5.5.7`) and used for the panel-H /
-Reference-DB matching (`recheck/run_tomtom.py` → `recheck/tomtom_RP_matches.tsv`). The
-cached modisco `report/motifs.html` (the original pipeline's own TomTom) agrees with it and
-is used as a fallback.
+## Localization (peak/median per-site |saliency|) — Shorkie ISM vs Random-Init
+| Panel | gene | Shorkie ISM | Shorkie LM | Random-Init |
+|---|---|---|---|---|
+| 4A | RPL26A | 16.30× | 7.07× | 7.19× |
+| 4B | FUN12 | 15.63× | 4.27× | 6.19× |
+| 4C | KRE33 | 28.03× | 7.37× | 6.43× |
+| 4E | DTD1 | 15.50× | (ISM-only) | — |
+| 4F | MMS2 | 23.03× | 7.89× | 14.11× |
+| 4G | HOP2 | 17.50× | (ISM-only) | — |
+Shorkie ISM localizes more sharply than Random-Init in every 3-model panel (A/B/C/F). verify_fig04.csv = 41/41.
 
-## Irreducibly manual (documented, not reproduced pixel-for-pixel)
-The published Figure 4 is an Illustrator composite. The exact panel placement, scale bars,
-font choices, and box positions are manual layout; the recheck reproduces every **data**
-element programmatically (per-panel PNGs + a stacked `Figure_4ABC_reproduced.png`) but does
-not reconstruct the final single-canvas Illustrator composition.
+## Panels D & H (out of scope here — unchanged)
+- **D**: splicing schematic + DB consensus (GTATGT/TACTAAC) + reconstruction from the SS-ISM PWM.
+- **H**: 12-TF DB-vs-reconstruction grid (TomTom via MEME 5.5.7 built from source; cached
+  `report/motifs.html` fallback). See `fig4H_tomtom_pairs.csv`.
+
+## Irreducibly manual
+The published Figure 4 is an Illustrator composite (panel placement, the red TF/splice boxes
++ text labels, the Reference-DB insets). The recheck reproduces every **data** element as
+clean per-panel PNGs; the manual annotations are intentionally omitted per the user request.

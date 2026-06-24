@@ -7,19 +7,24 @@ Reproduction package for **main-text Figure 4**. Published reference: [`../../pa
 - **Reproduce:** [`fig04_promoter_splicing_motifs.ipynb`](../../notebooks/fig04_promoter_splicing_motifs.ipynb) delegates to the `recheck/build_4*.py` builders.
 - **Verify:** `reproduced/verify_fig04.csv` (correctness + panel-completeness checks).
 
-All panels are **CPU-reproducible** from cached numeric data (ISM `scores.h5`, LM `preds.npz`,
-modisco `.h5`, the yeast motif database); no GPU is needed to regenerate the figure.
+The ISM/LM panels are reproduced from cached numeric data (ISM `scores.h5`, LM `preds.npz`,
+modisco `.h5`, the yeast motif database); the only GPU step is a single re-run of the
+**MMS2 Random-Init** ISM (its window was never in the released set — see below).
 
-> **Deep recheck (focused upgrade).** The first reproduction passed correctness checks but
-> rendered far fewer elements than the published panels (no "Shorkie LM" row, no Reference-DB
-> overlay, no gene models/annotations, panel D was text-only, panel H was an unnamed stack).
-> The recheck under [`recheck/`](recheck/) closes these gaps: 4-row promoter logos
-> (`build_4ABC.py`), splicing schematic + DB/reconstruction (`build_4D.py`), splicing ISM +
-> gene models + splice boxes (`build_4EFG.py`), and the 12-TF database-vs-reconstruction grid
-> (`build_4H.py`, paired with TomTom — MEME 5.5.7 built from source). See
-> [`recheck/DISCREPANCIES.md`](recheck/DISCREPANCIES.md) for the per-panel status, root causes,
-> and the documented residuals (no SS-MoDISco for panel D; no Random_Init tree for B/C/E–G;
-> LM↔ISM window offset; the irreducibly-manual Illustrator composition).
+> **Exact-match ISM pass (this session).** The per-gene ISM saliency logos are made to match
+> the published figure **exactly**: the published windows, the published ~33:1 per-row aspect,
+> and **all three model rows** (Shorkie LM / Shorkie ISM / Shorkie Random-Init ISM) where the
+> published shows them (panels A/B/C/F; E/G are ISM-only). The logos are rendered **clean** —
+> the red/purple TF & splice boxes, TF/splice text, TSS dividers, "450/50 nt" labels and
+> Reference-DB insets (manual Illustrator overlays) are **removed** at the user's request,
+> mirroring the original `2_modisco_DNA_logo.py --no_motif_annotation` mode; the gene-model
+> track is kept. **Root cause of the prior mismatch:** the reproduction read the wrong
+> `scores.h5` subdirectories — FUN12 used `_RRB` (+124 bp) instead of `_TSS` (exact), MMS2 used
+> the `_SS` gene-body window (57% coverage) instead of the `_TSS` 500 bp window, and the
+> FUN12/KRE33/MMS2 Random-Init rows were wrongly believed absent (they exist in the `_TSS` /
+> `_TSS_select` subs; MMS2's was recomputed on GPU). All builders are driven by the unified
+> `fig4_common.PANELS` registry. See [`recheck/DISCREPANCIES.md`](recheck/DISCREPANCIES.md).
+> Panels **D** and **H** are unchanged (12-TF grid paired with TomTom — MEME 5.5.7 from source).
 
 ---
 
@@ -27,74 +32,94 @@ modisco `.h5`, the yeast motif database); no GPU is needed to regenerate the fig
 
 Figure 4 shows that **Shorkie's in-silico-mutagenesis (ISM) saliency** recovers (i) ribosomal-protein/RRB **promoter** motifs and (ii) canonical **splicing** signals — knowledge acquired during masked-LM pretraining. 8 panels (A–H); D is a literature schematic.
 
-| Panel | Claim | Type | Gene → ISM window (coordinate-audited) | Source script | Config key |
-|---|---|---|---|---|---|
-| **A** | promoter ISM, RPL26A (Shorkie vs Random_Init) | CPU | RP `part4 idx10` = chrXII:818862-819362 | `04_analysis/shorkie/ism_motif/motif_shorkie__RP_TSS/1_plot_dna_logo_general.py` | `results.ism_scores` |
-| **B** | promoter ISM, FUN12 | CPU | RRB `part15 idx3` = chrI:76101-76601 | same | `results.ism_scores` |
-| **C** | promoter ISM, KRE33 | CPU | RRB `part11 idx3` = chrXIV:374870-375370 | same | `results.ism_scores` |
-| **D** | canonical splicing motifs (5′ donor GTATGT / branch TACTAAC / 3′ YAG) | schem | — (literature consensus) | — | — |
-| **E** | splicing ISM, DTD1 | CPU | SS `part22 idx0` = chrIV:65191-65816 | `…/motif_shorkie__RP_TSS/4_plot_dna_SS.py` | `results.ism_scores` |
-| **F** | splicing ISM, MMS2 | CPU | SS `part57 idx0` = chrVII:346354-346954 | same | `results.ism_scores` |
-| **G** | splicing ISM, HOP2 | CPU | SS `part80 idx0` = chrVII:435573-436451 | same | `results.ism_scores` |
-| **H** | TF-MoDISco motifs on Shorkie ISM | CPU | RP modisco h5 | `…/2_modisco_analysis/4_viz_motif.py` | `results.modisco_ism` |
+Rows per panel are data-driven (`fig4_common.PANELS`): A/B/C/F = LM + ISM + Random-Init; E/G = ISM only.
+
+| Panel | Claim | Rows | Published window = exact Shorkie-ISM entry | Random-Init entry |
+|---|---|---|---|---|
+| **A** | promoter ISM, RPL26A | LM/ISM/Random | chrXII:818,862-819,362 = `_RP` part4 idx10 | `_RP` p4 i10 |
+| **B** | promoter ISM, FUN12 | LM/ISM/Random | chrI:75,977-76,477 = `_TSS` part0 idx39 | `_TSS` p0 i39 |
+| **C** | promoter ISM, KRE33 | LM/ISM/Random | chrXIV:374,871-375,371 = `_RRB` part11 idx3 (−1 bp) | `_TSS_select` p0 i5 |
+| **D** | canonical splicing motifs (donor GTATGT / branch TACTAAC / 3′ YAG) | schem | — (literature consensus) | — |
+| **E** | splicing ISM, DTD1 | ISM only | chrIV:65,235-65,431 ⊂ `_SS` part22 idx0 (crop) | — |
+| **F** | promoter+splicing ISM, MMS2/MAD1 locus | LM/ISM/Random | chrVII:346,669-347,169 = `_TSS` part33 idx31 | **GPU-recomputed** (`run_mms2_random_ism.sh`) |
+| **G** | splicing ISM, HOP2 | ISM only | chrVII:435,625-436,401 ⊂ `_SS` part80 idx0 (crop) | — |
+| **H** | TF-MoDISco motifs on Shorkie ISM | grid | RP modisco h5 | — |
+
+Source: the ISM/LM saliency recipe of `04_analysis/shorkie/ism_motif/motif_shorkie__RP_TSS/`
++ `…/shorkie_lm/motif_analysis/motif_lm__RP_TSS/2_modisco_DNA_logo.py`, unified in
+`recheck/fig4_common.py`. ISM tree `motif_shorkie_RP_TSS` (`results.ism_scores`); Random-Init
+tree `motif_random_init_RP_TSS`; LM preds `motif_LM_RP_TSS/.../eval_{RP,TSS}`.
 
 **ISM saliency** = per-base `logSED` averaged over the **384 T0 RNA-seq tracks** (`track_offset=1148` into the 3053-track RNA-seq subset), mean-centered across the 4 bases, then projected onto the reference one-hot — the per-position attribution rendered as a logomaker logo. The **Shorkie** ISM lives in the `motif_shorkie_RP_TSS` tree; the **Shorkie_Random_Init** ISM in the parallel `motif_random_init_RP_TSS` tree. Reuses `shorkie.helpers.yeast_helpers.make_seq_1hot`; helper logic from the Shorkie ISM analysis (`motif_shorkie__RP_TSS`).
 
 ### Config fix applied this phase
 `results.ism_scores` and `results.modisco_ism` were corrected (in `config/paths.example.yaml`) to resolve to the real on-disk trees under `${experiments_root}/SUM_data_process/motifs` (the previous `motif_LM_fine_tuned_RP_TSS` value pointed at an empty path — the root cause of the earlier un-executed ISM reproduction).
 
-### Coordinate audit (the careful-verification upgrade)
-The gene → `(tree, sub, part, idx)` mapping was **not trusted as hardcoded**. Each of the 6 panel genes (RPL26A, FUN12, KRE33, DTD1, MMS2, HOP2) was resolved symbol → ORF → R64 coordinates from the released GTF (`genome.gtf`), then **every** `scores.h5` window in the RP / RRB / SS subs was enumerated (lazy read of `chr/start/end`) and matched by overlap. The result **confirmed the existing map is correct** (table above), resolving an earlier disagreement between two discovery passes over whether DTD1/MMS2/HOP2 were present in the SS set — they are, at parts 22/57/80. The audit is re-run inside the notebook (`win_overlaps_gene`) and asserted in Phase 3.
+### Window audit (exact-match)
+Every model row is driven by `fig4_common.PANELS` and its window verified against the published PDF
+title by reading the on-disk `scores.h5` `chr/start/end`: RPL26A / FUN12 / MMS2 Shorkie-ISM windows
+match **to the base** (offset 0); KRE33 is **−1 bp** (the only exact-window finetuned entry; sub-base,
+aligned by genomic coordinate); DTD1 / HOP2 published windows sit fully inside the larger `_SS` windows
+(cropped, 100% coverage). The LM and Random-Init windows match exactly for every 3-model panel.
 
 ---
 
 ## Phase 3 — Verification
 
-**`reproduced/verify_fig04.csv`: 25/25 PASS.** Figure 4 is qualitative (saliency maps + motif logos), so each panel is verified two ways (the deep recheck added the panel-completeness checks — "Shorkie LM row rendered" for A/B/C, panel-H TomTom-matched-TF count, panel-D reconstruction rendered; the last 6 checks cover the [clean uniform ISM grid](#clean-uniform-ism-grid-build_4_ism_gridpy) — 10 logos, uniform box size, region coverage, localization):
+**`reproduced/verify_fig04.csv`: 41/41 PASS.** Per-panel checks confirm the exact windows, the three
+model rows (where the published shows them), and the sharply-localized Shorkie signal:
 
-1. **Coordinate-overlap (correctness):** every panel's ISM window provably overlaps its R64 gene — 6/6 PASS. This is the strong check: it proves the reproduced panel shows the *claimed* gene.
-2. **Localized ISM signal (scale-invariant):** the Shorkie saliency peak exceeds **5× the window median** per-site saliency (a concentrated motif, not diffuse noise). Measured localization ratios:
+1. **Window match:** Shorkie-ISM offset 0 for RPL26A/FUN12/MMS2, |Δ|≤1 for KRE33, full coverage (≥0.99)
+   for all six. PASS.
+2. **Three model rows:** A/B/C/F each render Shorkie LM + Shorkie ISM + Shorkie Random-Init (E/G are
+   ISM-only by design); MMS2 (F) is confirmed a 3-model panel. PASS.
+3. **Localized ISM signal & Shorkie > Random-Init** (peak/median per-site |saliency|):
 
-| Panel | gene | max\|saliency\| | localization (peak/median) | verdict |
-|---|---|---|---|---|
-| 4A | RPL26A | 0.028 | **16.3×** | PASS |
-| 4B | FUN12 | 0.004 | **18.2×** | PASS |
-| 4C | KRE33 | 0.008 | **28.0×** | PASS |
-| 4E | DTD1 | 0.038 | **15.5×** | PASS |
-| 4F | MMS2 | 0.033 | **10.0×** | PASS |
-| 4G | HOP2 | 0.004 | **17.5×** | PASS |
+| Panel | gene | Shorkie ISM | Shorkie LM | Random-Init | Shorkie>Random |
+|---|---|---|---|---|---|
+| 4A | RPL26A | **16.3×** | 7.1× | 7.2× | ✓ |
+| 4B | FUN12 | **15.6×** | 4.3× | 6.2× | ✓ |
+| 4C | KRE33 | **28.0×** | 7.4× | 6.4× | ✓ |
+| 4E | DTD1 | **15.5×** | — | — | (ISM-only) |
+| 4F | MMS2 | **23.0×** | 7.9× | 14.1× | ✓ |
+| 4G | HOP2 | **17.5×** | — | — | (ISM-only) |
 
-3. **Shorkie > Random_Init:** at panel A (the only locus present in both trees), Shorkie localization **16.3× > 7.19×** Random_Init — Shorkie concentrates attribution; the from-scratch model is diffuse. PASS.
-4. **4H:** **105** TF-MoDISco patterns recovered (≥6). PASS.
+4. **4H:** 105 TF-MoDISco patterns (≥6); 12/12 reconstruction TFs TomTom-matched. PASS.
+5. **Clean ISM grid:** 14 logos, uniform box, all rows ≥0.99 coverage, all ISM localization ≥5×. PASS.
 
-### Discrepancy log (honest)
-| Item | Note |
+### Resolved residuals (vs the prior reproduction)
+| Item | Resolution |
 |---|---|
-| Earlier 3 FAILs (4B/4C/4G, signal = 0.0) | **Two causes, both resolved.** (i) 4B/4C were a *stale-execution* artifact — the RRB `scores.h5` parts were written after the first notebook run, so `ism_viz` returned `None` (file-not-found → 0.0). Re-execution populates them. (ii) 4G HOP2's failure was **not** stale: its absolute `max|saliency|` (0.004) is genuinely low, so the old `>0.01` absolute threshold rejected it. Replacing that fragile threshold with the **localization ratio** (17.5×, the *highest* of all panels — a razor-sharp splice-site peak above near-zero background) is the correct, scale-invariant signal check. |
-| Random_Init rows for 4B/4C/4E–G | The `motif_random_init_RP_TSS` tree only contains the **RP** sub on disk — it has no RRB or SS windows. So Shorkie-vs-Random_Init can only be compared at the RP locus (panel A); the FUN12/KRE33/DTD1/MMS2/HOP2 Random_Init rows are labelled "sub not in this tree" rather than fabricated. |
-| HOP2 absolute signal | Low (0.004) but **sharply localized** — the figure's claim (Shorkie maps the splice donor) holds; the magnitude is simply smaller than DTD1/MMS2. |
+| FUN12 window +124 bp | wrong sub — switched `_RRB` p15 i3 → **`_TSS` p0 i39** (exact). |
+| MMS2 "57% coverage" / ISM-only | MMS2 panel F is a 3-model promoter-style panel at the **MMS2/MAD1 locus**; switched `_SS` gene-body → **`_TSS` p33 i31** (exact); LM row sliced to the exact window; Random-Init **recomputed on GPU**. |
+| "no Random_Init for B/C" | wrong — Random-Init exists in the `_TSS`/`_TSS_select` subs (FUN12 i39, KRE33 i5). Recovered. |
+| red boxes / TF & splice text / TSS divider / 450-50 labels / Reference-DB insets | **removed** at user request — clean logos (the original `--no_motif_annotation` product); gene-model track kept. |
 
-**Changes to legacy scripts:** none edited. The verification helper `reproduction/common/compare.py` gained a backward-compatible `mode` field (`ge`/`gt`/`le`) so threshold checks (localization ≥ 5×, motif count ≥ 6) read cleanly; existing figures are unaffected.
+**Changes to legacy scripts:** none edited. The reproduction builders were refactored to the
+`fig4_common.PANELS` registry + the shared clean `render_ism_panel`; `compare.py`'s `mode` field is reused.
 
 ---
 
 ## Scripts & regeneration
 
 All builders live in [`recheck/`](recheck/) and import shared recipes from `fig4_common.py`
-(ISM/LM saliency, DB-motif IC logos, gene models) and the TF pairings from `match_tfs.py`. They are
-CPU-only and resolve every path through `shorkie.config` — no hardcoded machine paths. Build order:
+(`PANELS` registry, ISM/LM saliency, the clean `render_ism_panel`, DB-motif IC logos, gene models)
+and the TF pairings from `match_tfs.py`. They resolve every path through `shorkie.config` — no
+hardcoded machine paths. Build order:
 
-1. `run_tomtom.py` *(optional — needs the MEME `tomtom` binary on `PATH` or via the `tools.tomtom_bin`
-   config key)* — regenerates `tomtom_RP_matches.tsv` (MoDISco pattern → yeast-TF matches). **Already
-   committed**, so the rest runs without MEME installed.
-2. `build_4ABC.py`, `build_4D.py`, `build_4EFG.py`, `build_4H.py` — render the panel PNGs into
-   `reproduced/` and write the per-panel metric CSVs.
-3. `build_4_ism_grid.py` — the clean uniform ISM grid (see below) → `Figure_4_ISM_grid_reproduced.png`
-   + `fig4_ism_grid_metrics.csv`.
+0. `run_mms2_random_ism.sh` *(GPU, one-time)* — recomputes the MMS2 Random-Init ISM on the exact
+   published window (`hound_ism_bed.py` + the scratch checkpoint + a 1-row BED). Writes
+   `…/motif_random_init_RP_TSS/gene_exp_motif_test_MMS2_panel/f0c0/part0/scores.h5`. The result is
+   loaded like any other on-disk entry; the rest of the build is CPU-only.
+1. `run_tomtom.py` *(optional — needs MEME `tomtom`; `tomtom_RP_matches.tsv` is committed)*.
+2. `build_4ABC.py`, `build_4EFG.py` — clean per-gene ISM panels (LM/ISM/Random rows + gene-model
+   track, exact windows, ~33:1 aspect, no boxes/text) via `F.render_ism_panel`. `build_4D.py`,
+   `build_4H.py` — panels D/H (unchanged).
+3. `build_4_ism_grid.py` — the clean uniform ISM grid (see below) → `Figure_4_ISM_grid_reproduced.png`.
 4. `build_verify_fig04.py` — recomputes the checks → `reproduced/verify_fig04.csv`.
 5. `make_sidebyside_fig04.py` — published-vs-reproduced comparison PNGs (verification aid).
 
-The notebook [`fig04_promoter_splicing_motifs.ipynb`](../../notebooks/fig04_promoter_splicing_motifs.ipynb) simply invokes builders 2–3 in order.
+The notebook [`fig04_promoter_splicing_motifs.ipynb`](../../notebooks/fig04_promoter_splicing_motifs.ipynb) invokes builders 2–4 in order (after the one-time GPU step 0).
 
 **Committed vs regenerable.** Committed: the builders + `fig4_common.py` / `match_tfs.py`, the reproduced
 PNGs, `verify_fig04.csv`, and `tomtom_RP_matches.tsv` (so panel H reproduces without MEME). Gitignored
@@ -122,14 +147,13 @@ GPU**. Three rules:
 
 | Panel | Gene | Published window | Rows rendered | ISM coverage |
 |---|---|---|---|---|
-| A | RPL26A | chrXII:818,862-819,362 | LM · ISM · Random_Init | 100% |
-| B | FUN12 | chrI:75,977-76,477 | LM · ISM | **75%** (ISM data is chrI:76,101-76,601, ~124 bp offset) |
-| C | KRE33 | chrXIV:374,871-375,371 | LM · ISM | ~100% |
-| E | DTD1 | chrIV:65,235-65,431 | ISM | 100% |
-| F | MMS2 | chrVII:346,669-347,169 | ISM | **57%** (ISM data is chrVII:346,354-346,954) |
-| G | HOP2 | chrVII:435,625-436,401 | ISM | 100% |
+| A | RPL26A | chrXII:818,862-819,362 | LM · ISM · Random-Init | 100% |
+| B | FUN12 | chrI:75,977-76,477 | LM · ISM · Random-Init | 100% (`_TSS` idx39) |
+| C | KRE33 | chrXIV:374,871-375,371 | LM · ISM · Random-Init | ~100% (`_RRB` idx3, −1 bp) |
+| E | DTD1 | chrIV:65,235-65,431 | ISM | 100% (crop of `_SS`) |
+| F | MMS2 | chrVII:346,669-347,169 | LM · ISM · Random-Init | 100% (`_TSS` idx31; Random GPU-recomputed) |
+| G | HOP2 | chrVII:435,625-436,401 | ISM | 100% (crop of `_SS`) |
 
-> **Residual (not fabricated).** The published B/C panels show a Random_Init row and the published F panel
-> shows LM + Random_Init rows, but those came from data not in the released registry (`motif_random_init_RP_TSS`
-> has only the **RP** sub; LM `preds.npz` has no `eval_SS`). The grid plots only the saliency rows whose
-> data is actually on disk, so FUN12/KRE33 show LM+ISM and the splice genes show ISM only.
+> **14 logos total** (A/B/C/F = 3 model rows each; E/G = ISM only). Every row is full-coverage
+> after the sub-fix. The only re-run is MMS2's Random-Init row (GPU); all other rows are
+> precomputed (`scores.h5` / `preds.npz` caches).
