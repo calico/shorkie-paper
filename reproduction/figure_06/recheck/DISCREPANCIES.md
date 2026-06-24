@@ -3,9 +3,10 @@
 Figure 6 = *"Shorkie predicts promoter variant effects validated by MPRAs"* (Random-Promoter
 DREAM Challenge MPRA, Rafi et al. 2024; 71,103 test sequences; baseline = **DREAM-RNN**).
 
-This recheck reproduced **every panel A–I exactly from cached data (no GPU)** and found that the
+This recheck reproduced the **data panels B–I exactly from cached data (no GPU)** and found that the
 previous reproduction (which reported "7/7 PASS") was **substantially incomplete and partly
-mislabeled**. All issues below are now fixed; the reproduced Pearson/Spearman match the values
+mislabeled**. (Panel **A** is a methods schematic — the MPRA insertion cartoon — with no data, and is
+intentionally not reproduced; see the 2026-06-23 pass below.) All issues below are now fixed; the reproduced Pearson/Spearman match the values
 printed on the published figure to **|Δ| ≤ 0.001** for all of D–I (both models).
 
 ## Reproduced vs published (printed values; Pearson, Spearman)
@@ -113,3 +114,18 @@ still 26/26):
   adopt the published panel header (`"Rafi et al. {Name} Sequences\n({single|dual}-sequence)"`;
   `"RNA-Seq Coverage Prediction (held-out test set)"`), add the bold panel letter, and use the source
   font sizes. Markers/colors/regression/grid/labels were already source-exact.
+
+## Panel cleanup + B/C geometry (2026-06-23)
+- **Removed panel 6A.** It is a non-data methods schematic (the MPRA insertion cartoon, 100–200 bp
+  upstream, 10-bp steps); the reproduced version was a hand-drawn matplotlib approximation that added no
+  reproducibility value. The `build_6a()` builder, its outputs (`reproduced/Figure_6A_schematic.png`,
+  `published/Figure_6_6A.png`, `recheck/panel_6A_sidebyside.png`), and all 6A references were removed.
+  The reproduction now covers the data panels **B–I**; verification stays **26/26** (6A had no checks).
+- **6B/6C panel size/ratio matched to the published figure.** The published B/C panels have a **content
+  aspect ratio of ~1.93** (measured from a 300-dpi render of `Figure_6.pdf`: panel B 3174×1669 → 1.90,
+  panel C 3278×1669 → 1.96; identical heights). The reproduced panels were `figsize=(8, 3.7)` (ratio
+  2.16) and — more importantly — saved with `bbox_inches="tight"`, which recrops to content so the saved
+  PNG ratio was not even deterministic. Fix: `figsize=(8, 8/1.93)` and **drop `bbox_inches="tight"`** (keep
+  `fig.tight_layout()`), so the full fixed canvas is saved and the PNG aspect ratio equals the figsize
+  ratio (1.93) exactly. The side-by-side published crop boxes for 6B/6C were also refined to tightly bound
+  each panel (old box cut the x-label and added top slack). Numbers unchanged.

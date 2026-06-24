@@ -10,7 +10,10 @@ Reproduction package for **main-text Figure 6**. Published reference:
 - **Verify:** `reproduced/verify_fig06.csv` — **26/26 PASS** against the values printed on the
   published figure (both the Shorkie and DREAM-RNN subpanels of D–I).
 
-> **Deep recheck (2026-06-22):** the whole figure is reproduced **exactly from cached data — no
+> **Panel 6A is intentionally not reproduced** — it is a methods schematic (the MPRA insertion cartoon,
+> 100–200 bp upstream) carrying no data; the reproduction covers the data panels **B–I**.
+
+> **Deep recheck (2026-06-22):** panels **B–I** are reproduced **exactly from cached data — no
 > GPU**. Reading the published PDF panel-by-panel revealed the earlier reproduction was incomplete:
 > every panel D–I is a **two-scatter composite** (Shorkie blue **+** DREAM-RNN green), panel E is
 > **Random** (not "challenging"), and panels D–H use the **180 bp** insertion context. With those
@@ -22,6 +25,12 @@ Reproduction package for **main-text Figure 6**. Published reference:
 > a single `tab20`, three quantile aggregates with **STD** error bars in dark-green/dark-red/black, 3-col
 > legend, two-line title) as **separate** `Figure_6B.png`/`Figure_6C.png`; D–I drop the `(reproduced)`
 > prefix and carry the published panel header + bold panel letter + source font sizes. Numbers unchanged.
+
+> **Panel cleanup + B/C geometry (2026-06-23):** the methods-schematic panel **6A** was removed (no data).
+> Panels **6B/6C** now match the published panel aspect ratio — `figsize=(8, 8/1.93)` (ratio **1.93**,
+> measured from the 300-dpi published render) and saved **without** `bbox_inches="tight"` so the PNG ratio
+> equals the figsize ratio deterministically (previously `(8, 3.7)` + tight crop → stretched ~2.16). Numbers
+> unchanged (still 26/26).
 
 ---
 
@@ -35,7 +44,6 @@ SNV, motif-perturbation, motif-tiling); baseline comparator = **DREAM-RNN**.
 
 | Panel | Claim | Shorkie (pub→repro) | DREAM-RNN (pub→repro) | Source script |
 |---|---|---|---|---|
-| **6A** | MPRA insertion schematic (100–200 bp, 10-bp steps) | schematic | — | programmatic |
 | **6B** | AUROC, high- vs low-expr across insertion sites (3 quantiles) | >0.95 → **0.995** | — | `4_mpra_high_low_seq/5_MPRA_classifier_avg.py` |
 | **6C** | AUPRC, same | >0.95 → **0.996** | — | same |
 | **6D** | Yeast (single) | 0.695 → **0.695** | 0.891 → **0.891** | `5_mpra_viz/MPRA_scatter_regression_single.py` + `MPRA_ref_model_viz_single_index.py` |
@@ -62,7 +70,7 @@ Panel I is a gaussian-kde 2D density of log2(prediction+1) vs log2(Mean T0 RNA-S
 | `build_panels_DE.py` | 6D Yeast, 6E Random (Shorkie + DREAM) | `reproduced/Figure_6{D,E}.png`, `recheck/fig6_DEFGH_R.csv` |
 | `build_panels_FGH.py` | 6F SNV, 6G motif-pert, 6H motif-tiling (Shorkie + DREAM) | `reproduced/Figure_6{F,G,H}.png` |
 | `build_panel_I.py` | 6I RNA-seq coverage density (Shorkie + DREAM) | `reproduced/Figure_6I.png`, `recheck/fig6_I_R.csv` |
-| `build_panels_BC.py` | 6B/6C AUROC/AUPRC trends + 6A schematic | `reproduced/Figure_6B.png`, `reproduced/Figure_6C.png`, `reproduced/Figure_6A_schematic.png` |
+| `build_panels_BC.py` | 6B/6C AUROC/AUPRC trends | `reproduced/Figure_6B.png`, `reproduced/Figure_6C.png` |
 | `build_verify_fig06.py` | 26-check verification vs published figure | `reproduced/verify_fig06.csv` |
 | `make_sidebyside_fig06.py` | published-vs-reproduced crops + montage | `recheck/panel_*_sidebyside.png` |
 

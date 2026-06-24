@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Figure 6 panels B/C (AUROC/AUPRC of high- vs low-expression sequences across
-insertion sites) and the 6A insertion schematic.
+insertion sites).
 
 For each of the 18 reporter genes (6 per expression quantile: 5-25 / 25-75 / 75-95),
 Shorkie's per-sequence logSED classifies high- vs low-expression library sequences at
@@ -9,8 +9,12 @@ per-gene dashed lines with 'o' markers plus the three quantile aggregates (mean 
 fmt='o-'), faithful to 3_MPRA_classifier_merge.py::plot_combined_trend_quantiles. The
 quantile aggregates stay > 0.95 across all sites (individual genes dip at 100 bp).
 
-Outputs reproduced/Figure_6B.png, reproduced/Figure_6C.png,
-reproduced/Figure_6A_schematic.png, and recheck/fig6_BC.csv (mean AUROC/AUPRC).
+The panel figsize matches the published B/C content aspect ratio (~1.93, i.e. 8 x 8/1.93);
+bbox_inches="tight" is intentionally NOT used so the saved PNG aspect ratio equals the
+figsize ratio deterministically (tight_layout fits the title/legend within the canvas).
+
+Outputs reproduced/Figure_6B.png, reproduced/Figure_6C.png, and recheck/fig6_BC.csv
+(mean AUROC/AUPRC).
 """
 import sys
 import csv
@@ -60,7 +64,8 @@ def build_metric(metrics, mi, name, panel, letter):
     with 'o' markers (single tab20 over 18 genes), and three quantile aggregates with
     STD error bars (fmt='o-', ms=8, capsize=5) in dark-green/dark-red/black."""
     cmap = matplotlib.colormaps["tab20"].resampled(18)
-    fig, ax = plt.subplots(figsize=(8, 3.7))
+    # figsize aspect 8 / (8/1.93) = 1.93 matches the published B/C panel content ratio.
+    fig, ax = plt.subplots(figsize=(8, 8 / 1.93))
     handles, labels = [], []
     ci = 0
     for grp, genes in QUANTILES.items():
@@ -94,7 +99,8 @@ def build_metric(metrics, mi, name, panel, letter):
                 fontsize=20, fontweight="bold", va="top", ha="left")
     fig.tight_layout()
     out = REPRO / f"Figure_{panel}.png"
-    fig.savefig(out, dpi=200, bbox_inches="tight")
+    # No bbox_inches="tight": save the full fixed canvas so the PNG aspect ratio == figsize ratio (1.93).
+    fig.savefig(out, dpi=200)
     plt.close(fig)
     return out
 
@@ -105,37 +111,6 @@ def build_bc(metrics):
     return b, c
 
 
-def build_6a():
-    fig, ax = plt.subplots(figsize=(11, 3))
-    # gene/TSS at right
-    ax.add_patch(plt.Rectangle((330, 0.30), 70, 0.30, color="#1f5fb4"))
-    ax.text(365, 0.45, ">  >  >", ha="center", va="center", fontsize=10, color="white")
-    ax.text(420, 0.45, "TSS", ha="left", va="center", fontsize=10)
-    # inserted-sequence bars (a couple, faded) + insertion triangles 100..200
-    ax.add_patch(plt.Rectangle((40, 0.78), 260, 0.06, color="#86c172", alpha=0.7))
-    ax.add_patch(plt.Rectangle((60, 0.70), 260, 0.06, color="#9aa0a6", alpha=0.7))
-    ax.add_patch(plt.Rectangle((150, 0.62), 230, 0.06, color="#7aa6c2", alpha=0.7))
-    ax.text(305, 0.90, "...", fontsize=12)
-    cmap = matplotlib.colormaps["turbo"].resampled(11)
-    for i, d in enumerate(range(200, 99, -10)):
-        x = 330 - d
-        ax.plot(x, 0.50, marker="^", ms=12, color=cmap(i), mec="black", mew=0.4)
-        if d in (200, 180, 160, 140, 120, 100):
-            ax.text(x, 0.36, f"{d}bp", ha="center", fontsize=8)
-    # legend
-    ax.plot(360, 0.95, marker="^", ms=10, color="#1f5fb4")
-    ax.text(372, 0.95, "Inserted position", fontsize=8, va="center")
-    ax.add_patch(plt.Rectangle((352, 0.84), 16, 0.05, color="#7aa6c2"))
-    ax.text(372, 0.865, "Inserted sequence", fontsize=8, va="center")
-    ax.set_xlim(110, 470); ax.set_ylim(0.25, 1.02); ax.axis("off")
-    ax.set_title("Figure 6A (reproduced) — MPRA insertion schematic (100-200 bp upstream, 10-bp steps)", fontsize=10)
-    fig.tight_layout()
-    out = REPRO / "Figure_6A_schematic.png"
-    fig.savefig(out, dpi=140, bbox_inches="tight")
-    plt.close(fig)
-    return out
-
-
 def main():
     metrics = {g: gene_site_metrics(g) for grp in QUANTILES.values() for g in grp}
     metrics = {g: m for g, m in metrics.items() if m}
@@ -144,10 +119,8 @@ def main():
     mean_auroc, mean_auprc = float(np.mean(all_auroc)), float(np.mean(all_auprc))
     min_auroc, min_auprc = float(np.min(all_auroc)), float(np.min(all_auprc))
     b, c = build_bc(metrics)
-    a = build_6a()
     print(f"[6B/6C] genes={len(metrics)}  mean AUROC={mean_auroc:.4f} (min {min_auroc:.3f})  "
           f"mean AUPRC={mean_auprc:.4f} (min {min_auprc:.3f})  -> {b.name}, {c.name}")
-    print(f"[6A] schematic -> {a.name}")
     with open(RECHECK / "fig6_BC.csv", "w", newline="") as f:
         w = csv.writer(f)
         w.writerow(["metric", "mean", "min", "threshold"])

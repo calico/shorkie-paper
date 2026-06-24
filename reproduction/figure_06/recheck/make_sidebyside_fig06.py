@@ -25,9 +25,9 @@ RECHECK.mkdir(parents=True, exist_ok=True)
 
 # Fractional bboxes (l, t, r, b) of each panel in the published full render.
 PANEL_BBOX = {
-    "6A": (0.00, 0.00, 1.00, 0.17),
-    "6B": (0.00, 0.17, 0.50, 0.42),
-    "6C": (0.50, 0.17, 1.00, 0.42),
+    # 6B/6C tightly bound the published panel content (measured at 300 dpi: ratio ~1.93).
+    "6B": (0.000, 0.200, 0.455, 0.487),
+    "6C": (0.520, 0.200, 0.987, 0.487),
     "6D": (0.00, 0.42, 0.34, 0.68),
     "6E": (0.33, 0.42, 0.67, 0.68),
     "6F": (0.66, 0.42, 1.00, 0.68),
@@ -36,7 +36,7 @@ PANEL_BBOX = {
     "6I": (0.66, 0.68, 1.00, 1.00),
 }
 REPRO_PNG = {
-    "6A": "Figure_6A_schematic.png", "6B": "Figure_6B.png", "6C": "Figure_6C.png",
+    "6B": "Figure_6B.png", "6C": "Figure_6C.png",
     "6D": "Figure_6D.png", "6E": "Figure_6E.png", "6F": "Figure_6F.png",
     "6G": "Figure_6G.png", "6H": "Figure_6H.png", "6I": "Figure_6I.png",
 }
