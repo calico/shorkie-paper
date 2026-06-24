@@ -28,7 +28,7 @@ printed on the published figure to **|Δ| ≤ 0.001** for all of D–I (both mod
 **What:** each published panel D–I is a *two-scatter composite* — a **Shorkie (blue)** scatter
 and a **DREAM-RNN (green)** scatter side-by-side. The previous reproduction rendered only the
 Shorkie halves; all five green subpanels and the DREAM half of I were absent.
-**Root cause:** the notebook reused only the single-model `fig12` aggregation and never loaded the
+**Root cause:** the notebook reused only the single-model MPRA aggregation and never loaded the
 DREAM-RNN comparison predictions.
 **Fix:** the DREAM-RNN per-sequence predictions are cached on disk
 (`data/random-promoter-dream-challenge-2022/data/DREAM-RNN_output.txt`, 71,103 rows). The recheck

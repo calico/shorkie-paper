@@ -4,7 +4,7 @@
 
 Reproduction package for **main-text Figure 3**. Published reference: [`../../paper/Figures/Figure_3.pdf`](../../paper/Figures/Figure_3.pdf) (`published/Figure_3_full.png`).
 
-- **Reproduce:** [`reproduce_figure_03.ipynb`](reproduce_figure_03.ipynb) (executed in tmux, 9/9 cells, 0 errors, 5 figures).
+- **Reproduce:** [`fig03_supervised_rnaseq_prediction.ipynb`](../../notebooks/fig03_supervised_rnaseq_prediction.ipynb) (executed in tmux, 9/9 cells, 0 errors, 5 figures).
 - **Verify:** [Verification](#phase-3--verification) + `reproduced/verify_fig03.csv`.
 
 ---
@@ -19,10 +19,10 @@ Figure 3 establishes that LM-pretrained **Shorkie** beats the from-scratch **Sho
 | **B** | β-estradiol induction protocol (→ time-point RNA-seq tracks) | schem | — | `datasets.bigwigs` | none |
 | **C** | bin-level Pearson R distribution by track type — **split violin** | comp | `…/1_bin_level_freq_viz.py::plot_box_violin` | `train/f{i}c0/eval/acc.txt` (median-per-id) | none |
 | **D** | bin-level R scatter (Random_Init x vs Shorkie y) | comp | `…/1_bin_level_freq_viz.py::scatter_all_groups_scatter` | top-level `acc.txt` (mean-per-id) | none |
-| **E** | gene-level R scatter (`pearsonr`) | comp | `…/3_gene_level_score_dist_viz.py` **`level="track"`** | per-dt `gene_level_eval_rc/…/{dt}/acc.txt` | `fig09` |
-| **F** | quantile-normalized gene-level R scatter (`pearsonr_norm`) | comp | `…/3_gene_level_score_dist_viz.py` **`level="track"`** | per-dt `acc.txt` | `fig09` |
+| **E** | gene-level R scatter (`pearsonr`) | comp | `…/3_gene_level_score_dist_viz.py` **`level="track"`** | per-dt `gene_level_eval_rc/…/{dt}/acc.txt` | `fig03` |
+| **F** | quantile-normalized gene-level R scatter (`pearsonr_norm`) | comp | `…/3_gene_level_score_dist_viz.py` **`level="track"`** | per-dt `acc.txt` | `fig03` |
 | **G** | within-gene track-level R (`pearsonr_gene`) | comp | `…/3_gene_level_score_dist_viz.py` **`level="gene"`** | per-dt `gene_acc.txt` (drop bottom-10% cov) | none |
-| **H–J** | coverage at RPL7A / RPS16B-RPL13A / EFM5 (obs vs Shorkie vs Random_Init) | gpu | `…/3_viz_rnaseq_tracks/2_yeast_rna_seq_models.py` (+ `3_gene_annotation_viz.py`) | ensemble + bigwig + GTF | `fig08` |
+| **H–J** | coverage at RPL7A / RPS16B-RPL13A / EFM5 (obs vs Shorkie vs Random_Init) | gpu | `…/3_viz_rnaseq_tracks/2_yeast_rna_seq_models.py` (+ `3_gene_annotation_viz.py`) | ensemble + bigwig + GTF | `fig03` |
 
 > **Note on the panel E/F/G titles:** the released `3_gene_level_score_dist_viz.py` has an *inverted*
 > `level`↔title naming — panels **E/F** (titled "Gene Level") are emitted at `level="track"` (reading the

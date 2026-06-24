@@ -4,7 +4,7 @@
 
 Reproduction package for **main-text Figure 5**. Published reference: [`../../paper/Figures/Figure_5.pdf`](../../paper/Figures/Figure_5.pdf) (`published/Figure_5_full.png`).
 
-- **Reproduce:** [`reproduce_figure_05.ipynb`](reproduce_figure_05.ipynb) + the builders in [`recheck/`](recheck/).
+- **Reproduce:** [`fig05_timecourse_tf_induction.ipynb`](../../notebooks/fig05_timecourse_tf_induction.ipynb) + the builders in [`recheck/`](recheck/).
 - **Verify:** `reproduced/verify_fig05.csv`.
 - **Discrepancies & root causes:** [`recheck/DISCREPANCIES.md`](recheck/DISCREPANCIES.md).
 - **Side-by-side vs published:** `recheck/Figure_5_published_vs_reproduced.png` + `recheck/panel_*_sidebyside.png`.
@@ -74,5 +74,3 @@ promoter **chrXIII:70,173–70,673**.
 - Targets sheet `cleaned_sheet_RNA-Seq.txt` (track→timepoint, `track_offset=1148`); model
   `self_supervised_unet_small_bert_drop/train/f0c0`.
 
-> Note: `notebooks/fig05_promoter_umap.ipynb` is a **different** analysis (LM promoter-embedding UMAP),
-> not main-text Figure 5, despite the `fig05` filename prefix.

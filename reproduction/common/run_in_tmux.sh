@@ -9,7 +9,7 @@
 #   reproduction/common/run_in_tmux.sh fig03_exec /tmp/fig03.log \
 #     "conda run -n yeast_ml jupyter nbconvert --to notebook --execute --inplace \
 #      --ExecutePreprocessor.startup_timeout=240 --ExecutePreprocessor.timeout=3600 \
-#      --ExecutePreprocessor.kernel_name=yeast_ml reproduction/figure_03/reproduce_figure_03.ipynb"
+#      --ExecutePreprocessor.kernel_name=yeast_ml notebooks/fig03_supervised_rnaseq_prediction.ipynb"
 #
 # Check progress:  tmux attach -t <session_name>   (Ctrl-b d to detach)
 #                  tail -f <logfile>

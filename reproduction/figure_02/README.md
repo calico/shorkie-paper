@@ -4,7 +4,7 @@
 
 Reproduction package for **main-text Figure 2**. Published reference: [`../../paper/Figures/Figure_2.pdf`](../../paper/Figures/Figure_2.pdf) (`published/Figure_2_full.png`).
 
-- **Reproduce:** [`reproduce_figure_02.ipynb`](reproduce_figure_02.ipynb).
+- **Reproduce:** [`fig02_lm_conserved_motifs.ipynb`](../../notebooks/fig02_lm_conserved_motifs.ipynb).
 - **Verify:** [Verification](#phase-3--verification) + `reproduced/verify_fig02.csv`.
 
 ---
@@ -15,11 +15,11 @@ Figure 2 demonstrates that the masked DNA LM reconstructs canonical yeast TF mot
 
 | Panel | Claim | Type | Generating script | Input + config key | Notebook |
 |---|---|---|---|---|---|
-| **A** | SMT3 promoter logos over `SMT3_seq[690:800]` (chrIV): SpeciesLM vs Shorkie-LM vs 15% iterative, **all aligned**; poly(dA:dt), Cbf1p, Tye7.1 | comp (Shorkie rows, precomputed) + regenerated external (SpeciesLM) | `0_compute_specieslm_smt3.py` (SpeciesLM) + `2_viz_dna_pwm_shorkie_lm.py` / `6_extract_iterative_3arch.py` (Shorkie); render `recheck/build_2A_logos.py` | `preds_smt3_unmasked.npz` + `all_prbs_SMT3.npy` + `preds_smt3_iterative_3arch.npz` (3-arch) | `fig07` |
+| **A** | SMT3 promoter logos over `SMT3_seq[690:800]` (chrIV): SpeciesLM vs Shorkie-LM vs 15% iterative, **all aligned**; poly(dA:dt), Cbf1p, Tye7.1 | comp (Shorkie rows, precomputed) + regenerated external (SpeciesLM) | `0_compute_specieslm_smt3.py` (SpeciesLM) + `2_viz_dna_pwm_shorkie_lm.py` / `6_extract_iterative_3arch.py` (Shorkie); render `recheck/build_2A_logos.py` | `preds_smt3_unmasked.npz` + `all_prbs_SMT3.npy` + `preds_smt3_iterative_3arch.npz` (3-arch) | `fig02` |
 | **B** | iterative 15%-masked region prediction (per-iteration A/C/G/T matrix) | gpu | LM forward pass (`use_bert=true`, `mask_rate=0.15`) | — | **not reproduced** (out of scope) |
 | **C** | TF-MoDISco motif grid, 6 datasets × 11 motifs (TBP, 5′ splice donor, branch pt, Cbf1p, Reb1.1, Snf1.1, Mcm1.1, Rap1.1, Sfp1.2, Abf1.1, Dot6) | comp | `motif_lm/4_viz_motif.py` (in-dist) + `motif_lm__unseen_species/4_viz_motif.py` (cross-tier) | modisco `.h5` per tier → `results.modisco_lm` (+ `results.modisco_unseen`) | **upstream scripts (not re-rendered)** |
 | **D** | motif enrichment vs TSS — published 6-panel grid (True vs background) | comp | `motif_lm/4_motif_to_tss_dist/3_plot_tss_dist_freq.py`; render `recheck/build_2D_tss.py` | `motif_tss_distances.csv`, `background_tss_distances.csv` (`experiments_root/motif_LM/4_motif_to_tss_dist`) | in-notebook |
-| **E** | t-SNE of genomic elements from the 1st self-attention layer | comp | `umap_cluster_promoter/2_viz_clusters_LM.py`; precompute `recheck/build_2E_tsne.py`, render `recheck/render_2E.py` | `embeddings_chr*.h5` (16) → `results.umap`, `genome.gtf` | `fig05` |
+| **E** | t-SNE of genomic elements from the 1st self-attention layer | comp | `umap_cluster_promoter/2_viz_clusters_LM.py`; precompute `recheck/build_2E_tsne.py`, render `recheck/render_2E.py` | `embeddings_chr*.h5` (16) → `results.umap`, `genome.gtf` | `fig02` |
 
 **Env:** `yeast_ml` (CPU). Data on disk: modisco `.h5` (173 MB) for the 2C scripts; TSS-distance CSVs (58,170 motif hits, 101 motifs) for 2D; 16 `embeddings_chr*.h5` for 2E. The 2A SpeciesLM row is regenerated once via the external HF model (`lm_SMT3_viz/0_compute_specieslm_smt3.py`, env `pytorch_cuda`, CPU); the 2A 15%-iterative row uses the **precomputed 3-architecture ensemble** (`preds_train.npz`, CPU, via `lm_SMT3_viz/6_extract_iterative_3arch.py`).
 
@@ -32,7 +32,7 @@ Figure 2 demonstrates that the masked DNA LM reconstructs canonical yeast TF mot
 
 ## Phase 2 — Reproduction (status)
 
-`reproduce_figure_02.ipynb` reproduces panels **2A, 2D, 2E** in `reproduced/`:
+`fig02_lm_conserved_motifs.ipynb` reproduces panels **2A, 2D, 2E** in `reproduced/`:
 `Figure_2A_reproduced.png` (3 aligned SMT3 logos), `Figure_2D_reproduced.png` (the 6-panel TSS-distance grid), `Figure_2E_reproduced.png` (t-SNE). Panel 2C is a markdown skip-note pointing to the upstream scripts; panel 2B is omitted.
 
 The 2E t-SNE is precomputed by `recheck/build_2E_tsne.py` — **faithful to the original** `2_viz_clusters_LM.py`: `TSNE(n_components=2, random_state=42, verbose=1)` run **directly on the full embeddings (no PCA pre-reduction)** of the **1st self-attention layer** (`embeddings_multihead_attention`) over all qualifying intervals across the 16 chromosomes; the notebook loads the cache and renders via `recheck/render_2E.py`. **Node note:** t-SNE thrashes without thread limits — run heavy steps with `OMP_NUM_THREADS=4` and via `reproduction/common/run_in_tmux.sh` so they survive disconnection.

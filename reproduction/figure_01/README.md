@@ -4,7 +4,7 @@
 
 Reproduction package for **main-text Figure 1**. Published reference: [`../../paper/Figures/Figure_1.pdf`](../../paper/Figures/Figure_1.pdf) (rendered to `published/Figure_1_full.png`).
 
-- **Reproduce:** [`reproduce_figure_01.ipynb`](reproduce_figure_01.ipynb) (panels F, G inline + orchestrates the heavy panels) + [`panels/`](panels/) CLI scripts (B phylogeny, C MUMmer, D Mash). Panels A & E are hand-drawn schematics in the paper and are **skipped** (not reproduced).
+- **Reproduce:** [`fig01_fungal_lm_corpus_architecture.ipynb`](../../notebooks/fig01_fungal_lm_corpus_architecture.ipynb) (panels F, G inline + orchestrates the heavy panels) + [`panels/`](panels/) CLI scripts (B phylogeny, C MUMmer, D Mash). Panels A & E are hand-drawn schematics in the paper and are **skipped** (not reproduced).
 - **Verify:** the [Verification](#phase-3--verification) section below + `reproduced/verify_fig01.csv`.
 
 ---
@@ -66,7 +66,7 @@ Every input is present under `WORK = /scratch4/ssalzbe1/khchao/Yeast_ML` (resolv
 
 ## Phase 2 — Reproduction (status)
 
-The 5 data-driven panels (B, C, D, F, G) are reproduced from on-disk data via `reproduce_figure_01.ipynb` (executed, 0 error cells) + `panels/{run_mummer,run_mash,build_tree}.sh`. Panels **A & E are skipped** (hand-drawn schematics — see `reproduce_figure_01.ipynb`). Reproduced panels in `reproduced/`:
+The 5 data-driven panels (B, C, D, F, G) are reproduced from on-disk data via `fig01_fungal_lm_corpus_architecture.ipynb` (executed, 0 error cells) + `panels/{run_mummer,run_mash,build_tree}.sh`. Panels **A & E are skipped** (hand-drawn schematics — see `fig01_fungal_lm_corpus_architecture.ipynb`). Reproduced panels in `reproduced/`:
 `panelB_tree/Figure_1B_reproduced.png` (circular tree), `panelC_mummer/Figure_1C_reproduced.png` (6 dot plots), `Figure_1D_reproduced.png` (mash bars), `Figure_1F_reproduced.png` (val-loss curves), `Figure_1G_reproduced.png` (gene/intergenic perplexity).
 
 Tooling installed for the full recompute: `mash` v2.3 (fresh `mash_env`, symlinked into `yeast_ml`); MUMmer (`nucmer`/`show-coords`, conda base); `ete4 ncbiquery` (NCBI taxonomy → newick).

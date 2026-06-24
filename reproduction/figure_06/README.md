@@ -5,7 +5,7 @@
 Reproduction package for **main-text Figure 6**. Published reference:
 [`../../paper/Figures/Figure_6.pdf`](../../paper/Figures/Figure_6.pdf) (`published/Figure_6_full.png`).
 
-- **Reproduce:** [`reproduce_figure_06.ipynb`](reproduce_figure_06.ipynb) — delegates to the
+- **Reproduce:** [`fig06_mpra_variant_effects.ipynb`](../../notebooks/fig06_mpra_variant_effects.ipynb) — delegates to the
   `recheck/` builders (executed with `nbconvert`, 0 errors).
 - **Verify:** `reproduced/verify_fig06.csv` — **26/26 PASS** against the values printed on the
   published figure (both the Shorkie and DREAM-RNN subpanels of D–I).

@@ -28,7 +28,7 @@ import pandas as pd
 from shorkie import config
 
 # ---------------------------------------------------------------------------
-# Paths — identical to reproduce_figure_01.ipynb cell 1
+# Paths — identical to notebooks/fig01_fungal_lm_corpus_architecture.ipynb cell 1
 # ---------------------------------------------------------------------------
 REPRO = Path(config.repo_root()) / "reproduction" / "figure_01"
 RD = REPRO / "reproduced"

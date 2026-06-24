@@ -4,7 +4,7 @@
 
 Reproduction package for **main-text Figure 4**. Published reference: [`../../paper/Figures/Figure_4.pdf`](../../paper/Figures/Figure_4.pdf) (`published/Figure_4_full.png`).
 
-- **Reproduce:** [`reproduce_figure_04.ipynb`](reproduce_figure_04.ipynb) delegates to the `recheck/build_4*.py` builders.
+- **Reproduce:** [`fig04_promoter_splicing_motifs.ipynb`](../../notebooks/fig04_promoter_splicing_motifs.ipynb) delegates to the `recheck/build_4*.py` builders.
 - **Verify:** `reproduced/verify_fig04.csv` (correctness + panel-completeness checks).
 
 All panels are **CPU-reproducible** from cached numeric data (ISM `scores.h5`, LM `preds.npz`,
@@ -38,10 +38,10 @@ Figure 4 shows that **Shorkie's in-silico-mutagenesis (ISM) saliency** recovers 
 | **G** | splicing ISM, HOP2 | CPU | SS `part80 idx0` = chrVII:435573-436451 | same | `results.ism_scores` |
 | **H** | TF-MoDISco motifs on Shorkie ISM | CPU | RP modisco h5 | `…/2_modisco_analysis/4_viz_motif.py` | `results.modisco_ism` |
 
-**ISM saliency** = per-base `logSED` averaged over the **384 T0 RNA-seq tracks** (`track_offset=1148` into the 3053-track RNA-seq subset), mean-centered across the 4 bases, then projected onto the reference one-hot — the per-position attribution rendered as a logomaker logo. The **Shorkie** ISM lives in the `motif_shorkie_RP_TSS` tree; the **Shorkie_Random_Init** ISM in the parallel `motif_random_init_RP_TSS` tree. Reuses `shorkie.helpers.yeast_helpers.make_seq_1hot`; helper logic from notebook `fig13`.
+**ISM saliency** = per-base `logSED` averaged over the **384 T0 RNA-seq tracks** (`track_offset=1148` into the 3053-track RNA-seq subset), mean-centered across the 4 bases, then projected onto the reference one-hot — the per-position attribution rendered as a logomaker logo. The **Shorkie** ISM lives in the `motif_shorkie_RP_TSS` tree; the **Shorkie_Random_Init** ISM in the parallel `motif_random_init_RP_TSS` tree. Reuses `shorkie.helpers.yeast_helpers.make_seq_1hot`; helper logic from the Shorkie ISM analysis (`motif_shorkie__RP_TSS`).
 
 ### Config fix applied this phase
-`results.ism_scores` and `results.modisco_ism` were corrected (in `config/paths.example.yaml`) to resolve to the real on-disk trees under `${experiments_root}/SUM_data_process/motifs` (the previous `motif_LM_fine_tuned_RP_TSS` value pointed at an empty path — the root cause of the earlier un-executed `fig13`).
+`results.ism_scores` and `results.modisco_ism` were corrected (in `config/paths.example.yaml`) to resolve to the real on-disk trees under `${experiments_root}/SUM_data_process/motifs` (the previous `motif_LM_fine_tuned_RP_TSS` value pointed at an empty path — the root cause of the earlier un-executed ISM reproduction).
 
 ### Coordinate audit (the careful-verification upgrade)
 The gene → `(tree, sub, part, idx)` mapping was **not trusted as hardcoded**. Each of the 6 panel genes (RPL26A, FUN12, KRE33, DTD1, MMS2, HOP2) was resolved symbol → ORF → R64 coordinates from the released GTF (`genome.gtf`), then **every** `scores.h5` window in the RP / RRB / SS subs was enumerated (lazy read of `chr/start/end`) and matched by overlap. The result **confirmed the existing map is correct** (table above), resolving an earlier disagreement between two discovery passes over whether DTD1/MMS2/HOP2 were present in the SS set — they are, at parts 22/57/80. The audit is re-run inside the notebook (`win_overlaps_gene`) and asserted in Phase 3.
@@ -94,7 +94,7 @@ CPU-only and resolve every path through `shorkie.config` — no hardcoded machin
 4. `build_verify_fig04.py` — recomputes the checks → `reproduced/verify_fig04.csv`.
 5. `make_sidebyside_fig04.py` — published-vs-reproduced comparison PNGs (verification aid).
 
-The notebook [`reproduce_figure_04.ipynb`](reproduce_figure_04.ipynb) simply invokes builders 2–3 in order.
+The notebook [`fig04_promoter_splicing_motifs.ipynb`](../../notebooks/fig04_promoter_splicing_motifs.ipynb) simply invokes builders 2–3 in order.
 
 **Committed vs regenerable.** Committed: the builders + `fig4_common.py` / `match_tfs.py`, the reproduced
 PNGs, `verify_fig04.csv`, and `tomtom_RP_matches.tsv` (so panel H reproduces without MEME). Gitignored

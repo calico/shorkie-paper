@@ -41,7 +41,8 @@ paths resolve through `config/paths.yaml` — there are no hardcoded machine pat
 |---|---|
 | [`src/shorkie/`](./src/shorkie) | installable helper package — `config` (paths), `models.ensemble` (8-fold loader + `logSED`), `helpers.yeast_helpers`, `viz.load_cov` |
 | [`scripts/`](./scripts) | all pipelines, staged `00_setup → 01_data_build → 02_train → 03_eval → 04_analysis` (+ `common/`) |
-| [`notebooks/`](./notebooks) | 13 figure-reproduction notebooks (import from `shorkie`, pinned to the `yeast_ml` kernel) |
+| [`notebooks/`](./notebooks) | 7 figure-reproduction notebooks `fig01`–`fig07`, one per main-text figure (import from `shorkie`, pinned to the `yeast_ml` kernel) |
+| [`reproduction/`](./reproduction) | per-figure audit layer behind each notebook: panel builders, published-panel crops, reproduced-vs-published verification (`verify_figNN.csv`) |
 | [`config/`](./config) | `paths.example.yaml`, `slurm.example.yaml` templates |
 | [`data/`](./data) | committed reference files + `manifest.json` + `download.sh` (large data is on GCS) |
 | [`external/`](./external) | pinned `baskerville-yeast` + `westminster` submodules |
@@ -60,27 +61,21 @@ The only difference between *finetuned* and *scratch* is the `--restore` flag + 
 
 ### Figures → notebooks → upstream stage
 
-Each paper figure has a notebook in [`notebooks/`](./notebooks); ✅ = runs end-to-end from released
-data (`data/download.sh`), ⬚ = load-and-plot from a gated intermediate produced by the cited stage.
-See [`notebooks/README.md`](./notebooks/README.md) for the full artifact + `config` key index.
+One notebook per main-text figure in [`notebooks/`](./notebooks) (`fig01`–`fig07`); ✅ = runs
+end-to-end from released data (`data/download.sh`), ⬚ = load-and-plot from a gated intermediate
+produced by the cited stage. Each notebook delegates the panel work to its audit layer under
+[`reproduction/figure_NN/`](./reproduction). See [`notebooks/README.md`](./notebooks/README.md)
+for the full artifact + `config` key index.
 
 | Notebook | Figure | Runs from released data? | Upstream `scripts/` stage |
 |---|---|:--:|---|
-| `fig02_lm_genome_eval` | LM perplexity / loss | ⬚ | `03_eval/lm/lm_model_eval/` |
-| `fig03_lm_motifs` | LM MoDISco motif logos | ⬚ | `04_analysis/shorkie_lm/motif_analysis/motif_lm/` |
-| `fig04_cross_species_motifs` | cross-species motifs | ⬚ | `…/motif_lm__unseen_species/` |
-| `fig05_promoter_umap` | promoter embedding UMAP | ⬚ | `04_analysis/shorkie_lm/umap_cluster_promoter/` |
-| `fig06_attention_map` | LM self-attention | ✅ GPU | *(recompute from LM weights)* |
-| `fig07_smt3_dependency` | SMT3 PWM + dependency maps | ⬚ | `04_analysis/shorkie_lm/lm_SMT3_viz/` |
-| `fig08_track_prediction` | predicted vs observed coverage | ✅ GPU | `03_eval/supervised/track_prediction_eval/` |
-| `fig09_track_eval_metrics` | track-prediction metrics | ⬚ | `02_train/` + `03_eval/supervised/` |
-| `fig10_variant_effect_logSED` | variant-effect logSED track | ✅ GPU | `04_analysis/shorkie/eqtl/` (+ `minimal_example/`) |
-| `fig11_eqtl_benchmark` | cis-eQTL ROC/PR benchmark | ⬚ | `04_analysis/shorkie/eqtl/` |
-| `fig12_mpra_benchmark` | MPRA DREAM benchmark | ⬚ | `04_analysis/shorkie/mpra/` |
-| `fig13_ism_motifs` | Shorkie ISM saliency + motifs | ⬚† | `04_analysis/shorkie/ism_motif/motif_shorkie__RP_TSS/` |
-| `fig14_ablations` | LM-pretraining ablations | ⬚ | `04_analysis/shorkie_scratch/` + figs 11–12 |
-
-† `fig13` ships code-validated but not executed (its ISM `scores.h5` intermediate is not retained on disk); regeneration steps are in the notebook.
+| `fig01_fungal_lm_corpus_architecture` | Fig 1 — LM corpus, phylogeny, architecture & performance | ⬚ | `01_data_build/lm_corpus/` + `02_train/shorkie_lm/` + `03_eval/lm/` |
+| `fig02_lm_conserved_motifs` | Fig 2 — conserved TF motifs (SMT3, motif→TSS, t-SNE) | ⬚ | `04_analysis/shorkie_lm/{lm_SMT3_viz,motif_analysis,umap_cluster_promoter}/` |
+| `fig03_supervised_rnaseq_prediction` | Fig 3 — RNA-seq prediction (violin, scatter, coverage) | ⬚ / ✅ GPU | `03_eval/supervised/track_prediction_eval/` |
+| `fig04_promoter_splicing_motifs` | Fig 4 — promoter & splicing ISM motifs + MoDISco | ⬚ | `04_analysis/shorkie/ism_motif/motif_shorkie__RP_TSS/` |
+| `fig05_timecourse_tf_induction` | Fig 5 — time-course MSN2/MSN4 TF induction | ⬚ | `04_analysis/shorkie/ism_motif/motif_shorkie__time_series/` |
+| `fig06_mpra_variant_effects` | Fig 6 — MPRA promoter variant effects | ⬚ | `04_analysis/shorkie/mpra/` |
+| `fig07_eqtl_variant_effects` | Fig 7 — cis-eQTL variant effects (ROC/PR, ISM) | ⬚ / ✅ GPU | `04_analysis/shorkie/eqtl/` |
 
 ---
 

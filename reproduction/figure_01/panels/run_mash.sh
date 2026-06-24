@@ -3,7 +3,7 @@
 # 165_Saccharomycetales and 80_Strains datasets. Full recompute via `mash dist`.
 # Faithful to scripts/03_eval/lm/genome_evaluation/3_genome_dist/mash/1_mash_genome.sh
 # (one ref vs all targets), pointed at the on-disk corpus. Output tables are parsed
-# + plotted (sorted ascending bars) by reproduce_figure_01.ipynb.
+# + plotted (sorted ascending bars) by notebooks/fig01_fungal_lm_corpus_architecture.ipynb.
 set -euo pipefail
 
 cd "$(dirname "${BASH_SOURCE[0]}")/../../.."   # repo root

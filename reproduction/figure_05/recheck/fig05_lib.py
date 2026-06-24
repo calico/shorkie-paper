@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Shared helpers for the Figure 5 recheck builders (MSN2 & MSN4 time-course TF induction).
 
-Faithful to the source notebook recipe (reproduce_figure_05.ipynb) and the source
+Faithful to the source notebook recipe (notebooks/fig05_timecourse_tf_induction.ipynb) and the source
 scripts under scripts/04_analysis/shorkie/ism_motif/motif_shorkie__RP_TSS/, but:
   - logos are rendered over the FULL 500 bp promoter window (the published A/F view),
     NOT the 90 bp `focus` zoom the notebook used;

@@ -106,8 +106,3 @@ reproduction. (The exploratory progression builder lives only in the git history
 - **Global ΔlogFC R (supporting).** MSN2 **0.4949**, MSN4 **0.3992** (raw fold-change, all genes×timepoints,
   N=45,682) — distinct from the normalized per-track R of D/I; both reproduce.
 
-## Naming-collision note (not part of Figure 5)
-
-`notebooks/fig05_promoter_umap.ipynb` is a **different analysis** (Shorkie-LM promoter/feature embedding
-UMAP/t-SNE); despite the `fig05` filename prefix it is **not** main-text Figure 5. Main-text Figure 5 is
-the MSN2/MSN4 time-course reproduced here under `reproduction/figure_05/`.

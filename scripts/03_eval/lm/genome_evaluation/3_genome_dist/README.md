@@ -58,5 +58,5 @@ python first for `shorkie`). `dashing2` is built separately (`tools.dashing2_bin
 The runnable figure-reproduction notebook renders the **same** nucmer/mash outputs with
 matplotlib (a scheduler-/gnuplot-free path) via
 `reproduction/figure_01/panels/run_mummer.sh` + `run_mash.sh` and
-`reproduction/figure_01/reproduce_figure_01.ipynb`. These `scripts/` are the original
+`notebooks/fig01_fungal_lm_corpus_architecture.ipynb`. These `scripts/` are the original
 production pipeline (mummerplot/gnuplot dot plots), cleaned to the repo conventions.
