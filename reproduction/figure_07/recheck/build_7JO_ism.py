@@ -6,19 +6,20 @@ Each panel stacks, top to bottom (matching the published layout):
                      embedded from the project motif DB (experiments/motif_DB/...). Panel N's
                      Reb1.1 site is on the (-) strand, so its Ref DB logo is the REVERSE
                      COMPLEMENT (REB1.1_rc.png) — matching the published N (CGGGTAA).
-  2. Shorkie ISM (REF) — per-base ISM saliency of the *reference* sequence, recomputed
-                     from the cached 8-fold ensemble ISM (pred_ism_wt, mean-normalized x
-                     ref one-hot), 80 bp around the SNP.
-  3. Shorkie ISM (ALT) — same from the *alt* allele context (pred_ism_mut x alt one-hot).
-  4. DREAM-RNN ISM (REF) — per-base saliency from the cached DREAM-RNN ISM TSV
-                     (ref-average of the substitution deltas). All 6/6 loci on disk:
-                     K (YLR036C) and O (YGR046W) come from the targeted _additional run.
+  2. Shorkie ISM (REF) — per-base ISM saliency of the *reference* sequence, recomputed from
+                     the cached 8-fold ensemble ISM (pred_ism_wt), shown over the 80 bp ISM core
+                     plus the source's 18 bp left / 14 bp right grey padding (112 bp window).
+  3. Shorkie ISM (ALT) — same from the *alt* allele context (pred_ism_mut).
+  4. DREAM-RNN ISM (REF) — per-base saliency from the cached DREAM-RNN ISM TSV (ref-average of
+                     the substitution deltas), 110 bp window (80 bp core + 17/13 bp grey padding).
+                     All 6/6 loci on disk: K (YLR036C) and O (YGR046W) come from the _additional run.
   5. DREAM-RNN ISM (ALT) — same from the alt-context DREAM ISM TSV.
-  6. Shorkie Coverage — gene-windowed observed RNA-seq coverage (faithful proxy for the
-                     model's predicted track; cf. A/B where predicted vs observed correlate
-                     R>0.96), centred on the gene over [min(SNP,gene_start)-100,
-                     max(SNP,gene_end)+100] with SNP / Variant / gene-start / gene-end /
-                     ISM-region markers — matching the published zoomed coverage renderer.
+  6. Shorkie Coverage — gene-windowed coverage drawn in the published Ref (blue) + Alt (orange)
+                     overlap style, centred on the gene over [min(SNP,gene_start)-100,
+                     max(SNP,gene_end)+100] with SNP / Variant / gene-start / gene-end / ISM-region
+                     markers (the published zoomed renderer). Signal = observed RNA-seq (the model's
+                     training target, ~same scale; cf. A/B R>0.96); predicted allele-specific Ref/Alt
+                     needs the GPU ensemble, so Ref≈Alt (the per-SNP effect on total coverage is tiny).
 
 The Shorkie ISM logos (rows 2-3) — the scientifically central, model-derived content — are
 recomputed bit-for-bit from the released ISM cache. Rows 1/4/5 are rendered from cached
@@ -65,6 +66,10 @@ DREAM_DIRS = [
 ]
 MOTIF_DIR = f"{ROOT}/experiments/motif_DB"
 WIN_HALF = 40
+# Shorkie ISM display window (source 2_viz_ism_dna_logo.py defaults): 80 bp core + left/right
+# padding -> 112 bp; SNP highlight at left_pad + half - 1.
+SHK_HALF, SHK_LPAD, SHK_RPAD = 40, 18, 14
+SHK_HL = SHK_LPAD + SHK_HALF - 1            # = 57 (SNP column within the 112 bp window)
 NT = "ACGT"
 NTI = {b: i for i, b in enumerate(NT)}
 
@@ -109,13 +114,19 @@ def dna_letter_at(letter, x, y, yscale, ax):
     ax.add_artist(PathPatch(_LETTERS[letter], lw=0, fc=_COLORS[letter], transform=t))
 
 
-def plot_logo(ax, imp, highlight=None):
+def plot_logo(ax, imp, highlight=None, pad_left=0, pad_right=0):
     """Exact published recipe (yeast_helpers_selfsupervised.plot_seq_scores): per position
     draw the argmax-|.| base scaled by the row-sum (single letter, from y=0). `highlight` draws
-    the light-blue SNP span at that column index (matching plot_seq_scores' highlight_idx)."""
+    the light-blue SNP span at that column index (matching plot_seq_scores' highlight_idx).
+    `pad_left`/`pad_right` grey-shade the left/right padding columns outside the 80 bp ISM core
+    (the displayed window = left_pad + 80 core + right_pad, as in the published ISM logos)."""
     L = imp.shape[0]
+    if pad_left > 0:
+        ax.axvspan(0, pad_left, facecolor="0.9", zorder=-2)
+    if pad_right > 0:
+        ax.axvspan(L - pad_right, L, facecolor="0.9", zorder=-2)
     if highlight is not None and 0 <= highlight < L:
-        ax.axvspan(highlight, highlight + 1, facecolor="lightblue", alpha=0.3, zorder=0)
+        ax.axvspan(highlight, highlight + 1, facecolor="lightblue", alpha=0.5, zorder=-1)
     for p in range(L):
         base = int(np.argmax(np.abs(imp[p])))
         h = float(imp[p].sum())
@@ -141,7 +152,9 @@ def onehot(seq):
 def shorkie_logos(L, fa):
     """Published recipe: plot the RAW cached ISM (pred_ism_wt/mut) directly. These arrays are
     sparse ref-base saliency (one nonzero per row), so plot_logo (argmax|row|, height=row-sum)
-    reproduces the published 'Shorkie ISM (REF/ALT)' logos. Window = SNP center +/- 40 (80 bp)."""
+    reproduces the published 'Shorkie ISM (REF/ALT)' logos. Display window = 80 bp ISM core plus
+    the source's 18 bp left / 14 bp right padding (112 bp), matching 2_viz_ism_dna_logo.py
+    (left_index = rel_center - half - left_pad, right_index = rel_center + half + right_pad)."""
     z = np.load(f"{ISM_DIR}/{L['gene']}_{L['chrom']}_{L['pos']}.npz", allow_pickle=True)
     wt = z["pred_ism_wt"]; mut = z["pred_ism_mut"]
     start = int(z["start"]); cp = int(z["center_pos"])
@@ -149,7 +162,9 @@ def shorkie_logos(L, fa):
     seq = fa.fetch(L["chrom"], start, start + wt.shape[0]).upper()
     ci = cp - start - 1
     ref_base = seq[ci]
-    lo, hi = ci - WIN_HALF, ci + WIN_HALF      # 80 bp [ci-40, ci+40); SNP (ci) at index 40
+    rel = ci + 1                               # source rel_center = center_pos - start
+    lo = rel - SHK_HALF - SHK_LPAD             # = ci - 57
+    hi = rel + SHK_HALF + SHK_RPAD             # = ci + 55  -> 112 bp; SNP (ci) at index 57
     imp_ref = wt[lo:hi]
     imp_alt = mut[lo:hi]
     maxabs = float(np.max(np.abs(imp_ref.sum(axis=1))))
@@ -174,9 +189,10 @@ def dream_logos(L):
     """Exact DREAM-RNN ISM recipe (eQTL_MPRA_models_ISM/2_plot_DNA_logo.py):
     build the (110,4) delta-matrix (ref base = 0), negate it, subtract the GLOBAL mean, then form
     the ref-base-average matrix (each position's ref base = mean of its 3 substitution values).
-    Crop the 80bp ISM core pos[17:97) so the SNP (pos 57) lands at index 40 — aligned to Shorkie.
+    Return the full 110 bp window (17 bp left pad + 80 bp ISM core + 13 bp right pad; SNP at pos 57),
+    so plot_logo can grey-shade the same padding bands the published DREAM logos show.
     The locus is looked up across DREAM_DIRS (main run, then the targeted _additional run that
-    supplies K=YLR036C and O=YGR046W). Returns (ref_logo, alt_logo) each (80,4), or None if the
+    supplies K=YLR036C and O=YGR046W). Returns (ref_logo, alt_logo) each (110,4), or None if the
     locus is in none of the released TSVs."""
     out = {}
     for which, fn in [("ref", "ism_ref_results.tsv"), ("alt", "ism_alt_results.tsv")]:
@@ -210,24 +226,23 @@ def dream_logos(L):
             if b in NTI:
                 ri = NTI[b]
                 ref_mat[p, ri] = np.mean(np.delete(mat_norm[p, :], ri))  # ref-base average
-        out[which] = ref_mat[DREAM_LEFT_PAD:DREAM_LEFT_PAD + DREAM_CORE]  # 80bp core, SNP at idx 40
+        out[which] = ref_mat                   # full 110 bp window; padding grey-shaded in plot_logo
     return out["ref"], out["alt"]
 
 
 def coverage_track(ax, L):
-    """Gene-windowed coverage, matching the published renderer
+    """Gene-windowed Ref/Alt coverage, matching the published renderer
     plot_coverage_track_pair_bins_w_ref_zoomed: x-window =
     [min(SNP, gene_start) - 100, max(SNP, gene_end) + 100] snapped to the 16 bp model-bin grid,
-    drawn on a bin-index x-axis with the SNP / Variant / gene-start (green) / gene-end (red) /
-    ±40 bp ISM-region (grey) markers and a `chrom:region_start-region_end bp` xlabel.
-    (Predicted Ref/Alt coverage needs the 8-fold GPU ensemble and is not cached, so this plots
-    the observed RNA-seq T0 track — the faithful proxy used across Fig 7 J-O; cf. panels A/B
-    where predicted vs observed coverage correlate R>0.96.)"""
-    from shorkie.viz.load_cov import read_coverage
-    base = f"{ROOT}/seq_experiment/exp_histone__chip_exo__rna_seq_no_norm_5215_tracks/16bp"
-    sheet = pd.read_csv(f"{base}/cleaned_sheet_RNA-Seq_T0.txt", sep="\t", index_col=0)
-    files = sheet["file"].iloc[::max(1, len(sheet) // 12)].head(12).tolist()
+    drawn on a bin-index x-axis as overlapping Ref (blue) + Alt (orange) bars (alpha 0.6) with the
+    SNP / Variant / gene-start (green) / gene-end (red) / ±40 bp ISM-region (grey) markers and a
+    `chrom:region_start-region_end bp` xlabel.
 
+    Coverage source: the 8-fold ensemble PREDICTED Ref/Alt RNA-Seq(T0) coverage from
+    `reproduced/ism/cov_<panel>.npz` (run_cov_eqtl_jo.py) — same window convention (start = pos-8192),
+    so the predicted output bins align 1:1 with the published bin grid and the y-axis matches the
+    published predicted scale. Falls back to observed RNA-seq if the predicted cache is absent.
+    Returns the source label used."""
     pos, gs, ge, strand = L["pos"], L["gstart"], L["gend"], L["strand"]
     margin, bin_size, pad = 100, 16, 64
     start = pos - 8192                              # SNP-centred 16384 bp ISM window start
@@ -237,20 +252,38 @@ def coverage_track(ax, L):
     g0 = start + (plot_start_bin + pad) * bin_size  # bin-grid-snapped genomic edges
     g1 = start + (plot_end_bin   + pad) * bin_size
     nb = plot_end_bin - plot_start_bin
-
-    covs = []
-    for f in files:
-        try:
-            cv = np.asarray(read_coverage(f, L["chrom"], g0, g1), dtype="float32")
-            if len(cv) == nb * bin_size:
-                covs.append(cv)
-        except Exception:
-            continue
-    cov = np.mean(covs, axis=0) if covs else np.zeros(nb * bin_size)
-    cov = cov.reshape(nb, bin_size).mean(axis=1)
     x = np.arange(plot_start_bin, plot_end_bin)
-    ymax = max(float(cov.max()), 1e-6)
 
+    # 1) predicted Ref/Alt coverage (preferred — matches the published predicted y-scale)
+    cov_ref = cov_alt = None
+    source = "observed"
+    cov_npz = REPRO / "reproduced" / "ism" / f"cov_{L['panel']}.npz"
+    if cov_npz.exists():
+        d = np.load(cov_npz, allow_pickle=True)
+        cr = np.asarray(d["cov_ref"], dtype="float32"); ca = np.asarray(d["cov_alt"], dtype="float32")
+        sos = int(d["seq_out_start"]); st = int(d["stride"])
+        i0 = int(round((g0 - sos) / st))           # predicted bin index of the left display edge
+        if 0 <= i0 and i0 + nb <= len(cr):
+            cov_ref, cov_alt, source = cr[i0:i0 + nb], ca[i0:i0 + nb], "predicted (8-fold ensemble)"
+
+    # 2) fallback: observed RNA-seq T0 (Ref==Alt)
+    if cov_ref is None:
+        from shorkie.viz.load_cov import read_coverage
+        base = f"{ROOT}/seq_experiment/exp_histone__chip_exo__rna_seq_no_norm_5215_tracks/16bp"
+        sheet = pd.read_csv(f"{base}/cleaned_sheet_RNA-Seq_T0.txt", sep="\t", index_col=0)
+        files = sheet["file"].iloc[::max(1, len(sheet) // 12)].head(12).tolist()
+        covs = []
+        for f in files:
+            try:
+                cv = np.asarray(read_coverage(f, L["chrom"], g0, g1), dtype="float32")
+                if len(cv) == nb * bin_size:
+                    covs.append(cv)
+            except Exception:
+                continue
+        c = (np.mean(covs, axis=0) if covs else np.zeros(nb * bin_size)).reshape(nb, bin_size).mean(axis=1)
+        cov_ref = cov_alt = c
+
+    ymax = max(float(cov_ref.max()), float(cov_alt.max()), 1e-6)
     center_bin = (pos - start) // bin_size - pad
     gstart_bin = (gs - start) // bin_size - pad
     gend_bin   = (ge - start) // bin_size - pad
@@ -258,20 +291,23 @@ def coverage_track(ax, L):
     he = hs + 6
 
     ax.axvspan(hs, he, color="lightgrey", alpha=0.6, zorder=0, label="±(40bp) ISM region")
-    ax.bar(x, cov, width=1.0, color="#d9a066", alpha=0.9, lw=0, label="RNA-seq (observed)")
+    # Published overlap style: Ref (C0 blue) then Alt (C1 orange), both alpha 0.6.
+    ax.bar(x, cov_ref, width=1.0, color="#1f77b4", alpha=0.6, lw=0, label="Ref")
+    ax.bar(x, cov_alt, width=1.0, color="#ff7f0e", alpha=0.6, lw=0, label="Alt")
     ax.scatter([center_bin], [0.05 * ymax], s=55, marker="*", color="k", zorder=5, label="SNP")
     ax.axvline(center_bin, color="k", ls=":", lw=0.8, label=f"Variant ({pos})")
     s_line, e_line = (gstart_bin, gend_bin) if strand == "+" else (gend_bin, gstart_bin)
     ax.axvline(s_line, color="g", ls="--", lw=0.9, label=f"{L['gene']} start ({gs})")
     ax.axvline(e_line, color="r", ls="-.", lw=0.9, label=f"{L['gene']} end ({ge})")
     ax.set_xlim(plot_start_bin, plot_end_bin)
-    ax.set_ylim(0, ymax * 1.08)
-    ax.set_yticks([])
-    ax.tick_params(axis="x", labelsize=6)
+    ax.set_ylim(0, ymax * 1.05)
+    ax.set_ylabel("Coverage", fontsize=6)
+    ax.tick_params(axis="both", labelsize=6)
     ax.set_xlabel(f"{L['chrom']}:{region_start}-{region_end}bp", fontsize=6)
     loc = "upper right" if pos > ge else "upper left"
     ax.legend(loc=loc, fontsize=4.6, frameon=True, framealpha=0.6,
               handlelength=1.2, borderpad=0.25, labelspacing=0.25)
+    return source
 
 
 def add_refdb(ax, L):
@@ -303,15 +339,17 @@ def main():
         d_ref, d_alt = dream_logos(L)
 
         add_refdb(axs[0], L)
-        plot_logo(axs[1], imp_ref, highlight=WIN_HALF)   # SNP at index 40 in the 80bp window
-        plot_logo(axs[2], imp_alt, highlight=WIN_HALF)
+        plot_logo(axs[1], imp_ref, highlight=SHK_HL, pad_left=SHK_LPAD, pad_right=SHK_RPAD)
+        plot_logo(axs[2], imp_alt, highlight=SHK_HL, pad_left=SHK_LPAD, pad_right=SHK_RPAD)
+        dream_hl = DREAM_LEFT_PAD + DREAM_CORE // 2                 # = 57 (SNP col in the 110bp window)
+        dream_rpad = DREAM_SEQ_LEN - DREAM_LEFT_PAD - DREAM_CORE    # = 13
         for ax, d in [(axs[3], d_ref), (axs[4], d_alt)]:
             if d is None:
                 ax.text(0.5, 0.5, "DREAM-RNN ISM not on disk", ha="center", va="center",
                         fontsize=7, color="gray"); ax.set_xticks([]); ax.set_yticks([])
             else:
-                plot_logo(ax, d, highlight=WIN_HALF)
-        coverage_track(axs[5], L)
+                plot_logo(ax, d, highlight=dream_hl, pad_left=DREAM_LEFT_PAD, pad_right=dream_rpad)
+        cov_source = coverage_track(axs[5], L)
 
         for ax, lab in zip(axs, ROW_LABELS):
             ax.set_ylabel(lab, fontsize=7, rotation=0, ha="right", va="center", labelpad=22)
@@ -327,7 +365,7 @@ def main():
                          ref=ref_base, ref_pub=pub_ref, ref_ok=ref_ok,
                          alt=alt, alt_pub=pub_alt, alt_ok=alt_ok, motif=L["motif"],
                          shorkie_ism_recomputed=(maxabs > 0), shorkie_ism_maxabs=round(maxabs, 5),
-                         dream_ism_on_disk=(d_ref is not None),
+                         dream_ism_on_disk=(d_ref is not None), coverage_source=cov_source,
                          avg_logsed_published=L["avg_logsed"],
                          q_logsed_published=L["q_logsed"], q_delta_published=L["q_delta"]))
     fa.close()
@@ -358,7 +396,8 @@ def main():
         flag = "OK" if (r["ref_ok"] and r["alt_ok"]) else "MISMATCH"
         print(f"  {r['panel']} {r['gene']} {r['region']} {r['ref']}>{r['alt']} "
               f"(pub {r['ref_pub']}>{r['alt_pub']}) {flag}  motif={r['motif']}  "
-              f"dream_on_disk={r['dream_ism_on_disk']}  maxISM={r['shorkie_ism_maxabs']}")
+              f"dream_on_disk={r['dream_ism_on_disk']}  cov={r['coverage_source']}  "
+              f"maxISM={r['shorkie_ism_maxabs']}")
 
 
 if __name__ == "__main__":

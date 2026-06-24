@@ -81,8 +81,26 @@ A third pass (this session) matched the remaining E/F/G axis scaling and complet
   (`plot_coverage_track_pair_bins_w_ref_zoomed`) — with SNP / Variant / gene-start (green) / gene-end (red) /
   ±40 bp-ISM-region (grey) markers and a `chrom:region_start-region_end bp` xlabel. R64 gene spans
   (0-based start = GTF_start−1) reproduce the published ranges exactly (M `chrXI:603094-604456`,
-  N `chrXIV:200228-202033`, O `chrVII:584583-586152`, …). Coverage signal remains the observed RNA-seq
-  proxy (predicted Ref/Alt needs the GPU ensemble; not cached).
+  N `chrXIV:200228-202033`, O `chrVII:584583-586152`, …). Coverage signal here was still the observed
+  RNA-seq proxy (predicted Ref/Alt needs the GPU ensemble) — replaced with predicted coverage in pass 4.
+
+## Refinement pass 4 (ISM padding bands + GPU-predicted Ref/Alt coverage + coverage y-axis)
+A fourth pass (this session) matched the remaining J-O details to the published panels:
+- **ISM padding bands (both sides).** The published ISM logos show the 80 bp ISM core flanked by grey
+  padding on both sides (the source standalone renderers: Shorkie `2_viz_ism_dna_logo.py` uses 18 bp
+  left / 14 bp right -> 112 bp; DREAM `2_plot_DNA_logo.py` uses 17/13 -> 110 bp). `plot_logo` now shows
+  those full windows with the padding columns grey-shaded and the SNP column light-blue, for all four
+  ISM rows (Shorkie REF/ALT, DREAM REF/ALT) of every panel.
+- **GPU-predicted Ref/Alt coverage + matching y-axis.** The published coverage overlays the model's
+  PREDICTED Ref (blue) + Alt (orange) RNA-Seq(T0) coverage. Those arrays were cached only for M/N
+  (OMA1/LAP3); the observed RNA-seq is on a different, locus-specific scale (~11-17x smaller; M ~17x,
+  N ~11x) so it could not match the published y-axis. Re-ran the 8-fold Shorkie ensemble for all six
+  loci (`panels/run_cov_eqtl_jo.py` -> `reproduced/ism/cov_<panel>.npz`) using the renderer's simple
+  SNP-centred window (`start = pos-8192`, off=1024, stride=16) so the predicted output bins align 1:1
+  with the published bin grid. The coverage track now draws genuine overlapping Ref/Alt bars at the
+  predicted scale; the **y-axis limits match the published** (e.g. M 0-7.5, N 0-27, O 0-6) and the
+  x-axis (bin window) already matched. `coverage_track` falls back to observed only if a predicted npz
+  is absent. `verify_fig7JO.csv` = **24/24** (ref/alt/ISM-recomputed + DREAM-present per locus).
 
 ---
 
@@ -160,10 +178,11 @@ The stale claim has been corrected in `README.md` and `reproduction/VERIFICATION
    shown in J–O (−0.271 / 0.177), which is a per-track/per-gene average. The **Shorkie ISM REF/ALT
    saliency logos themselves (rows 2–3) are recomputed bit-for-bit from the released ISM cache.**
 
-5. **J–O Shorkie Coverage** is now **gene-windowed** (centred on the gene, with the published
-   range/markers — refinement pass 3) but the signal is still observed RNA-seq coverage as a faithful
-   proxy for the model's predicted-coverage track (the two correlate R>0.96 at these loci; cf. A/B).
-   Predicted Ref/Alt coverage needs the 8-fold GPU ensemble and is not cached.
+5. **J–O Shorkie Coverage** is the 8-fold ensemble's PREDICTED Ref/Alt RNA-Seq(T0) coverage
+   (refinement pass 4; `panels/run_cov_eqtl_jo.py` -> `reproduced/ism/cov_<panel>.npz`), gene-windowed
+   and drawn in the published overlapping Ref (blue) + Alt (orange) style with **matching x and y axis
+   limits**. (Earlier passes used the observed RNA-seq proxy, which sits on a different, locus-specific
+   scale ~11-17x smaller and so could not match the published predicted y-axis.)
 
 6. **C/D are schematics** (cartoons), reproduced to match the published illustrations conceptually.
    The panel-D TSS-distance ECDF (genuine evidence the negatives are distance-matched) is retained
