@@ -1,0 +1,7 @@
+panel,csv_name,n_true,n_bg,median_abs_dist_true,median_abs_dist_bg,enriched_near_tss,published_n,count_match
+start codon (ATG),MIG3.4,2216,2216,4.0,553.0,True,2218,False
+Abf1.1,ABF1.1,745,745,232.0,556.0,True,745,True
+Rap1.1,RAP1.1,644,644,312.0,552.0,True,644,True
+Reb1p,Reb1p&consensus=CCGGGTAA,821,821,224.0,569.0,True,821,True
+5' splice site (donor site),CHA4.11,603,603,125.0,599.0,True,603,True
+branch point,SWI5.7,779,779,342.0,599.0,True,779,True

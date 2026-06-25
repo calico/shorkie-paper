@@ -17,13 +17,86 @@ Contact *[drk (at) @calicolabs.com](mailto:drk@calicolabs.com)*, *[jlinder (at) 
 
 ---
 
+## Reproducing the paper
+
+### Quickstart
+
+```bash
+git clone --recurse-submodules git@github.com:calico/shorkie-paper.git
+cd shorkie-paper
+conda env create -f environment.yml && conda activate yeast_ml      # env name: yeast_ml
+pip install -e external/baskerville-yeast -e external/westminster -e .   # model code + this package
+cp config/paths.example.yaml config/paths.yaml                      # then edit `work_root`
+bash data/download.sh --minimal                                     # 8 finetuned folds for the minimal example
+python -m ipykernel install --user --name yeast_ml                  # for the notebooks
+```
+
+`data/download.sh` also takes `--models [lm|finetuned|random_init|all]` (Shorkie LM + Shorkie 8-fold are
+live now; Shorkie_Random_Init 8-fold is catalogued and goes live after the maintainer runs
+`scripts/00_setup/upload_release.sh`), `--lm-corpus <tier>`, `--supervised`, `--eqtl`, and `--mpra`
+(all verified against [`data/manifest.json`](./data/manifest.json)). All filesystem paths resolve
+through `config/paths.yaml` — there are no hardcoded machine paths in the scripts.
+
+### Repository layout
+
+| Path | What |
+|---|---|
+| [`src/shorkie/`](./src/shorkie) | installable helper package — `config` (paths), `models.ensemble` (8-fold loader + `logSED`), `helpers.yeast_helpers`, `viz.load_cov` |
+| [`scripts/`](./scripts) | all pipelines, staged `00_setup → 01_data_build → 02_train → 03_eval → 04_analysis` (+ `common/`) |
+| [`notebooks/`](./notebooks) | 7 figure-reproduction notebooks `fig01`–`fig07`, one per main-text figure (import from `shorkie`, pinned to the `yeast_ml` kernel) |
+| [`reproduction/`](./reproduction) | per-figure audit layer behind each notebook: panel builders, published-panel crops, reproduced-vs-published verification (`verify_figNN.csv`) |
+| [`config/`](./config) | `paths.example.yaml`, `slurm.example.yaml` templates |
+| [`data/`](./data) | committed reference files + `manifest.json` + `download.sh` (large data is on GCS) |
+| [`external/`](./external) | pinned `baskerville-yeast` + `westminster` submodules |
+| [`examples/`](./examples) | how-to examples: load + run inference + variant effect for Shorkie/Shorkie_LM, and fine-tuning the LM on RNA-seq tracks |
+| [`minimal_example/`](./minimal_example) | self-contained logSED variant scorer • [`containers/`](./containers) scheduler-free image |
+
+### Reproducibility matrix
+
+| Variant | Data build | Train | Eval | Analysis |
+|---|---|---|---|---|
+| **Shorkie LM** (masked DNA LM) | [`01_data_build/lm_corpus/`](./scripts/01_data_build/lm_corpus) | [`02_train/shorkie_lm/`](./scripts/02_train/shorkie_lm) | [`03_eval/lm/`](./scripts/03_eval/lm) | [`04_analysis/shorkie_lm/`](./scripts/04_analysis/shorkie_lm) |
+| **Shorkie** (fine-tuned) | [`01_data_build/supervised_tracks/`](./scripts/01_data_build/supervised_tracks) | [`02_train/shorkie_finetuned/`](./scripts/02_train/shorkie_finetuned) | [`03_eval/supervised/`](./scripts/03_eval/supervised) | [`04_analysis/shorkie/`](./scripts/04_analysis/shorkie) |
+| **Shorkie_Random_Init** (random-init ablation, lr 5e-4, 8-fold; released) | *(same supervised set)* | [`02_train/shorkie_scratch/`](./scripts/02_train/shorkie_scratch) | [`03_eval/supervised/`](./scripts/03_eval/supervised) | [`04_analysis/shorkie_scratch/`](./scripts/04_analysis/shorkie_scratch) |
+
+The only difference between *finetuned* and *scratch* is the `--restore` flag + learning rate
+(see [`scripts/02_train/README.md`](./scripts/02_train/README.md)).
+
+### Figures → notebooks → upstream stage
+
+One notebook per main-text figure in [`notebooks/`](./notebooks) (`fig01`–`fig07`); ✅ = runs
+end-to-end from released data (`data/download.sh`), ⬚ = load-and-plot from a gated intermediate
+produced by the cited stage. Each notebook delegates the panel work to its audit layer under
+[`reproduction/figure_NN/`](./reproduction). See [`notebooks/README.md`](./notebooks/README.md)
+for the full artifact + `config` key index.
+
+| Notebook | Figure | Runs from released data? | Upstream `scripts/` stage |
+|---|---|:--:|---|
+| `fig01_fungal_lm_corpus_architecture` | Fig 1 — LM corpus, phylogeny, architecture & performance | ⬚ | `01_data_build/lm_corpus/` + `02_train/shorkie_lm/` + `03_eval/lm/` |
+| `fig02_lm_conserved_motifs` | Fig 2 — conserved TF motifs (SMT3, motif→TSS, t-SNE) | ⬚ | `04_analysis/shorkie_lm/{lm_SMT3_viz,motif_analysis,umap_cluster_promoter}/` |
+| `fig03_supervised_rnaseq_prediction` | Fig 3 — RNA-seq prediction (violin, scatter, coverage) | ⬚ / ✅ GPU | `03_eval/supervised/track_prediction_eval/` |
+| `fig04_promoter_splicing_motifs` | Fig 4 — promoter & splicing ISM motifs + MoDISco | ⬚ | `04_analysis/shorkie/ism_motif/motif_shorkie__RP_TSS/` |
+| `fig05_timecourse_tf_induction` | Fig 5 — time-course MSN2/MSN4 TF induction | ⬚ | `04_analysis/shorkie/ism_motif/motif_shorkie__time_series/` |
+| `fig06_mpra_variant_effects` | Fig 6 — MPRA promoter variant effects | ⬚ | `04_analysis/shorkie/mpra/` |
+| `fig07_eqtl_variant_effects` | Fig 7 — cis-eQTL variant effects (ROC/PR, ISM) | ⬚ / ✅ GPU | `04_analysis/shorkie/eqtl/` |
+
+---
+
 ## Model Availability
 
-The model weights can be downloaded as .h5 files from the URLs below. We are releasing both Shorkie LM-DNA language model and Shorkie, fine-tuned with thousands of epigenomic and transcriptomic profiles. 
+The model weights are downloaded as .h5 files from the URLs below (or with
+`data/download.sh --models all`). **Shorkie LM** and **Shorkie** (8-fold) are live on the public bucket;
+**Shorkie_Random_Init** is prepared + catalogued in [`data/manifest.json`](./data/manifest.json) and is
+published by the maintainer with `scripts/00_setup/upload_release.sh --models` (the links below go live
+after that upload).
 
-- [Shorkie LM](https://storage.googleapis.com/seqnn-share/shorkie_lm/train/model_best.h5)
-- Shorkie (`gs://seqnn-share/shorkie/`)
+- **(live)** [Shorkie LM](https://storage.googleapis.com/seqnn-share/shorkie_lm/train/model_best.h5)
+- **(live)** Shorkie (`gs://seqnn-share/shorkie/`)
     - [f0](https://storage.googleapis.com/seqnn-share/shorkie/f0/model_best.h5) | [f1](https://storage.googleapis.com/seqnn-share/shorkie/f1/model_best.h5) | [f2](https://storage.googleapis.com/seqnn-share/shorkie/f2/model_best.h5) | [f3](https://storage.googleapis.com/seqnn-share/shorkie/f3/model_best.h5) | [f4](https://storage.googleapis.com/seqnn-share/shorkie/f4/model_best.h5) | [f5](https://storage.googleapis.com/seqnn-share/shorkie/f5/model_best.h5) | [f6](https://storage.googleapis.com/seqnn-share/shorkie/f6/model_best.h5) | [f7](https://storage.googleapis.com/seqnn-share/shorkie/f7/model_best.h5)
+- **(pending upload)** Shorkie_Random_Init (from-scratch ablation, lr 5e-4, 8-fold; `gs://seqnn-share/shorkie_random_init/f0..f7/model_best.h5`)
+
+**New users → see [`examples/`](./examples)** for notebooks on loading each model, running inference,
+variant-effect prediction, and fine-tuning the LM on RNA-seq tracks.
 
 ---
 
@@ -39,7 +112,7 @@ To support reproducibility and the Shorkie LM variants introduced in the paper, 
 - 165_Saccharomycetales: [genomes] `gs://shorkie-paper/data/unsupervised/genome/165_Saccharomycetales/` | [tfrecord] `gs://shorkie-paper/data/unsupervised/processed/165_Saccharomycetales/`
 - 1341_Fungus: [genomes] `gs://shorkie-paper/data/unsupervised/genome/1341_Fungus/` | [tfrecord] `gs://shorkie-paper/data/unsupervised/processed/1341_Fungus/`
 
-- The training script is at [`model/shorkie_lm` on GitHub](https://github.com/calico/shorkie-paper/tree/main/model/shorkie_lm).
+- The training script is at [`scripts/02_train/shorkie_lm/`](./scripts/02_train/shorkie_lm).
 
 ### Shorkie
 
@@ -53,7 +126,7 @@ Shorkie was fine-tuned from the Shorkie LM using large-scale transcriptomic and 
 
 - **ChIP-exo** & **ChIP-MNase**: (Rossi, M.J. et al., *Nature*, 2021).
 
-- The training script is at [`model/shorkie` on GitHub](https://github.com/calico/shorkie-paper/tree/main/model/shorkie).
+- The training script is at [`scripts/02_train/shorkie_finetuned/`](./scripts/02_train/shorkie_finetuned).
 
 
 ---
@@ -61,6 +134,15 @@ Shorkie was fine-tuned from the Shorkie LM using large-scale transcriptomic and 
 ## Benchmark data availability
 
 This section lists external benchmark datasets used to evaluate **Shorkie**, along with their sources and primary references.
+
+> **Prepared for reproduction (publication pending).** The reproduction-critical subsets — the per-SNP
+> eQTL score TSVs (Caudal/Kita/Renganaath, Shorkie / Shorkie_LM / Shorkie_Random_Init) and the MPRA
+> ground-truth expression + cached Shorkie/DREAM scores — are catalogued in
+> [`data/manifest.json`](./data/manifest.json) and published to `gs://shorkie-paper/{eqtl,mpra}/` by the
+> maintainer with `scripts/00_setup/upload_release.sh --eqtl --mpra`; thereafter `data/download.sh --eqtl`
+> / `--mpra` (requester-pays; pass `-u PROJECT`) fetches them and Figures 6–7 reproduce on CPU without
+> re-scoring. The large raw inputs (the 1011-genomes GVCF, the full DREAM Challenge sequences, the
+> DREAM-RNN/PrixFixe weights) are third-party and obtained from their original sources below (not re-hosted).
 
 ### MPRA (Random Promoter DREAM Challenge)
 
@@ -97,7 +179,9 @@ Effect Difference) score for a single SNP — no fine-tuning required.
 
 ### Setup
 
-1. **Download model weights** (8 folds):
+1. **Download model weights** (8 folds). Easiest: `bash data/download.sh --minimal`
+   (fetches into the `my_shorkie/train/f{i}c0/train/model_best.h5` layout below and
+   verifies MD5s against [`data/manifest.json`](./data/manifest.json)). Or manually:
    ```bash
    mkdir -p my_shorkie/train
    for i in 0 1 2 3 4 5 6 7; do

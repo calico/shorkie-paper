@@ -205,3 +205,47 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# ---- shorkie-paper ----
+# User config copies (templates are committed as *.example.yaml)
+config/paths.yaml
+config/slurm.yaml
+# Transient SLURM job logs from notebook execution (Phase 7b GPU runs)
+notebooks/_gpu_*.out
+notebooks/*.out
+# Downloaded large artifacts (default data_root)
+data_local/
+# Large binaries should never be committed (hosted on GCS; see data/manifest.json)
+*.h5
+*.bw
+*.bigwig
+*.tfr
+*.bam
+*.bai
+*.fasta
+*.fa
+*.fai
+# ...but keep the committed small reference files under data/
+!data/R64_annotations/**
+# Manuscript PDFs: large local reference (~370 MB). The reproduction/ layer is
+# self-contained via its committed published/*.png renders. Un-ignore if you want
+# the figure PDFs in-repo (e.g. !paper/Figures/**).
+paper/
+# Heavy reproduction intermediates (recomputed by reproduction/**/panels/*.sh);
+# small text outputs (.coords/.tab/.nwk) and rendered PNGs are kept.
+reproduction/**/*.delta
+reproduction/**/reproduced/**/*.fasta
+# Figure 4 recheck regenerable caches/intermediates (rebuilt from gated preds.npz /
+# the modisco h5 via recheck/build_4*.py + run_tomtom.py).
+reproduction/figure_04/recheck/lm_cache_*.npz
+reproduction/figure_04/recheck/_modisco_RP_query.meme
+reproduction/figure_04/recheck/_tomtom_RP/
+# Recheck QA comparison composites — regenerated on demand by recheck/make_sidebyside_*.py
+# and reproduction/recheck/make_sidebyside.py (the reproduced/ panels + verify CSVs are committed).
+reproduction/figure_*/recheck/*_sidebyside.png
+reproduction/figure_*/recheck/published_vs_reproduced.png
+reproduction/figure_*/recheck/Figure_*_published_vs_reproduced.png
+reproduction/figure_*/recheck/original_vs_reproduced_*.png
+reproduction/figure_07/recheck/_pub_*.png
+# minimal_example downloaded model weights (populated by `data/download.sh --minimal`)
+my_shorkie/

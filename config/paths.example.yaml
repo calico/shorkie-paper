@@ -1,0 +1,142 @@
+# ---------------------------------------------------------------------------
+# shorkie-paper path configuration
+# ---------------------------------------------------------------------------
+# Copy this file to config/paths.yaml (git-ignored) and edit `work_root` for
+# your machine, or point $SHORKIE_CONFIG at a copy elsewhere. Loaded by
+# src/shorkie/config.py.  ${token} resolves to an environment variable of that
+# name if set, otherwise to another key here (dotted path, e.g. ${genome.fasta}).
+# ${repo_root} is injected automatically (the repository root).
+# ---------------------------------------------------------------------------
+
+# Legacy work directory that holds the large data / model / experiment trees.
+# This is the ONE place an absolute machine path is recorded; override it.
+work_root: /home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML
+
+# Where data/download.sh places downloaded PUBLIC artifacts (clean layout).
+release_root: ./data_local
+
+# Small reference files committed in this repo.
+reference_dir: ${repo_root}/data/R64_annotations
+
+# External motif-database directory (MEME/YeTFaSCo yeast set: merged_meme.meme,
+# merged_meme_high_conf.meme, 3UTR_prob.meme, …). Used by the modisco `report`
+# steps in the motif-analysis pipelines to annotate discovered motifs. Not
+# committed (external download/build) — override for your machine.
+motif_db_dir: /home/kchao10/tools/motif_databases/YEAST
+
+# External-tool binaries / library files required by the LM-corpus build + genome-eval
+# pipelines (RepeatMasker repeat masking, the RMRB RepeatMasker library, and the
+# dashing2 genome-sketch tool). These are external downloads/builds — install them and
+# point these keys at your local copies (documented as prerequisites in the relevant
+# stage READMEs).
+tools:
+  repeatmasker_lib: /home/khc/bin/RepeatMasker/Libraries/RepeatMasker.lib
+  rmrb_lib:         /home/khc/tools/RMRB/Libraries/RMRBSeqs.fasta
+  dashing2_bin:     /home/khc/bin/dashing2
+  # TomTom (MEME suite) executable for motif->TF matching (figure_04 panel H +
+  # the motif_lm__RP_TSS pipeline). Defaults to `tomtom` on PATH (mirrors the
+  # upstream --tomtom_exec); set an absolute path if MEME is installed off-PATH
+  # (e.g. ~/tools/meme/bin/tomtom).
+  tomtom_bin:       tomtom
+
+# --- Sub-roots of the work dir (preserve the existing tree structure) ---
+data_root:           ${work_root}/data
+seq_experiment_root: ${work_root}/seq_experiment
+lm_experiment_root:  ${work_root}/lm_experiment
+experiments_root:    ${work_root}/experiments
+
+# --- Legacy data-build / genome-eval working roots (separate from work_root) ---
+# The LM-corpus build (scripts/01_data_build/lm_corpus/) and genome/model evaluation
+# (scripts/03_eval/lm/{genome_evaluation,model_evaluation}/) were run under a separate
+# scratch root, `yeast_ssm`, distinct from work_root above. Override for your machine.
+corpus_build_data_root:    /scratch4/khc/yeast_ssm/data
+corpus_build_results_root: /scratch4/khc/yeast_ssm/results
+# Legacy ssm paralog/genome-similarity results read by the corpus paralog-coords step
+# (scripts/01_data_build/lm_corpus/3_data_filtering/.../nucmer/s5_get_paralog_coords.py).
+ssm_results_root:          /home/khc/projects/ssm/results
+# Legacy yeast-seqNN gene-level eval root for the big-UNet self/supervised comparison
+# (scripts/03_eval/lm/model_evaluation/); holds {self_supervised,supervised}_unet_big/.
+yeast_seqnn_eval_root:     /home/khc/projects/yeast_seqNN/self_supervised/exp_105/histone__chip_exo__rna_seq/16bp
+
+# --- S. cerevisiae R64 reference genome (lives in the LM corpus data tree) ---
+r64_data_dir: ${data_root}/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_r64_gtf
+genome:
+  fasta:       ${r64_data_dir}/fasta/GCA_000146045_2.cleaned.fasta
+  gtf:         ${r64_data_dir}/gtf/GCA_000146045_2.59.gtf
+  chrom_sizes: ${reference_dir}/chrom.sizes
+  mask_bed:    ${reference_dir}/mask_rossi.bed
+  gaps_bed:    ${reference_dir}/assembly_gaps.bed
+  # Supervised-track TFRecord build uses the SGD S288C R64-3-1 assembly (publicly
+  # available; see scripts/01_data_build/supervised_tracks/README.md). Not committed
+  # (~12 MB) — point this at a local copy.
+  r64_supervised_fasta: ${seq_experiment_root}/R64_annotations/S288C_R64-3-1.fasta
+
+# --- Trained models ---
+models:
+  num_folds: 8
+  # Shorkie_LM directory and its best checkpoint (the --restore target).
+  shorkie_lm:            ${lm_experiment_root}/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/LM_Johannes/lm_saccharomycetales_gtf/lm_saccharomycetales_gtf_unet_small_bert_drop
+  shorkie_lm_checkpoint: ${models.shorkie_lm}/train/model_best.h5
+  # Supervised 8-fold models (each holds train/f0c0..f7c0/).
+  shorkie_finetuned:     ${seq_experiment_root}/exp_histone__chip_exo__rna_seq_no_norm_5215_tracks/16bp/self_supervised_unet_small_bert_drop
+  # Shorkie_Random_Init: the from-scratch ablation used in the paper figures (lr 5e-4, 8-fold).
+  shorkie_random_init:   ${seq_experiment_root}/exp_histone__chip_exo__rna_seq_no_norm_5215_tracks/16bp/supervised_unet_small_bert_drop_variants/learning_rate_0.0005
+  # DEPRECATED: an earlier random-init run at lr 1e-4. The paper's Shorkie_Random_Init is
+  # models.shorkie_random_init (lr 5e-4) above; this key is kept only for back-compat.
+  shorkie_scratch:       ${seq_experiment_root}/exp_histone__chip_exo__rna_seq_no_norm_5215_tracks/16bp/shorkie_models/shorkie_random_initialization
+
+# --- Datasets ---
+datasets:
+  supervised_root: ${seq_experiment_root}/exp_histone__chip_exo__rna_seq_no_norm_5215_tracks/16bp
+  targets_sheet:   ${datasets.supervised_root}/cleaned_sheet.txt
+  # 8-fold supervised TFRecord dir (hound_data.py output) — the positional data
+  # arg consumed by westminster_train_folds.py for the finetuned + scratch models.
+  supervised_data: ${datasets.supervised_root}/data
+  bigwigs:         ${data_root}/bigwigs
+  mpra:            ${data_root}/MPRA
+  eqtl:            ${data_root}/eQTL
+  lm_corpus_root:  ${data_root}/yeast/ensembl_fungi_59      # 4 corpus tiers live under here
+  # Chromosome-holdout split subdir under lm_corpus_root holding the 4 tier dirs
+  # (data_{r64,strains,saccharomycetales,fungi_1385}_gtf/) + per-tier species CSVs.
+  lm_corpus_split_root: ${datasets.lm_corpus_root}/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI
+  # The 165_Saccharomycetales tier dir (tfrecords/ + statistics.json) the LM trains on
+  # — hound_train.py's --eval_dir and positional data arg. This is the released-corpus
+  # layout; the original training read from an internal seqnn/ensembl_fungi_59_3 staging
+  # path that no longer exists.
+  lm_train_dir: ${datasets.lm_corpus_split_root}/data_saccharomycetales_gtf
+
+# --- Analysis intermediates (NOT in the released data/manifest.json) ---
+# These artifacts are produced by the cited upstream scripts/ stages and are large /
+# work-dir-only. The figure-reproduction notebooks (notebooks/figNN_*.ipynb) read
+# them through these keys. To reproduce a "gated" figure, first run its upstream
+# stage, then point the relevant key at where you wrote the output (defaults below
+# follow the paper's work_root layout). The runnable notebooks (fig01/06/08/10) do
+# NOT need this block — they recompute from released weights + genome/bigwigs.
+results:
+  # LM test perplexity/loss logs: <key>/lm_<tier>_gtf/lm_<tier>_gtf_<arch>/test_testset_perplexity_region/test_testset_perplexity_region.out  (scripts/03_eval/lm/lm_model_eval/)
+  lm_eval_logs:   ${lm_experiment_root}/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/LM_Johannes
+  # In-distribution LM tfmodisco: <key>/<arch>/modisco_results_w16384_n100000.h5  (.../motif_analysis/motif_lm/)
+  modisco_lm:     ${experiments_root}/motif_LM/saccharomycetales_viz_seq
+  # Cross-species LM tfmodisco: <key>/<tier>_viz_seq/<arch>/modisco_results_w_16384_n_1000000.h5  (.../motif_lm__unseen_species/)
+  modisco_unseen: ${experiments_root}/motif_LM__unseen_species
+  # Shorkie ISM tfmodisco: <key>/gene_exp_motif_test_{RP,TSS}/f0c0/logSED/modisco_results_10000_500.h5
+  modisco_ism:    ${experiments_root}/SUM_data_process/motifs/motif_shorkie_RP_TSS/1_modisco_analysis
+  # Shorkie/Random_Init ISM score .h5 (RP/RRB/SS genes): <key>/motif_{shorkie,random_init}_RP_TSS/gene_exp_motif_test_{RP,RRB_targets,SS}/f0c0/part*/scores.h5
+  ism_scores:     ${experiments_root}/SUM_data_process/motifs
+  # Promoter LM embeddings (embeddings_LM_sequence/embeddings_chr*.h5) + UMAP coords  (.../UMAP_cluster_promoter/)
+  umap:           ${experiments_root}/UMAP_cluster_promoter
+  # Precomputed attention tensors — optional; fig06 instead recomputes from models.shorkie_lm  (.../attention_map/)
+  attention:      ${experiments_root}/attention_map
+  # eQTL per-model score TSVs: <key>/negset_<n>/<exp>_Shorkie{,_LM,_Random_Init}_scores.tsv  (.../eqtl/3_visualization/)
+  eqtl_scores:    ${work_root}/revision_experiments/eQTL/viz_new/results
+  # DREAM MPRA-model eQTL eval TSVs (baseline comparison for the eQTL benchmark)  (.../eqtl/)
+  mpra_eval:      ${experiments_root}/SUM_data_process/eQTL/eqtl_MPRA_modeals_eval
+  # MPRA per-context logSED prediction NPZ: <key>/results/<seq_type>/<SYMBOL>_<ORF>_avg_outputs/<ORF>_context_<i>_*.npz  (scripts/04_analysis/shorkie/mpra/5_mpra_viz/)
+  mpra_viz:       ${experiments_root}/SUM_data_process/MPRA/MPRA_promoter_seqs/scores_avg
+  # Per-fold training logs: <key>/{supervised,self_supervised}_unet_small_bert_drop/train/f<i>c0/train.out  (scripts/03_eval/supervised/, scripts/04_analysis/shorkie_scratch/)
+  train_logs:     ${datasets.supervised_root}
+
+# --- External code (in-repo git submodules) ---
+external:
+  baskerville_scripts: ${repo_root}/external/baskerville-yeast/src/baskerville/scripts
+  westminster_scripts: ${repo_root}/external/westminster/src/westminster/scripts

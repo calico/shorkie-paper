@@ -1,0 +1,37 @@
+#!/bin/sh
+
+#SBATCH --partition=parallel
+#SBATCH --time=72:00:00
+#SBATCH -N 1
+#SBATCH -n 8
+#SBATCH --job-name=tfmodisco
+#SBATCH --output=job_output_%A_%a.log
+#SBATCH --mail-type=end
+#SBATCH -A ssalzbe1_gpu
+#SBATCH --mem=64G
+#SBATCH --array=0-1
+
+# Resolve machine paths from config (config/paths.yaml)
+cfg() { python -c "import sys; from shorkie import config; print(config.get(sys.argv[1]) or '')" "$1"; }
+MOTIF_DB_DIR="$(cfg motif_db_dir)"
+
+# Define the species list
+species_ls=('schizosaccharomycetales' 'strains_select')
+
+# Get the current species based on the array index
+if [ $SLURM_ARRAY_TASK_ID -lt ${#species_ls[@]} ]; then
+    species=${species_ls[$SLURM_ARRAY_TASK_ID]}
+else
+    echo "Error: SLURM_ARRAY_TASK_ID out of bounds. Exiting."
+    exit 1
+fi
+
+# Define the model architecture (single model in this case)
+model="unet_small_bert_aux_drop"
+
+# Define input file paths based on the species
+output_file="${species}_viz_seq/averaged_models/${model}/modisco_results.h5"
+report_dir="${species}_viz_seq/averaged_models/${model}/report_merge/"
+
+# Run TF-MoDISco
+modisco report -i "$output_file" -o "$report_dir" -s "$report_dir" -m ${MOTIF_DB_DIR}/merged_meme.meme

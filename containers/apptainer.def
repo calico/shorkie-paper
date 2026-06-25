@@ -1,0 +1,31 @@
+# Shorkie reproducibility image for HPC (Apptainer / Singularity).
+#
+# Build (needs fakeroot or sudo) from the repo root with submodules present:
+#   git submodule update --init external/baskerville-yeast external/westminster
+#   apptainer build shorkie.sif containers/apptainer.def
+#
+# Run:
+#   apptainer exec shorkie.sif python minimal_example/run_shorkie_variant.py --help
+Bootstrap: docker
+From: continuumio/miniconda3:24.1.2-0
+
+%files
+    . /opt/shorkie
+
+%post
+    apt-get update && apt-get install -y --no-install-recommends \
+        build-essential git wget zlib1g-dev libbz2-dev liblzma-dev libcurl4-openssl-dev
+    rm -rf /var/lib/apt/lists/*
+    cd /opt/shorkie
+    conda env create -f environment.yml
+    . /opt/conda/etc/profile.d/conda.sh
+    conda activate yeast_ml
+    pip install -e external/baskerville-yeast
+    pip install -e external/westminster
+    pip install -e .
+
+%environment
+    export PATH=/opt/conda/envs/yeast_ml/bin:$PATH
+
+%runscript
+    exec python "$@"

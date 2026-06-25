@@ -1,0 +1,2 @@
+source "$(git rev-parse --show-toplevel)/scripts/common/env.sh"
+python 2_extract_SS_from_multiexon.py -i ${WORK_ROOT}/data/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_r64_gtf/gtf/GCA_000146045_2.59.gtf -o ${WORK_ROOT}/data/gene_exp_ism_window/SS_windows.bed

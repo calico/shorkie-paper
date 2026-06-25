@@ -1,0 +1,14 @@
+metric,value
+n_points,16384
+n_classes,5
+silhouette_2d,0.0964
+silhouette_2d[Intergenic region],-0.0946
+silhouette_2d[Promoter],0.1884
+silhouette_2d[Protein-coding gene],0.0490
+silhouette_2d[Transposable element],0.6359
+silhouette_2d[tRNA],0.8499
+count[Promoter],6573
+count[Protein-coding gene],6572
+count[Intergenic region],2873
+count[tRNA],275
+count[Transposable element],91

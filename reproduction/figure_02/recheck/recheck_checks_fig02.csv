@@ -1,0 +1,22 @@
+panel,metric,reported,reproduced,delta,rtol,atol,verdict
+2A,three_rows_same_width,1.0,1.0,0.0,0.02,0.0,PASS
+2A,SpeciesLM_argmax_vs_genome_agree(>=0.8),0.8,0.9455,0.14549999999999996,0.02,0.0,PASS
+2A,SpeciesLM_vs_Shorkie_registered_pwm_corr(>=0.5),0.5,0.9511,0.45109999999999995,0.02,0.0,PASS
+2A,Shorkie_unmasked_vs_iterative_pwm_corr(>=0.4),0.4,0.814,0.4139999999999999,0.02,0.0,PASS
+2A,Cbf1_Ebox_in_window,1.0,1.0,0.0,0.02,0.0,PASS
+2A,polydAdT_in_window,1.0,1.0,0.0,0.02,0.0,PASS
+2D,start codon (ATG)_enriched_near_TSS,1.0,1.0,0.0,0.02,0.0,PASS
+2D,Abf1.1_enriched_near_TSS,1.0,1.0,0.0,0.02,0.0,PASS
+2D,Rap1.1_enriched_near_TSS,1.0,1.0,0.0,0.02,0.0,PASS
+2D,Reb1p_enriched_near_TSS,1.0,1.0,0.0,0.02,0.0,PASS
+2D,5' splice site (donor site)_enriched_near_TSS,1.0,1.0,0.0,0.02,0.0,PASS
+2D,branch point_enriched_near_TSS,1.0,1.0,0.0,0.02,0.0,PASS
+2D,"start codon (ATG)_n≈published(2218,±1%)",1.0,1.0,0.0,0.02,0.0,PASS
+2D,"Abf1.1_n≈published(745,±1%)",1.0,1.0,0.0,0.02,0.0,PASS
+2D,"Rap1.1_n≈published(644,±1%)",1.0,1.0,0.0,0.02,0.0,PASS
+2D,"Reb1p_n≈published(821,±1%)",1.0,1.0,0.0,0.02,0.0,PASS
+2D,"5' splice site (donor site)_n≈published(603,±1%)",1.0,1.0,0.0,0.02,0.0,PASS
+2D,"branch point_n≈published(779,±1%)",1.0,1.0,0.0,0.02,0.0,PASS
+2E,feature_classes_present(==5),5.0,5.0,0.0,0.0,0.0,PASS
+2E,tSNE_silhouette_2d(>0),0.0,0.0964,0.0964,0.02,0.0,PASS
+2E,n_points_all_16_chr(>=10000),10000.0,16384.0,6384.0,0.02,0.0,PASS

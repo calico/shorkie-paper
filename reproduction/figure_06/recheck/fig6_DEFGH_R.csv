@@ -1,0 +1,11 @@
+panel,seq_type,model,pearson_repro,spearman_repro,n,published_pearson,delta
+6D,yeast_seqs,Shorkie,0.6950,0.7178,964,0.695,-0.0000
+6D,yeast_seqs,DREAM-RNN,0.8908,0.8906,964,0.891,-0.0002
+6E,all_random_seqs,Shorkie,0.7442,0.7577,800,0.744,+0.0002
+6E,all_random_seqs,DREAM-RNN,0.9807,0.9830,800,0.981,-0.0003
+6F,all_SNVs_seqs,Shorkie,0.5389,0.4197,999,0.539,-0.0001
+6F,all_SNVs_seqs,DREAM-RNN,0.8656,0.7091,1000,0.866,-0.0004
+6G,motif_perturbation,Shorkie,0.8192,0.7454,1000,0.819,+0.0002
+6G,motif_perturbation,DREAM-RNN,0.9830,0.9700,1000,0.983,-0.0000
+6H,motif_tiling_seqs,Shorkie,0.5612,0.5463,1000,0.561,+0.0002
+6H,motif_tiling_seqs,DREAM-RNN,0.9427,0.9437,1000,0.943,-0.0003

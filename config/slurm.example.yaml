@@ -1,0 +1,39 @@
+# ---------------------------------------------------------------------------
+# SLURM scheduler configuration for shorkie-paper
+# ---------------------------------------------------------------------------
+# Copy to config/slurm.yaml (git-ignored) and edit. Consumed by
+# scripts/common/submit.sh, which emits #SBATCH directives keyed by a
+# --profile {gpu|cpu|bigmem} argument, so the pipeline scripts themselves stay
+# scheduler-agnostic. Leave `email` blank to disable mail notifications.
+# ---------------------------------------------------------------------------
+
+email:        ""          # blank = no --mail-user; otherwise your address
+mail_type:    end
+conda_env:    yeast_ml
+
+default_time: "48:00:00"
+default_mem:  "32G"
+
+# Partition profiles observed on the JHU Salzberg cluster. Edit for your site.
+profiles:
+  gpu:
+    partition: a100
+    account:   ssalzbe1_gpu
+    gres:      "gpu:1"
+    time:      "72:00:00"
+    mem:       "32G"
+    ntasks_per_node: 1
+  cpu:
+    partition: parallel
+    account:   ssalzbe1-chess
+    gres:      ""
+    time:      "48:00:00"
+    mem:       "32G"
+    ntasks_per_node: 8
+  bigmem:
+    partition: bigmem
+    account:   ssalzbe1_bigmem
+    gres:      ""
+    time:      "48:00:00"
+    mem:       "64G"
+    ntasks_per_node: 8

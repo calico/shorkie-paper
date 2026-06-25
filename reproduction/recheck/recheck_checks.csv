@@ -1,0 +1,9 @@
+panel,metric,reported,reproduced,delta,rtol,atol,verdict
+2C,n_TFMoDISco_pos_patterns(>=6),6,118,112,0.02,0.0,PASS
+2D,tss_median_abs_dist_motif_bp(<bg),553.5,500.0,-53.5,0.02,0.0,PASS
+2D,tss_MannWhitneyU_p_motif_lt_bg(<0.05),0.05,5.8282541930505356e-93,-0.05,0.02,0.0,PASS
+3E,gene_R_allgroups_pearsonr_median[Shorkie],0.88,0.8799,-9.999999999998899e-05,0.02,0.0,PASS
+3E,gene_R[Shorkie]>gene_R[Random_Init],0.8772056774145921,0.8799,0.0026943225854079156,0.02,0.0,PASS
+3F,RNAseq_pearsonr_gene_median[Shorkie]>[Random_Init],0.6273,0.7712,0.14390000000000003,0.02,0.0,PASS
+6D,"DREAM_native_pearsonR_all_splits(best ctx 150, <0.70)",0.7,0.2635,-0.43649999999999994,0.02,0.0,PASS
+6D,Shorkie_native_logSED_R_present(=0.644),0.644,0.644,0.0,0.02,0.001,PASS

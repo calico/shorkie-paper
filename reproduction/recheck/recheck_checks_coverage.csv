@@ -1,0 +1,7 @@
+panel,metric,reported,reproduced,delta,rtol,atol,verdict
+3H,"coverage_Pearson_R[Shorkie,obs](>0.5)",0.5,0.9919,0.4919,0.02,0.0,PASS
+3H,"coverage_Pearson_R[Random_Init,obs](>0.5)",0.5,0.9689,0.4689,0.02,0.0,PASS
+3I,"coverage_Pearson_R[Shorkie,obs](>0.5)",0.5,0.9598,0.4598,0.02,0.0,PASS
+3I,"coverage_Pearson_R[Random_Init,obs](>0.5)",0.5,0.9575,0.4575,0.02,0.0,PASS
+3J,"coverage_Pearson_R[Shorkie,obs](>0.5)",0.5,0.975,0.475,0.02,0.0,PASS
+3J,"coverage_Pearson_R[Random_Init,obs](>0.5)",0.5,0.8472,0.34719999999999995,0.02,0.0,PASS

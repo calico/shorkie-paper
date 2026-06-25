@@ -7,13 +7,21 @@ Only `--model_dir` is required; all other arguments have sensible defaults.
 
 ## Quick Start
 
+First fetch the 8-fold weights (public bucket), then point `--model_dir` at them:
+
 ```bash
-python run_shorkie_variant.py \
-  --model_dir /home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML/seq_experiment/\
-exp_histone__chip_exo__rna_seq_no_norm_5215_tracks/16bp/self_supervised_unet_small_bert_drop
+bash ../data/download.sh --minimal              # -> ./my_shorkie/train/f{0..7}c0/train/model_best.h5
+python run_shorkie_variant.py --model_dir ./my_shorkie
 ```
 
-This runs on a built-in example variant (`chrI:124373 T>C`, gene `YAL016C-B`).
+On the training cluster you can instead use the config-resolved path:
+```bash
+python run_shorkie_variant.py \
+  --model_dir "$(python -c 'from shorkie import config; print(config.path("models.shorkie_finetuned"))')"
+```
+
+This runs on a built-in example variant (`chrI:124373 T>C`, gene `YAL016C-B`). For a notebook walkthrough
+(load → predict → variant effect), see [`../examples/`](../examples).
 
 ### Supply your own variant
 

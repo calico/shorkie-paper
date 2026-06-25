@@ -1,0 +1,5 @@
+tier,n_epochs,min_valid_loss,argmin_epoch,x_extent_batches,gene_ppl,intergenic_ppl,overall_ppl,overall_loss
+R64_yeast,117,0.4181,66,7488,3.756067,3.738555,3.74581,
+80_Strains,170,0.4154,119,10880,3.734157,3.722529,3.72572,
+165_Saccharomycetales,5001,0.4018,4728,320064,3.548762,3.636016,3.58526,
+1342_Fungus,3991,0.4055,2990,255424,3.604276,3.685101,3.63795,

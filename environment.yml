@@ -1,0 +1,82 @@
+# Conda environment for shorkie-paper.
+#
+#   conda env create -f environment.yml
+#   conda activate yeast_ml
+#   pip install -e external/baskerville-yeast -e external/westminster -e .
+#
+# Pins follow baskerville-yeast's pyproject (python 3.9, tensorflow 2.15,
+# numpy 1.24, pandas 1.5, ...). The bioconda binaries below are the external
+# tools invoked by scripts/01_data_build and scripts/04_analysis. dashing2 and
+# tfmodisco/tensorrt are not reliably packaged for conda — see notes at bottom.
+name: yeast_ml
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python=3.9
+  # --- scientific stack (ranges match baskerville-yeast) ---
+  - numpy=1.24.*
+  - pandas=1.5.*
+  - scipy=1.9.*
+  - scikit-learn=1.2.*
+  - statsmodels=0.13.*
+  - matplotlib=3.7.*
+  - seaborn=0.12.*
+  - h5py=3.10.*
+  - tqdm
+  - pyyaml
+  # --- genomics I/O ---
+  - pysam=0.22.*
+  - pybigwig=0.3.*
+  - pybedtools=0.9.*
+  - htslib
+  # --- data-build toolchain (binaries invoked by scripts) ---
+  - bedtools
+  - samtools
+  - bwa
+  - star
+  - macs3
+  - ucsc-bedgraphtobigwig
+  - minimap2
+  - mummer4
+  - repeatmasker
+  - repeatmodeler
+  - busco
+  - mash
+  - meme            # FIMO / motif DB tooling
+  # --- notebooks / figure reproduction (notebooks/figNN_*.ipynb) ---
+  # attrs>=23 is REQUIRED: nbformat/jsonschema need attrs>=22.2, but some deps
+  # (e.g. kipoi) pin attrs 21.4, which silently breaks `import nbformat` and the
+  # whole Jupyter stack. Pin the floor here so a fresh env works out of the box.
+  - attrs>=23
+  - referencing
+  - jsonschema>=4.18
+  - jupyterlab
+  - ipykernel
+  - nbconvert
+  - nbformat
+  - papermill        # optional: parameterized notebook execution
+  - logomaker        # sequence/PWM logos (fig03/04/07/13)
+  - umap-learn       # promoter embedding UMAP (fig05)
+  - pip
+  - pip:
+      - tensorflow~=2.15.0
+      - modisco-lite           # TF-MoDISco motif discovery
+      - google-cloud-storage~=2.0.0
+      - intervaltree~=3.1.0
+      - natsort~=7.1.1
+      - networkx~=2.8.4
+      - qnorm~=0.8.1
+      - tabulate
+      # Editable installs are done AFTER env creation (see header), not here,
+      # so the submodules are present first:
+      #   pip install -e external/baskerville-yeast -e external/westminster -e .
+
+# NOTES
+#  * dashing2 (genome similarity) is not on bioconda; build from
+#    https://github.com/dnbaker/dashing2 or skip (only 3_genome_dist uses it).
+#  * If a dependency resolver warns that `kipoi` wants an older `attrs`, ignore it:
+#    the notebooks need attrs>=23 and the kipoi pin is not used at runtime here.
+#    On an already-broken env: `pip install -U 'attrs>=23' referencing jsonschema`.
+#  * GPU training additionally needs `tensorrt==8.6.1` (pip) + a CUDA-enabled
+#    TensorFlow build; the container image (containers/) bakes a known-good set.

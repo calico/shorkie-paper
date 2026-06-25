@@ -1,0 +1,13 @@
+panel,metric,reported,reproduced,delta,rtol,atol,verdict
+1F,min_valid_loss[R64_yeast],0.4181,0.4181,0.0,0.0,0.0,PASS
+1G,gene_ppl[R64_yeast],3.7561,3.7561,0.0,0.0,0.0,PASS
+1G,intergenic_ppl[R64_yeast],3.7386,3.7386,0.0,0.0,0.0,PASS
+1F,min_valid_loss[80_Strains],0.4154,0.4154,0.0,0.0,0.0,PASS
+1G,gene_ppl[80_Strains],3.7342,3.7342,0.0,0.0,0.0,PASS
+1G,intergenic_ppl[80_Strains],3.7225,3.7225,0.0,0.0,0.0,PASS
+1F,min_valid_loss[165_Saccharomycetales],0.4018,0.4018,0.0,0.0,0.0,PASS
+1G,gene_ppl[165_Saccharomycetales],3.5488,3.5488,0.0,0.0,0.0,PASS
+1G,intergenic_ppl[165_Saccharomycetales],3.636,3.636,0.0,0.0,0.0,PASS
+1F,min_valid_loss[1342_Fungus],0.4055,0.4055,0.0,0.0,0.0,PASS
+1G,gene_ppl[1342_Fungus],3.6043,3.6043,0.0,0.0,0.0,PASS
+1G,intergenic_ppl[1342_Fungus],3.6851,3.6851,0.0,0.0,0.0,PASS

@@ -1,0 +1,8 @@
+figure,notebook_reexecuted,verify_csv_byte_identical,method,notes
+01,yes,yes,"fresh nbconvert re-exec (2026-06-21)","mash/mummer/ete tree outputs are cached behind `if not exists` guards; 1F/1G anchors are deterministic parses of static train.out / perplexity .out logs; 1C/1D read cached mummer .coords / mash .tab"
+02,yes,yes,"fresh nbconvert re-exec (2026-06-21)","reads static modisco .h5, TSS-distance CSV, attention embeddings .h5; deterministic pandas/plotting"
+03,yes,yes,"fresh nbconvert re-exec (2026-06-21)","reads released acc.txt / gene_acc.txt eval tables; deterministic medians"
+04,yes,yes,"fresh nbconvert re-exec (2026-06-21)","reads released ISM scores.h5 + modisco_results .h5; deterministic"
+05,yes,yes,"fresh nbconvert re-exec (2026-06-21)","reads released eval_{MSN2,MSN4} metrics + modisco diff .h5; deterministic"
+06,yes,yes,"fresh nbconvert re-exec (2026-06-21)","reads released high/low/yeast NPZ + DREAM predictions; deterministic"
+07,yes,yes,"fresh nbconvert re-exec (2026-06-21)","CPU panels read released scored eQTL TSVs; 7A/7B/7J-O render from cached GPU-ISM npz (np.load, no GPU relaunch); deterministic"

@@ -1,0 +1,10 @@
+bar,perplexity,top_pixel,pred_pixel,resid_perplexity
+gene[R64_yeast],3.7561,328,327.9,0.0000
+gene[80_Strains],3.7342,399,399.0,0.0000
+gene[165_Saccharomycetales],3.5488,1001,1000.4,0.0002
+gene[1342_Fungus],3.6043,820,820.4,0.0001
+inter[R64_yeast],3.7386,385,384.7,0.0001
+inter[80_Strains],3.7225,437,436.9,0.0000
+inter[165_Saccharomycetales],3.6360,717,717.5,0.0002
+inter[1342_Fungus],3.6851,558,558.2,0.0001
+# fit a=-3243.9970 b=12512.6949 R2=0.999998 max_resid_ppl=0.0002 verdict=PASS
