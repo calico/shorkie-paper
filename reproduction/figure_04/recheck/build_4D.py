@@ -10,7 +10,7 @@ Schirman et al.). Below, two columns (donor / branch) x two rows:
     model reconstructs from in-silico mutagenesis.
 
 (No SS-MoDISco exists on disk, so the reconstruction is taken directly from the
-SS-ISM PWM around the splice sites — documented in DISCREPANCIES.md.)
+SS-ISM PWM around the splice sites.)
 
 Output: reproduced/Figure_4D_reproduced.png
 """

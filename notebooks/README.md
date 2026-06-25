@@ -10,10 +10,9 @@ run first. All are pinned to the `yeast_ml` kernel.
 Each notebook is the **user-facing entry point** for its figure; it delegates the
 panel-by-panel work to that figure's builders under
 [`../reproduction/figure_NN/recheck/`](../reproduction). The
-[`../reproduction/`](../reproduction) tree is the **deep audit counterpart**: it adds
-the published-panel crops, the reproduced-vs-published verification (`verify_figNN.csv`),
-and per-figure `DISCREPANCIES.md`. Run the notebook to regenerate a figure; read
-`reproduction/figure_NN/` to audit how each number was checked.
+[`../reproduction/`](../reproduction) tree holds those builders plus the published-panel
+crops and the reproduced-vs-published checks (`verify_figNN.csv`). Run the notebook to
+regenerate a figure; see `reproduction/figure_NN/` for the panel sources and checks.
 
 ## Setup
 

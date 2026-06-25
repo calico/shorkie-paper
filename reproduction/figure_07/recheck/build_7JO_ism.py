@@ -24,7 +24,7 @@ Each panel stacks, top to bottom (matching the published layout):
 The Shorkie ISM logos (rows 2-3) — the scientifically central, model-derived content — are
 recomputed bit-for-bit from the released ISM cache. Rows 1/4/5 are rendered from cached
 external/database artifacts; the published Avg-logSED / quantile annotations come from the
-released scoring run (recorded in fig7JO_logsed.csv, not re-derived). See DISCREPANCIES.md.
+released scoring run (recorded in fig7JO_logsed.csv, not re-derived).
 
 Outputs: reproduced/Figure_7JO_reproduced.png
          recheck/fig7JO_logsed.csv

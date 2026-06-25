@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Rebuild reproduced/verify_fig05.csv with FIGURE-based targets and the CORRECTED panel
 letters (published: D/I = norm-R boxplots). Panels E/J (TF-Modisco motif progression) are
-intentionally skipped — see recheck/DISCREPANCIES.md.
+intentionally skipped.
 
 Checks (all recomputed from the reproduced artifacts):
   5A  ATG42 ISM window == chrII:515,214-515,714        (recomputed locus, now exact)
@@ -87,7 +87,7 @@ def main():
     # --- B/G: global ΔlogFC R ---
     checks.append(Check("5B", "MSN2_global_dLFC_PearsonR", 0.4949, round(global_r("MSN2", "YBR139W_ATG42"), 4), atol=0.001))
     checks.append(Check("5G", "MSN4_global_dLFC_PearsonR", 0.3992, round(global_r("MSN4", "YML100W_TSL1"), 4), atol=0.001))
-    # (Panels E/J — TF-Modisco motif progression — intentionally skipped; see DISCREPANCIES.md)
+    # (Panels E/J — TF-Modisco motif progression — intentionally skipped)
 
     checks.sort(key=lambda c: (c.panel, c.metric))
     print(summary(checks))

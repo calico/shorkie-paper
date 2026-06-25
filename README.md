@@ -11,15 +11,18 @@
 Shorkie is a semi-supervised sequence-to-expression model for yeast: a masked DNA language model pretrained on hundreds of closely related fungal genomes and fine-tuned on thousands of epigenomic and transcriptomic profiles—including a large set of transcriptional-regulator induction RNA-seq experiments generated for this study—to predict RNA-seq coverage and variant effects.
 
 
-This repository contains shell scripts, notebooks, and command snippets used to reproduce the analyses in the **Shorkie** paper. These analyses invoke functionality from the <a href="https://github.com/calico/baskerville-yeast" target="_blank"><strong>baskerville-yeast</strong></a>, and <a href="https://github.com/calico/westminster" target="_blank"><strong>westminster</strong></a> repositories. Please visit those repositories for installation and environment setup instructions.
+This repository lets you **run Shorkie on your own yeast sequences and variants** — and reproduce the
+analyses in the **Shorkie** paper. The model framework lives in the
+<a href="https://github.com/calico/baskerville-yeast" target="_blank"><strong>baskerville-yeast</strong></a>
+and <a href="https://github.com/calico/westminster" target="_blank"><strong>westminster</strong></a>
+repositories (pinned as submodules under `external/`); this repo adds an installable helper package
+(`src/shorkie`), the released model/data catalogue, runnable examples, and the figure notebooks.
 
 Contact *[drk (at) @calicolabs.com](mailto:drk@calicolabs.com)*, *[jlinder (at) @calicolabs.com](mailto:jlinder@calicolabs.com)*, or *[kuanhao.chao (at) @gmail.com](mailto:kuanhao.chao@gmail.com)* for questions.
 
 ---
 
-## Reproducing the paper
-
-### Quickstart
+## Quickstart
 
 ```bash
 git clone --recurse-submodules git@github.com:calico/shorkie-paper.git
@@ -27,58 +30,24 @@ cd shorkie-paper
 conda env create -f environment.yml && conda activate yeast_ml      # env name: yeast_ml
 pip install -e external/baskerville-yeast -e external/westminster -e .   # model code + this package
 cp config/paths.example.yaml config/paths.yaml                      # then edit `work_root`
-bash data/download.sh --minimal                                     # 8 finetuned folds for the minimal example
-python -m ipykernel install --user --name yeast_ml                  # for the notebooks
+bash data/download.sh --minimal                                     # 8 Shorkie folds for the example below
 ```
 
-`data/download.sh` also takes `--models [lm|finetuned|random_init|all]` (Shorkie LM + Shorkie 8-fold are
-live now; Shorkie_Random_Init 8-fold is catalogued and goes live after the maintainer runs
-`scripts/00_setup/upload_release.sh`), `--lm-corpus <tier>`, `--supervised`, `--eqtl`, and `--mpra`
-(all verified against [`data/manifest.json`](./data/manifest.json)). All filesystem paths resolve
-through `config/paths.yaml` — there are no hardcoded machine paths in the scripts.
+`data/download.sh` takes `--models [lm|finetuned|random_init|all]` (Shorkie LM + Shorkie 8-fold are live
+now; Shorkie_Random_Init 8-fold is catalogued and goes live after the maintainer runs
+`scripts/00_setup/upload_release.sh`), plus `--lm-corpus <tier>`, `--supervised`, `--eqtl`, `--mpra`
+(all verified against [`data/manifest.json`](./data/manifest.json)). Every filesystem path resolves
+through `config/paths.yaml` — there are no hardcoded machine paths.
 
-### Repository layout
+## Using Shorkie on your own data
 
-| Path | What |
-|---|---|
-| [`src/shorkie/`](./src/shorkie) | installable helper package — `config` (paths), `models.ensemble` (8-fold loader + `logSED`), `helpers.yeast_helpers`, `viz.load_cov` |
-| [`scripts/`](./scripts) | all pipelines, staged `00_setup → 01_data_build → 02_train → 03_eval → 04_analysis` (+ `common/`) |
-| [`notebooks/`](./notebooks) | 7 figure-reproduction notebooks `fig01`–`fig07`, one per main-text figure (import from `shorkie`, pinned to the `yeast_ml` kernel) |
-| [`reproduction/`](./reproduction) | per-figure audit layer behind each notebook: panel builders, published-panel crops, reproduced-vs-published verification (`verify_figNN.csv`) |
-| [`config/`](./config) | `paths.example.yaml`, `slurm.example.yaml` templates |
-| [`data/`](./data) | committed reference files + `manifest.json` + `download.sh` (large data is on GCS) |
-| [`external/`](./external) | pinned `baskerville-yeast` + `westminster` submodules |
-| [`examples/`](./examples) | how-to examples: load + run inference + variant effect for Shorkie/Shorkie_LM, and fine-tuning the LM on RNA-seq tracks |
-| [`minimal_example/`](./minimal_example) | self-contained logSED variant scorer • [`containers/`](./containers) scheduler-free image |
-
-### Reproducibility matrix
-
-| Variant | Data build | Train | Eval | Analysis |
-|---|---|---|---|---|
-| **Shorkie LM** (masked DNA LM) | [`01_data_build/lm_corpus/`](./scripts/01_data_build/lm_corpus) | [`02_train/shorkie_lm/`](./scripts/02_train/shorkie_lm) | [`03_eval/lm/`](./scripts/03_eval/lm) | [`04_analysis/shorkie_lm/`](./scripts/04_analysis/shorkie_lm) |
-| **Shorkie** (fine-tuned) | [`01_data_build/supervised_tracks/`](./scripts/01_data_build/supervised_tracks) | [`02_train/shorkie_finetuned/`](./scripts/02_train/shorkie_finetuned) | [`03_eval/supervised/`](./scripts/03_eval/supervised) | [`04_analysis/shorkie/`](./scripts/04_analysis/shorkie) |
-| **Shorkie_Random_Init** (random-init ablation, lr 5e-4, 8-fold; released) | *(same supervised set)* | [`02_train/shorkie_scratch/`](./scripts/02_train/shorkie_scratch) | [`03_eval/supervised/`](./scripts/03_eval/supervised) | [`04_analysis/shorkie_scratch/`](./scripts/04_analysis/shorkie_scratch) |
-
-The only difference between *finetuned* and *scratch* is the `--restore` flag + learning rate
-(see [`scripts/02_train/README.md`](./scripts/02_train/README.md)).
-
-### Figures → notebooks → upstream stage
-
-One notebook per main-text figure in [`notebooks/`](./notebooks) (`fig01`–`fig07`); ✅ = runs
-end-to-end from released data (`data/download.sh`), ⬚ = load-and-plot from a gated intermediate
-produced by the cited stage. Each notebook delegates the panel work to its audit layer under
-[`reproduction/figure_NN/`](./reproduction). See [`notebooks/README.md`](./notebooks/README.md)
-for the full artifact + `config` key index.
-
-| Notebook | Figure | Runs from released data? | Upstream `scripts/` stage |
-|---|---|:--:|---|
-| `fig01_fungal_lm_corpus_architecture` | Fig 1 — LM corpus, phylogeny, architecture & performance | ⬚ | `01_data_build/lm_corpus/` + `02_train/shorkie_lm/` + `03_eval/lm/` |
-| `fig02_lm_conserved_motifs` | Fig 2 — conserved TF motifs (SMT3, motif→TSS, t-SNE) | ⬚ | `04_analysis/shorkie_lm/{lm_SMT3_viz,motif_analysis,umap_cluster_promoter}/` |
-| `fig03_supervised_rnaseq_prediction` | Fig 3 — RNA-seq prediction (violin, scatter, coverage) | ⬚ / ✅ GPU | `03_eval/supervised/track_prediction_eval/` |
-| `fig04_promoter_splicing_motifs` | Fig 4 — promoter & splicing ISM motifs + MoDISco | ⬚ | `04_analysis/shorkie/ism_motif/motif_shorkie__RP_TSS/` |
-| `fig05_timecourse_tf_induction` | Fig 5 — time-course MSN2/MSN4 TF induction | ⬚ | `04_analysis/shorkie/ism_motif/motif_shorkie__time_series/` |
-| `fig06_mpra_variant_effects` | Fig 6 — MPRA promoter variant effects | ⬚ | `04_analysis/shorkie/mpra/` |
-| `fig07_eqtl_variant_effects` | Fig 7 — cis-eQTL variant effects (ROC/PR, ISM) | ⬚ / ✅ GPU | `04_analysis/shorkie/eqtl/` |
+- **[`examples/`](./examples)** — step-by-step notebooks: load each model, run inference, score variant
+  effects for Shorkie / Shorkie_LM, and fine-tune the LM on your own RNA-seq tracks. Start here.
+- **[`minimal_example/`](./minimal_example)** — a self-contained CLI that scores one SNP end-to-end
+  (see [Minimal Example](#minimal-example-variant-effect-prediction-with-shorkie) below).
+- **[`containers/`](./containers)** — Docker / Apptainer image for a scheduler-free run.
+- **[`src/shorkie/`](./src/shorkie)** — the importable helper package: `config` (path resolution),
+  `models.ensemble` (8-fold loader + `logSED`), `helpers.yeast_helpers`, `viz.load_cov`.
 
 ---
 
@@ -218,3 +187,26 @@ python minimal_example/run_shorkie_variant.py \
 ```
 
 See [`minimal_example/README.md`](./minimal_example/README.md) for full documentation.
+
+---
+
+## Reproducing the paper figures
+
+Each main-text figure has one notebook in [`notebooks/`](./notebooks) (`fig01`–`fig07`). A notebook
+either runs end-to-end from released data (`data/download.sh`) or loads a gated intermediate produced by
+the cited `scripts/` stage, then renders the panels by calling that figure's builders under
+[`reproduction/figure_NN/`](./reproduction). See [`notebooks/README.md`](./notebooks/README.md) for the
+full figure → artifact → `config`-key index, and [`reproduction/`](./reproduction) for the per-figure
+panel builders, published crops, and reproduced-vs-published checks (`verify_figNN.csv`).
+
+The end-to-end pipelines live in [`scripts/`](./scripts), staged
+`00_setup → 01_data_build → 02_train → 03_eval → 04_analysis`, for all three model variants:
+
+| Variant | Train | Analysis |
+|---|---|---|
+| **Shorkie LM** (masked DNA LM) | [`02_train/shorkie_lm/`](./scripts/02_train/shorkie_lm) | [`04_analysis/shorkie_lm/`](./scripts/04_analysis/shorkie_lm) |
+| **Shorkie** (fine-tuned) | [`02_train/shorkie_finetuned/`](./scripts/02_train/shorkie_finetuned) | [`04_analysis/shorkie/`](./scripts/04_analysis/shorkie) |
+| **Shorkie_Random_Init** (random-init ablation, lr 5e-4, 8-fold) | [`02_train/shorkie_scratch/`](./scripts/02_train/shorkie_scratch) | [`04_analysis/shorkie_scratch/`](./scripts/04_analysis/shorkie_scratch) |
+
+The only difference between *finetuned* and *random-init* is the `--restore` flag + learning rate
+(see [`scripts/02_train/README.md`](./scripts/02_train/README.md)).

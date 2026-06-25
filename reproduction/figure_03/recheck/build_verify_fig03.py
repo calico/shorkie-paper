@@ -11,7 +11,7 @@ Writes reproduced/verify_fig03.csv (+ a copy to recheck/recheck_checks_fig03.csv
 NOTE (documented residual, intentionally NOT a hard check): the manuscript-text
 "87.8% of genes Shorkie>Random_Init" does not reproduce — the 3G pearsonr_gene
 RNA-Seq fraction-above-diagonal is ~75% on the released eval tables. The panel-G
-means (0.61/0.73) reproduce exactly. See recheck/DISCREPANCIES.md.
+means (0.61/0.73) reproduce exactly.
 """
 import sys
 from pathlib import Path
@@ -86,7 +86,7 @@ def main():
     write_verdicts(checks, REPRO / "reproduced" / "verify_fig03.csv")
     write_verdicts(checks, RC / "recheck_checks_fig03.csv")
     print(f"\n[residual] 3G RNA-Seq fraction Shorkie>Random = {r3g.pct_above_diag:.1f}% "
-          f"(published text says 87.8%; means 0.61/0.73 reproduce exactly) — see DISCREPANCIES.md")
+          f"(published text says 87.8%; means 0.61/0.73 reproduce exactly)")
 
 
 if __name__ == "__main__":
