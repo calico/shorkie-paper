@@ -4,7 +4,7 @@ side-by-side composites for the data-driven panels (B, C, D, F, G), plus a singl
 stacked overview. Schematic panels (A, E) are skipped per the recheck scope.
 
 Published sub-panels were cropped from published/Figure_1_full.png (see the crop
-bboxes recorded in DISCREPANCIES.md). Reproduced panels come from reproduced/.
+bboxes recorded alongside the builders). Reproduced panels come from reproduced/.
 
 Run (env yeast_ml):
     python reproduction/figure_01/recheck/make_sidebyside_fig01.py

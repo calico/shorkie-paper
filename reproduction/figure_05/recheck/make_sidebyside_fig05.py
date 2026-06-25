@@ -33,7 +33,7 @@ PANELS = {
           "5C — ATG42 ISM pairwise distance (viridis)"),
     "D": ((0.66, 0.262, 1.00, 0.430), RD / "Figure_5D_MSN2_boxplot.png",
           "5D — MSN2 normalized Pearson's R per timepoint"),
-    # 5E (MSN2 TF-Modisco motif progression) intentionally skipped — see DISCREPANCIES.md
+    # 5E (MSN2 TF-Modisco motif progression) intentionally skipped
     "F": ((0.00, 0.520, 1.00, 0.752), RD / "Figure_5F_TSL1_logos.png",
           "5F — MSN4 @ TSL1 ISM logos over time (full 500 bp)"),
     "G": ((0.00, 0.765, 0.345, 0.928), RD / "eval_MSN4/YML100W_TSL1/fold_change_by_timepoint_bar.png",
@@ -42,7 +42,7 @@ PANELS = {
           "5H — TSL1 ISM pairwise distance (viridis)"),
     "I": ((0.66, 0.765, 1.00, 0.928), RD / "Figure_5I_MSN4_boxplot.png",
           "5I — MSN4 normalized Pearson's R per timepoint"),
-    # 5J (MSN4 TF-Modisco motif progression) intentionally skipped — see DISCREPANCIES.md
+    # 5J (MSN4 TF-Modisco motif progression) intentionally skipped
 }
 
 H = 560

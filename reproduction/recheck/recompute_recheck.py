@@ -14,7 +14,7 @@ Covered here (cheap, CPU, from released on-disk eval artifacts):
 Fig 6 F/G/H MPRA Δ correlations are recomputed separately by
 reproduction/figure_06/reproduced/refalt/recompute_mpra_fgh.py.
 Fig 2 t-SNE silhouette is recorded from the recheck investigation (deterministic,
-random_state=0) — see VERIFICATION_REPORT.md.
+random_state=0).
 """
 import sys, glob, json
 from pathlib import Path

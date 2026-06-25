@@ -113,5 +113,4 @@ def distance_heatmap(norm, title, png_name):
     print(f"  saved {out}")
     return D, ts
 
-# (TF-Modisco motif helpers for the E/J progression were removed — panels E/J are skipped;
-#  see recheck/DISCREPANCIES.md.)
+# (TF-Modisco motif helpers for the E/J progression were removed — panels E/J are skipped.)

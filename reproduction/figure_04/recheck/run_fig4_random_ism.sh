@@ -23,7 +23,7 @@
 #SBATCH --export=ALL
 echo "START $(date) host=$(hostname)"
 
-# GPU TensorFlow env first (env.sh below calls `python` from shorkie) — see CLAUDE.md
+# GPU TensorFlow env first (env.sh below calls `python` from shorkie)
 source /home/kchao10/miniconda3/etc/profile.d/conda.sh
 conda activate yeast_ml
 echo "python: $(which python)"; python --version
