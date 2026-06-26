@@ -104,14 +104,13 @@ Shorkie was fine-tuned from the Shorkie LM using large-scale transcriptomic and 
 
 This section lists external benchmark datasets used to evaluate **Shorkie**, along with their sources and primary references.
 
-> **Prepared for reproduction (publication pending).** The reproduction-critical subsets — the per-SNP
-> eQTL score TSVs (Caudal/Kita/Renganaath, Shorkie / Shorkie_LM / Shorkie_Random_Init) and the MPRA
-> ground-truth expression + cached Shorkie/DREAM scores — are catalogued in
-> [`data/manifest.json`](./data/manifest.json) and published to `gs://shorkie-paper/{eqtl,mpra}/` by the
-> maintainer with `scripts/00_setup/upload_release.sh --eqtl --mpra`; thereafter `data/download.sh --eqtl`
-> / `--mpra` (requester-pays; pass `-u PROJECT`) fetches them and Figures 6–7 reproduce on CPU without
-> re-scoring. The large raw inputs (the 1011-genomes GVCF, the full DREAM Challenge sequences, the
-> DREAM-RNN/PrixFixe weights) are third-party and obtained from their original sources below (not re-hosted).
+> **Released.** The reproduction-critical subsets — the per-SNP eQTL score TSVs (Caudal/Kita/Renganaath,
+> Shorkie / Shorkie_LM / Shorkie_Random_Init) and the MPRA ground-truth expression + cached Shorkie/DREAM
+> scores — are catalogued in [`data/manifest.json`](./data/manifest.json) and live on
+> `gs://shorkie-paper/{eqtl,mpra}/`. Fetch them with `data/download.sh --eqtl` / `--mpra` (requester-pays;
+> pass `-u PROJECT`) and Figures 6–7 reproduce on CPU without re-scoring. The large raw inputs (the
+> 1011-genomes GVCF, the full DREAM Challenge sequences, the DREAM-RNN/PrixFixe weights) are third-party
+> and obtained from their original sources below (not re-hosted).
 
 ### MPRA (Random Promoter DREAM Challenge)
 
