@@ -1,5 +1,9 @@
 # 04_analysis/shorkie — fine-tuned (supervised) model analyses
 
+> **Advanced / reproduction-only.** You don't need this to *run* Shorkie — use `examples/` +
+> `minimal_example/` on the released artifacts (`data/download.sh`). These analyses produce the
+> gated intermediates behind the figure notebooks (`notebooks/fig0N_*.ipynb`).
+
 Downstream analyses of the fine-tuned 8-fold Shorkie ensemble: cis-eQTL
 benchmarking, the DREAM-Challenge MPRA benchmark, and in-silico mutagenesis
 (ISM) + MoDISco motif discovery over ribosomal-protein (RP) / TSS genes and

@@ -19,7 +19,7 @@ other three tiers were used for the LM ablation variants in the paper.
 
 All four tiers share the same held-out **test (528 seqs)** and **valid (518 seqs)**
 splits (both drawn from *S. cerevisiae* R64 only — see the chromosome-holdout
-split in `scripts/01_data_build/lm_corpus/README.md`); only `train_seqs` grows
+split under `scripts/01_data_build/lm_corpus/`); only `train_seqs` grows
 with the tier. `seq_length = 16384` throughout.
 
 ## A note on the "1341 / 1361 / 1385" numbers
@@ -59,4 +59,4 @@ Comma-separated, one row per assembly (plus a header). Columns:
 
 The download stage (`1_data_download/{1_download_fasta,2_download_gtf}.py`) turns
 `Accession` / `Species_str` / `assembly` / `Core_db` into EnsemblFungi r59 FTP
-URLs. See `scripts/01_data_build/lm_corpus/README.md`.
+URLs. See the build scripts under `scripts/01_data_build/lm_corpus/`.

@@ -1,5 +1,9 @@
 # scripts/
 
+> **Advanced / reproduction-only.** You don't need this to *run* Shorkie — download released
+> artifacts with `data/download.sh` and use `examples/` + `minimal_example/`. These stages retrain
+> the models and reproduce the paper figures end-to-end.
+
 All pipeline scripts, organized by stage so the project runs end-to-end
 `00 → 04`. Numbered-step prefixes (`0_`, `1_`, `2_`, …) inside each leaf
 directory encode execution order, and each working `*.py` keeps its paired
@@ -21,6 +25,6 @@ local/container fallback.
 | 04 | `04_analysis/` | eQTL, MPRA, motif/MoDISco, ISM, attention, UMAP, SMT3, dependency maps, phylogeny |
 | —  | `common/` | portable SLURM submit wrapper + shared runners |
 
-Most leaf directories carry their own `README.md` with stage-specific detail. Shared
+Some stage directories carry a `README.md` with stage-specific detail. Shared
 helpers live in the installable [`shorkie`](../src/shorkie) package — scripts import them
 (`from shorkie.helpers.yeast_helpers import …`) rather than copying code.

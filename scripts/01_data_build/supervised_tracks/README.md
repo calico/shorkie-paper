@@ -1,5 +1,9 @@
 # Supervised-track data build
 
+> **Advanced / reproduction-only.** You don't need this to *run* Shorkie — download released
+> artifacts with `data/download.sh` and use `examples/` + `minimal_example/`. This stage rebuilds
+> the training data; you only need it to fine-tune Shorkie on your own RNA-seq tracks.
+
 Produces the **5,215-track**, 8-fold TFRecord dataset that Shorkie
 (`shorkie_finetuned` and `shorkie_scratch`) trains on: raw FASTQ → aligned BAM →
 coverage BigWig → (via `hound_data.py`) TFRecords on the *S. cerevisiae* R64

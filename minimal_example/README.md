@@ -63,12 +63,9 @@ self_supervised_unet_small_bert_drop/
     └── f7c0/train/model_best.h5
 ```
 
-The canonical model on the Salzberg cluster:
-```
-$ROOT/seq_experiment/exp_histone__chip_exo__rna_seq_no_norm_5215_tracks/16bp/
-    self_supervised_unet_small_bert_drop/
-```
-where `ROOT=/home/kchao10/scr4_ssalzbe1/khchao/Yeast_ML`.
+`bash data/download.sh --minimal` fetches the released 8-fold model into exactly this
+layout (or download each fold from `gs://seqnn-share/shorkie/` — see *Model Availability*
+in the top-level [`README`](../README.md)).
 
 ---
 

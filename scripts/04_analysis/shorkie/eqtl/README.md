@@ -1,5 +1,9 @@
 # eQTL Benchmarking and Analysis Pipeline
 
+> **Advanced / reproduction-only.** You don't need this to *run* Shorkie — use `examples/` +
+> `minimal_example/` on the released artifacts (`data/download.sh`). This pipeline produces the
+> eQTL benchmark scores behind Figure 7 (`notebooks/fig07_eqtl_variant_effects.ipynb`).
+
 This directory contains the generalized, essential scripts used to benchmark and compare the performance of various models (including `Shorkie`, `Shorkie_LM`, `SpeciesLM`, and MPRA-trained architectures) on eQTL datasets. The scripts have been parameterized to be portable and applicable across multiple datasets (e.g. Renganaath et al., Kita et al., Caudal et al.).
 
 The overall pipeline is structured into five main steps:
