@@ -1,5 +1,9 @@
 # 04_analysis/shorkie_scratch — random-init (no-LM) ablation analyses
 
+> **Advanced / reproduction-only.** You don't need this to *run* Shorkie. These ablation analyses
+> (random-init vs LM-pretrained) are reported in the paper; to use Shorkie, see `examples/` +
+> `minimal_example/` on the released artifacts (`data/download.sh`).
+
 Stage-04 ablation analyses for the **random-init / from-scratch supervised
 baseline** (`02_train/shorkie_scratch/`, no MLM pretraining). These compare it
 against the LM-pretrained `Shorkie` to quantify the impact of language-model

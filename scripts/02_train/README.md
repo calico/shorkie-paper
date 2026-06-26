@@ -1,5 +1,9 @@
 # 02_train — model training
 
+> **Advanced / reproduction-only.** You don't need this to *run* Shorkie — download the released
+> weights with `data/download.sh --models all` and use `examples/` + `minimal_example/`. This stage
+> documents how the released models were trained (and lets you retrain on your own data).
+
 Three model variants, all built on the same `baskerville-yeast` + `westminster`
 forks (pinned submodules under `external/`) and the same `unet_small_bert_drop`
 architecture. They are deliberately minimal variations of one another:
