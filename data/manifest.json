@@ -126,8 +126,8 @@
     },
     "eqtl": {
       "description": "cis-eQTL variant-effect benchmark (Figure 7). Reproduction-minimal release: the per-SNP scored TSVs (Shorkie / Shorkie_LM / Shorkie_Random_Init) over 4 matched negative sets + the TSS/dist subsets, plus the DREAM-model eQTL baselines — enough to reproduce Figure 7 E-O on CPU without re-scoring. Requester-pays bucket.",
-      "pending_upload": true,
-      "note": "Prepared; NOT yet on the bucket — publish with `scripts/00_setup/upload_release.sh --eqtl` (pending gs://shorkie-paper billing).",
+      "pending_upload": false,
+      "note": "Live on gs://shorkie-paper/eqtl/{scores,dream_eval}/. Fetch with `data/download.sh --eqtl -u PROJECT` (requester-pays).",
       "studies": { "caudal_etal": 1901, "kita_etal": 683, "renganaath_etal": 142 },
       "consumed_via": "config keys results.eqtl_scores (Shorkie family) + results.mpra_eval (DREAM)",
       "scores":      { "gs_uri": "gs://shorkie-paper/eqtl/scores/",      "approx_size": "~51 MB", "md5": null },
@@ -136,8 +136,8 @@
     },
     "mpra": {
       "description": "MPRA promoter variant-effect benchmark (Figure 6). Reproduction-minimal release: ground-truth MAUDE expression, test-set subset indices, the cached Shorkie per-context logSED predictions, and the DREAM-RNN baseline output — enough to reproduce Figure 6 B-I on CPU without re-scoring. Requester-pays bucket.",
-      "pending_upload": true,
-      "note": "Prepared; NOT yet on the bucket — publish with `scripts/00_setup/upload_release.sh --mpra` (pending gs://shorkie-paper billing).",
+      "pending_upload": false,
+      "note": "Live on gs://shorkie-paper/mpra/{ground_truth,test_subset_ids,scores,dream}/. Fetch with `data/download.sh --mpra -u PROJECT` (requester-pays).",
       "consumed_via": "scripts/04_analysis/shorkie/mpra/ + reproduction/figure_06 (config key results.mpra_viz)",
       "ground_truth":   { "gs_uri": "gs://shorkie-paper/mpra/ground_truth/filtered_test_data_with_MAUDE_expression.txt", "size_bytes": 9184998, "md5": null },
       "test_subset_ids":{ "gs_uri": "gs://shorkie-paper/mpra/test_subset_ids/", "approx_size": "~21 MB", "md5": null },
