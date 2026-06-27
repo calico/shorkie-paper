@@ -234,20 +234,16 @@ The only difference between *finetuned* and *random-init* is the `--restore` fla
 
 ## Citation
 
-The manuscript and supplements are in [`paper/`](./paper) — [`shorkie.pdf`](./paper/shorkie.pdf),
-[`shorkie_supplemental_figures.pdf`](./paper/shorkie_supplemental_figures.pdf), and
-[`shorkie_supplemental_tables.pdf`](./paper/shorkie_supplemental_tables.pdf).
+If you use Shorkie, please cite our preprint:
 
-If you use Shorkie, please cite:
-
-> Chao, K.-H., Magzoub, M. M., Stoops, E., Hackett, S. R., Linder, J., & Kelley, D. R. (2025).
+> Chao, K.-H., Magzoub, M. M., Stoops, E. H., Hackett, S. R., Linder, J., & Kelley, D. R. (2025).
 > *Predicting dynamic expression patterns in budding yeast with a fungal DNA language model.* bioRxiv.
 > <https://doi.org/10.1101/2025.09.19.677475>
 
 ```bibtex
 @article{chao2025shorkie,
   title   = {Predicting dynamic expression patterns in budding yeast with a fungal DNA language model},
-  author  = {Chao, Kuan-Hao and Magzoub, Majed M. and Stoops, E. and Hackett, Sean R. and Linder, Johannes and Kelley, David R.},
+  author  = {Chao, Kuan-Hao and Magzoub, Majed M. and Stoops, Emily H. and Hackett, Sean R. and Linder, Johannes and Kelley, David R.},
   journal = {bioRxiv},
   year    = {2025},
   doi     = {10.1101/2025.09.19.677475},
