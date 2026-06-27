@@ -1,0 +1,36 @@
+cff-version: 1.2.0
+message: "If you use Shorkie, please cite the following preprint."
+title: "Predicting dynamic expression patterns in budding yeast with a fungal DNA language model"
+authors:
+  - family-names: Chao
+    given-names: Kuan-Hao
+  - family-names: Magzoub
+    given-names: Majed M.
+  - family-names: Stoops
+    given-names: E.
+  - family-names: Hackett
+    given-names: Sean R.
+  - family-names: Linder
+    given-names: Johannes
+  - family-names: Kelley
+    given-names: David R.
+preferred-citation:
+  type: article
+  title: "Predicting dynamic expression patterns in budding yeast with a fungal DNA language model"
+  authors:
+    - family-names: Chao
+      given-names: Kuan-Hao
+    - family-names: Magzoub
+      given-names: Majed M.
+    - family-names: Stoops
+      given-names: E.
+    - family-names: Hackett
+      given-names: Sean R.
+    - family-names: Linder
+      given-names: Johannes
+    - family-names: Kelley
+      given-names: David R.
+  journal: bioRxiv
+  year: 2025
+  doi: 10.1101/2025.09.19.677475
+  url: "https://www.biorxiv.org/content/10.1101/2025.09.19.677475v1"

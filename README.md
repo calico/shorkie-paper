@@ -18,14 +18,24 @@ and <a href="https://github.com/calico/westminster" target="_blank"><strong>west
 repositories (pinned as submodules under `external/`); this repo adds an installable helper package
 (`src/shorkie`), the released model/data catalogue, runnable examples, and the figure notebooks.
 
-Contact *[drk (at) @calicolabs.com](mailto:drk@calicolabs.com)*, *[jlinder (at) @calicolabs.com](mailto:jlinder@calicolabs.com)*, or *[kuanhao.chao (at) @gmail.com](mailto:kuanhao.chao@gmail.com)* for questions.
+Please open a [GitHub issue](https://github.com/calico/shorkie-paper/issues) for bugs or questions. For other inquiries, contact *[drk (at) calicolabs.com](mailto:drk@calicolabs.com)*, *[jlinder (at) calicolabs.com](mailto:jlinder@calicolabs.com)*, or *[kuanhao.chao (at) gmail.com](mailto:kuanhao.chao@gmail.com)*.
+
+---
+
+## Requirements
+
+- **OS:** Linux. **Python:** 3.9. **TensorFlow:** ~2.15 (exact pins in [`environment.yml`](./environment.yml)).
+- **CPU** is enough to run inference, score variants, and reproduce the figures from released data.
+- **GPU** (CUDA-capable) is needed only for training / fine-tuning and the GPU-marked figure panels — those
+  also need `tensorrt==8.6.1` and a CUDA-enabled TensorFlow build. [`containers/`](./containers) ships a
+  known-good Docker / Apptainer image for a scheduler-free run.
 
 ---
 
 ## Quickstart
 
 ```bash
-git clone --recurse-submodules git@github.com:calico/shorkie-paper.git
+git clone --recurse-submodules https://github.com/calico/shorkie-paper.git   # (or git@github.com:calico/shorkie-paper.git with SSH access)
 cd shorkie-paper
 conda env create -f environment.yml && conda activate yeast_ml      # env name: yeast_ml
 pip install -e external/baskerville-yeast -e external/westminster -e .   # model code + this package
@@ -33,11 +43,16 @@ cp config/paths.example.yaml config/paths.yaml                      # then edit 
 bash data/download.sh --minimal                                     # 8 Shorkie folds for the example below
 ```
 
-`data/download.sh` takes `--models [lm|finetuned|random_init|all]` (Shorkie LM + Shorkie 8-fold are live
-now; Shorkie_Random_Init 8-fold is catalogued and goes live after the maintainer runs
-`scripts/00_setup/upload_release.sh`), plus `--lm-corpus <tier>`, `--supervised`, `--eqtl`, `--mpra`
-(all verified against [`data/manifest.json`](./data/manifest.json)). Every filesystem path resolves
-through `config/paths.yaml` — there are no hardcoded machine paths.
+`data/download.sh` takes `--models [lm|finetuned|random_init|all]` — all three model variants (Shorkie LM,
+the Shorkie 8-fold ensemble, and the Shorkie_Random_Init 8-fold ablation) are **live** on the public bucket
+`gs://seqnn-share` — plus `--lm-corpus <tier>`, `--supervised`, `--eqtl`, `--mpra` (all verified against
+[`data/manifest.json`](./data/manifest.json)). Every filesystem path resolves through `config/paths.yaml`
+— there are no hardcoded machine paths.
+
+Approximate download sizes: `--minimal` (8 Shorkie folds) ≈ 0.46 GB; `--models all` (LM + both 8-fold
+ensembles) ≈ 1.4 GB. The LM corpora (`--lm-corpus`) and `--supervised` bigwigs/TFRecords are large (tens to
+hundreds of GB — e.g. the supervised bigwigs are ~93 GB); see the `size_bytes` / `approx_size` fields in
+[`data/manifest.json`](./data/manifest.json) for exact figures.
 
 ## Using Shorkie on your own data
 
@@ -54,18 +69,18 @@ through `config/paths.yaml` — there are no hardcoded machine paths.
 ## Model Availability
 
 The model weights are downloaded as .h5 files from the URLs below (or with
-`data/download.sh --models all`). **Shorkie LM** and **Shorkie** (8-fold) are live on the public bucket;
-**Shorkie_Random_Init** is prepared + catalogued in [`data/manifest.json`](./data/manifest.json) and is
-published by the maintainer with `scripts/00_setup/upload_release.sh --models` (the links below go live
-after that upload).
+`data/download.sh --models all`). **Shorkie LM**, **Shorkie** (8-fold), and **Shorkie_Random_Init** (8-fold)
+are all live on the public bucket `gs://seqnn-share` and catalogued (with md5s) in
+[`data/manifest.json`](./data/manifest.json).
 
 - **(live)** [Shorkie LM](https://storage.googleapis.com/seqnn-share/shorkie_lm/train/model_best.h5)
 - **(live)** Shorkie (`gs://seqnn-share/shorkie/`)
     - [f0](https://storage.googleapis.com/seqnn-share/shorkie/f0/model_best.h5) | [f1](https://storage.googleapis.com/seqnn-share/shorkie/f1/model_best.h5) | [f2](https://storage.googleapis.com/seqnn-share/shorkie/f2/model_best.h5) | [f3](https://storage.googleapis.com/seqnn-share/shorkie/f3/model_best.h5) | [f4](https://storage.googleapis.com/seqnn-share/shorkie/f4/model_best.h5) | [f5](https://storage.googleapis.com/seqnn-share/shorkie/f5/model_best.h5) | [f6](https://storage.googleapis.com/seqnn-share/shorkie/f6/model_best.h5) | [f7](https://storage.googleapis.com/seqnn-share/shorkie/f7/model_best.h5)
-- **(pending upload)** Shorkie_Random_Init (from-scratch ablation, lr 5e-4, 8-fold; `gs://seqnn-share/shorkie_random_init/f0..f7/model_best.h5`)
+- **(live)** Shorkie_Random_Init (from-scratch ablation, lr 5e-4, 8-fold; `gs://seqnn-share/shorkie_random_init/`)
+    - [f0](https://storage.googleapis.com/seqnn-share/shorkie_random_init/f0/model_best.h5) | [f1](https://storage.googleapis.com/seqnn-share/shorkie_random_init/f1/model_best.h5) | [f2](https://storage.googleapis.com/seqnn-share/shorkie_random_init/f2/model_best.h5) | [f3](https://storage.googleapis.com/seqnn-share/shorkie_random_init/f3/model_best.h5) | [f4](https://storage.googleapis.com/seqnn-share/shorkie_random_init/f4/model_best.h5) | [f5](https://storage.googleapis.com/seqnn-share/shorkie_random_init/f5/model_best.h5) | [f6](https://storage.googleapis.com/seqnn-share/shorkie_random_init/f6/model_best.h5) | [f7](https://storage.googleapis.com/seqnn-share/shorkie_random_init/f7/model_best.h5)
 
-**New users → see [`examples/`](./examples)** for notebooks on loading each model, running inference,
-variant-effect prediction, and fine-tuning the LM on RNA-seq tracks.
+See [`examples/`](./examples) for runnable notebooks on each model — loading, inference, variant-effect
+prediction, and fine-tuning the LM on your own RNA-seq tracks.
 
 ---
 
@@ -120,7 +135,7 @@ This section lists external benchmark datasets used to evaluate **Shorkie**, alo
 
 ### *cis*-eQTL benchmarks
 
-We evaluate Shorkie and compare to DREAM models on two independent yeast *cis*-eQTL resources:
+We evaluate Shorkie and compare to DREAM models on three independent yeast *cis*-eQTL resources:
 
 1) **Caudal *et al.* pan-transcriptome**  
    - **Data portal**: 1002 Yeast Genomes project  
@@ -135,6 +150,11 @@ We evaluate Shorkie and compare to DREAM models on two independent yeast *cis*-e
    - [**Supplementary table**](https://www.pnas.org/doi/suppl/10.1073/pnas.1717421114/suppl_file/pnas.1717421114.sd01.txt)
    - **Primary reference**: Kita, R. *et al.* “High-resolution mapping of *cis*-regulatory variation in budding yeast.” *PNAS* 114 (2017).  
    - **Notes**: We benchmarked 683 variants, stratified into Promoter, UTR5, UTR3, and ORF categories.
+
+3) **Renganaath *et al.* MPRA-validated *cis*-regulatory variants**
+   - [**Article (eLife 2020)**](https://elifesciences.org/articles/62669)
+   - **Primary reference**: Renganaath, K., Chong, R., Day, L., Kosuri, S., Kruglyak, L. & Albert, F. W. “Systematic identification of *cis*-regulatory variants that cause gene expression differences in a yeast cross.” *eLife* 9, e62669 (2020).
+   - **Notes**: We benchmarked 142 core-promoter variants (Figure 7, panel G).
 
 
 ---
@@ -209,3 +229,36 @@ The end-to-end pipelines live in [`scripts/`](./scripts), staged
 
 The only difference between *finetuned* and *random-init* is the `--restore` flag + learning rate
 (see [`scripts/02_train/README.md`](./scripts/02_train/README.md)).
+
+---
+
+## Citation
+
+The manuscript and supplements are in [`paper/`](./paper) — [`shorkie.pdf`](./paper/shorkie.pdf),
+[`shorkie_supplemental_figures.pdf`](./paper/shorkie_supplemental_figures.pdf), and
+[`shorkie_supplemental_tables.pdf`](./paper/shorkie_supplemental_tables.pdf).
+
+If you use Shorkie, please cite:
+
+> Chao, K.-H., Magzoub, M. M., Stoops, E., Hackett, S. R., Linder, J., & Kelley, D. R. (2025).
+> *Predicting dynamic expression patterns in budding yeast with a fungal DNA language model.* bioRxiv.
+> <https://doi.org/10.1101/2025.09.19.677475>
+
+```bibtex
+@article{chao2025shorkie,
+  title   = {Predicting dynamic expression patterns in budding yeast with a fungal DNA language model},
+  author  = {Chao, Kuan-Hao and Magzoub, Majed M. and Stoops, E. and Hackett, Sean R. and Linder, Johannes and Kelley, David R.},
+  journal = {bioRxiv},
+  year    = {2025},
+  doi     = {10.1101/2025.09.19.677475},
+  url     = {https://www.biorxiv.org/content/10.1101/2025.09.19.677475v1}
+}
+```
+
+---
+
+## License
+
+Code in this repository is released under the **Apache License 2.0** — see [`LICENSE`](./LICENSE). The
+released model weights (`gs://seqnn-share`) and the third-party benchmark datasets carry their own terms;
+see the original sources cited above.
