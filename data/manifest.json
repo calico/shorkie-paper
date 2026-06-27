@@ -52,9 +52,8 @@
     },
     "shorkie_random_init": {
       "description": "Shorkie_Random_Init: supervised 8-fold ensemble trained from random init (no LM pretraining, lr 5e-4); the from-scratch ablation baseline used in the paper figures (e.g. Figure 7 eQTL). Identical data/architecture to shorkie_finetuned, minus --restore. Model block byte-identical to shorkie_finetuned; differs only in train.{learning_rate,task}.",
-      "released": false,
-      "pending_upload": true,
-      "note": "Prepared + catalogued (gs:// URIs, md5, sizes below). NOT yet on the bucket — publish with `scripts/00_setup/upload_release.sh --models` (pending gs://seqnn-share write access). `verify_release.py` confirms once uploaded.",
+      "released": true,
+      "note": "Live on gs://seqnn-share/shorkie_random_init/ (8 folds + params.json; md5s/sizes pinned below). Fetch with `data/download.sh --models random_init` (or `--models all`).",
       "num_folds": 8,
       "fold_subdir": "f{fold}c0",
       "files": [

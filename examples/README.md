@@ -14,8 +14,8 @@ git submodule update --init                                      # external/bask
 pip install -e external/baskerville-yeast -e external/westminster
 
 # 2. weights (public bucket gs://seqnn-share)
-data/download.sh --models all          # shorkie_lm + shorkie (8-fold); these examples need only these
-#   (shorkie_random_init is a separate ablation, fetched with --models random_init once it's published)
+data/download.sh --models all          # shorkie_lm + shorkie (8-fold) + shorkie_random_init; these examples need only the first two
+#   (shorkie_random_init is a separate ablation, also live — fetch just it with --models random_init)
 #   ^ then either set config/paths.yaml:work_root, or `export SHORKIE_MODELS=<dest>/models`
 #     so the notebooks find the checkpoints (default: they resolve via shorkie.config).
 
