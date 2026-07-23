@@ -64,7 +64,7 @@ self_supervised_unet_small_bert_drop/
 ```
 
 `bash data/download.sh --minimal` fetches the released 8-fold model into exactly this
-layout (or download each fold from `gs://seqnn-share/shorkie/` — see *Model Availability*
+layout (or download each fold from `gs://seqnn-share/shorkie_models/shorkie/` — see *Model Availability*
 in the top-level [`README`](../README.md)).
 
 ---

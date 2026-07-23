@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # ---------------------------------------------------------------------------
-# Upload the release artifacts that data/manifest.json catalogs but that are
-# not yet on the buckets:
-#   * Shorkie_Random_Init model (lr 5e-4, 8-fold)  -> gs://seqnn-share/shorkie_random_init/  (PUBLIC)
+# Upload the release artifacts that data/manifest.json catalogs to their bucket destinations
+# (idempotent — safe to re-run, e.g. to publish future additions):
+#   * Shorkie_Random_Init model (lr 5e-4, 8-fold)  -> gs://seqnn-share/shorkie_models/shorkie_random_init/  (PUBLIC)
 #   * eQTL scores + DREAM baselines (Figure 7)       -> gs://shorkie-paper/eqtl/   (REQUESTER-PAYS)
 #   * MPRA ground-truth + subset ids + scores (Fig 6)-> gs://shorkie-paper/mpra/   (REQUESTER-PAYS)
 #
@@ -40,12 +40,12 @@ dcp() { local src="$1" dst="$2"; [[ -e "$src" ]] || { echo "  SKIP (missing): $s
   echo "+ gsutil -u $PROJECT cp -n -r $src $dst"; [[ "$DRY" == 1 ]] || "$GSUTIL" -u "$PROJECT" cp -n -r "$src" "$dst"; }
 
 if [[ "$WHAT" == "models" || "$WHAT" == "all" ]]; then
-  echo "=== Shorkie_Random_Init (lr 5e-4, 8-fold) -> gs://seqnn-share/shorkie_random_init/ ==="
+  echo "=== Shorkie_Random_Init (lr 5e-4, 8-fold) -> gs://seqnn-share/shorkie_models/shorkie_random_init/ ==="
   RI="$(cfg models.shorkie_random_init)/train"
   for f in 0 1 2 3 4 5 6 7; do
-    mcp "$RI/f${f}c0/train/model_best.h5" "gs://seqnn-share/shorkie_random_init/f${f}/model_best.h5"
+    mcp "$RI/f${f}c0/train/model_best.h5" "gs://seqnn-share/shorkie_models/shorkie_random_init/f${f}/model_best.h5"
   done
-  mcp "$RI/f0c0/train/params.json" "gs://seqnn-share/shorkie_random_init/params.json"
+  mcp "$RI/f0c0/train/params.json" "gs://seqnn-share/shorkie_models/shorkie_random_init/params.json"
 fi
 
 if [[ "$WHAT" == "eqtl" || "$WHAT" == "all" ]]; then
