@@ -13,7 +13,7 @@ genome assemblies listed in the CSV files committed here, so the corpus build
 | **165_Saccharomycetales** ⭐ | `species_saccharomycetales_gtf.cleaned.csv` | `data_saccharomycetales_gtf` | 165 | 385,551 |
 | **1341_Fungus** | `species_fungi_1385_gtf.cleaned.csv` | `data_fungi_1385_gtf` | 1,361 | 625,355 |
 
-⭐ The **released Shorkie LM** (`gs://seqnn-share/shorkie_lm/`) was pretrained on
+⭐ The **released Shorkie LM** (`gs://seqnn-share/shorkie_models/shorkie_lm/`) was pretrained on
 the **165_Saccharomycetales** tier (model dir `lm_saccharomycetales_gtf`). The
 other three tiers were used for the LM ablation variants in the paper.
 

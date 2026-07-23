@@ -9,7 +9,7 @@ active and `config/paths.yaml` exists.
 |------|------|
 | `init_submodules.sh` | Init the pinned forks `external/baskerville-yeast` and `external/westminster`, print their pins, then echo the follow-up install/config commands. |
 | `verify_install.sh` | After `pip install -e .`: `import shorkie`, resolve the released model keys, run `pytest tests/`. |
-| `upload_release.sh` | **Maintainer-only.** Publish the catalogued-but-not-yet-uploaded artifacts (`shorkie_random_init` model → `gs://seqnn-share`; `eqtl`/`mpra` scores → `gs://shorkie-paper`). Idempotent (`gsutil cp -n`). Needs write access to both buckets. `--dry-run` prints the commands. |
+| `upload_release.sh` | **Maintainer-only.** Publish release artifacts to the buckets (models → `gs://seqnn-share`; datasets → `gs://shorkie-paper`). Idempotent (`gsutil cp -n`). Needs write access to both buckets. `--dry-run` prints the commands. |
 | `verify_release.py` | Audit `manifest.json` vs the buckets (`gsutil stat`/`ls`): size+md5 for models, non-empty prefixes for datasets. Run after `upload_release.sh` to confirm completeness. |
 
 ## Order of operations
@@ -40,9 +40,9 @@ data/download.sh --mpra all -u PROJECT           # Figure-6 MPRA data (after rel
 
 ### Maintainer: publishing the release
 
-`shorkie_random_init` + the `eqtl`/`mpra` scores are catalogued in `manifest.json` with
-`pending_upload: true` but not yet on the buckets. Publish them (needs write access to
-`gs://seqnn-share` + `gs://shorkie-paper`), then verify:
+The full release (all three models + eQTL + MPRA) is already live on both buckets — this is how
+it got there, and how any future additions would be published (needs write access to
+`gs://seqnn-share` + `gs://shorkie-paper`):
 
 ```bash
 bash scripts/00_setup/upload_release.sh --all -u PROJECT      # gsutil cp -n (idempotent); --dry-run to preview

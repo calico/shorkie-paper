@@ -73,11 +73,11 @@ The model weights are downloaded as .h5 files from the URLs below (or with
 are all live on the public bucket `gs://seqnn-share` and catalogued (with md5s) in
 [`data/manifest.json`](./data/manifest.json).
 
-- **(live)** [Shorkie LM](https://storage.googleapis.com/seqnn-share/shorkie_lm/train/model_best.h5)
-- **(live)** Shorkie (`gs://seqnn-share/shorkie/`)
-    - [f0](https://storage.googleapis.com/seqnn-share/shorkie/f0/model_best.h5) | [f1](https://storage.googleapis.com/seqnn-share/shorkie/f1/model_best.h5) | [f2](https://storage.googleapis.com/seqnn-share/shorkie/f2/model_best.h5) | [f3](https://storage.googleapis.com/seqnn-share/shorkie/f3/model_best.h5) | [f4](https://storage.googleapis.com/seqnn-share/shorkie/f4/model_best.h5) | [f5](https://storage.googleapis.com/seqnn-share/shorkie/f5/model_best.h5) | [f6](https://storage.googleapis.com/seqnn-share/shorkie/f6/model_best.h5) | [f7](https://storage.googleapis.com/seqnn-share/shorkie/f7/model_best.h5)
-- **(live)** Shorkie_Random_Init (from-scratch ablation, lr 5e-4, 8-fold; `gs://seqnn-share/shorkie_random_init/`)
-    - [f0](https://storage.googleapis.com/seqnn-share/shorkie_random_init/f0/model_best.h5) | [f1](https://storage.googleapis.com/seqnn-share/shorkie_random_init/f1/model_best.h5) | [f2](https://storage.googleapis.com/seqnn-share/shorkie_random_init/f2/model_best.h5) | [f3](https://storage.googleapis.com/seqnn-share/shorkie_random_init/f3/model_best.h5) | [f4](https://storage.googleapis.com/seqnn-share/shorkie_random_init/f4/model_best.h5) | [f5](https://storage.googleapis.com/seqnn-share/shorkie_random_init/f5/model_best.h5) | [f6](https://storage.googleapis.com/seqnn-share/shorkie_random_init/f6/model_best.h5) | [f7](https://storage.googleapis.com/seqnn-share/shorkie_random_init/f7/model_best.h5)
+- **(live)** [Shorkie LM](https://storage.googleapis.com/seqnn-share/shorkie_models/shorkie_lm/train/model_best.h5)
+- **(live)** Shorkie (`gs://seqnn-share/shorkie_models/shorkie/`)
+    - [f0](https://storage.googleapis.com/seqnn-share/shorkie_models/shorkie/f0/model_best.h5) | [f1](https://storage.googleapis.com/seqnn-share/shorkie_models/shorkie/f1/model_best.h5) | [f2](https://storage.googleapis.com/seqnn-share/shorkie_models/shorkie/f2/model_best.h5) | [f3](https://storage.googleapis.com/seqnn-share/shorkie_models/shorkie/f3/model_best.h5) | [f4](https://storage.googleapis.com/seqnn-share/shorkie_models/shorkie/f4/model_best.h5) | [f5](https://storage.googleapis.com/seqnn-share/shorkie_models/shorkie/f5/model_best.h5) | [f6](https://storage.googleapis.com/seqnn-share/shorkie_models/shorkie/f6/model_best.h5) | [f7](https://storage.googleapis.com/seqnn-share/shorkie_models/shorkie/f7/model_best.h5)
+- **(live)** Shorkie_Random_Init (from-scratch ablation, lr 5e-4, 8-fold; `gs://seqnn-share/shorkie_models/shorkie_random_init/`)
+    - [f0](https://storage.googleapis.com/seqnn-share/shorkie_models/shorkie_random_init/f0/model_best.h5) | [f1](https://storage.googleapis.com/seqnn-share/shorkie_models/shorkie_random_init/f1/model_best.h5) | [f2](https://storage.googleapis.com/seqnn-share/shorkie_models/shorkie_random_init/f2/model_best.h5) | [f3](https://storage.googleapis.com/seqnn-share/shorkie_models/shorkie_random_init/f3/model_best.h5) | [f4](https://storage.googleapis.com/seqnn-share/shorkie_models/shorkie_random_init/f4/model_best.h5) | [f5](https://storage.googleapis.com/seqnn-share/shorkie_models/shorkie_random_init/f5/model_best.h5) | [f6](https://storage.googleapis.com/seqnn-share/shorkie_models/shorkie_random_init/f6/model_best.h5) | [f7](https://storage.googleapis.com/seqnn-share/shorkie_models/shorkie_random_init/f7/model_best.h5)
 
 See [`examples/`](./examples) for runnable notebooks on each model — loading, inference, variant-effect
 prediction, and fine-tuning the LM on your own RNA-seq tracks.
@@ -175,7 +175,7 @@ Effect Difference) score for a single SNP — no fine-tuning required.
    for i in 0 1 2 3 4 5 6 7; do
      mkdir -p my_shorkie/train/f${i}c0/train
      wget -O my_shorkie/train/f${i}c0/train/model_best.h5 \
-       https://storage.googleapis.com/seqnn-share/shorkie/f${i}/model_best.h5
+       https://storage.googleapis.com/seqnn-share/shorkie_models/shorkie/f${i}/model_best.h5
    done
    ```
 

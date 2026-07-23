@@ -13,7 +13,7 @@ and the restore mechanism.
 - `--restore` loads the pretrained LM trunk (`models.shorkie_lm_checkpoint`); the
   supervised head is trained on the 5215-track dataset (`datasets.supervised_data`).
 - The published weights + `params.json` + `targets.txt` are released at
-  `gs://seqnn-share/shorkie/` and catalogued in `data/manifest.json`
+  `gs://seqnn-share/shorkie_models/shorkie/` and catalogued in `data/manifest.json`
   (fetch with `data/download.sh --models finetuned`, or `--minimal` for the
   `minimal_example/` layout).
 - Run `bash make_model.sh --dry-run` to print the exact resolved command.

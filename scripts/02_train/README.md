@@ -10,8 +10,8 @@ architecture. They are deliberately minimal variations of one another:
 
 | Variant | Dir | Driver | Init | Output |
 |---|---|---|---|---|
-| **Shorkie_LM** | `shorkie_lm/` | `hound_train.py` (single fold) | random | 1× `model_best.h5` → `gs://seqnn-share/shorkie_lm/` |
-| **Shorkie_finetuned** | `shorkie_finetuned/` | `westminster_train_folds.py --restore <LM>` | **from Shorkie_LM** | 8× `model_best.h5` → `gs://seqnn-share/shorkie/f0..f7/` |
+| **Shorkie_LM** | `shorkie_lm/` | `hound_train.py` (single fold) | random | 1× `model_best.h5` → `gs://seqnn-share/shorkie_models/shorkie_lm/` |
+| **Shorkie_finetuned** | `shorkie_finetuned/` | `westminster_train_folds.py --restore <LM>` | **from Shorkie_LM** | 8× `model_best.h5` → `gs://seqnn-share/shorkie_models/shorkie/f0..f7/` |
 | **Shorkie_scratch** | `shorkie_scratch/` | `westminster_train_folds.py` (no `--restore`) | random | 8× `model_best.h5` (ablation; not publicly released) |
 
 `Shorkie_LM` is a masked DNA language model pretrained on the 165_Saccharomycetales
@@ -40,7 +40,7 @@ a larger step), holding architecture, data, warmup, and optimizer betas fixed.
 
 > **Provenance / fidelity.** The committed `shorkie_lm/params.json` and
 > `shorkie_finetuned/params.json` are **byte-identical to the released configs** on
-> `gs://seqnn-share/{shorkie_lm,shorkie}/params.json` (verified), so this repo's
+> `gs://seqnn-share/shorkie_models/{shorkie_lm,shorkie}/params.json` (verified), so this repo's
 > training commands match the published models exactly. `shorkie_scratch/params.json`
 > is the work-dir random-init config (no released counterpart). A separate work-dir
 > fine-tuning run (`self_supervised_unet_small_bert_drop`) used different
