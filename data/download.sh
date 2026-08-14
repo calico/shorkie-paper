@@ -10,6 +10,8 @@
 #   data/download.sh --minimal                  # 8 fine-tuned folds -> ./my_shorkie
 #                                                #   (exactly what minimal_example expects)
 #   data/download.sh --models [lm|finetuned|random_init|all]  # weights -> <dest>/models/...
+#   data/download.sh --genome -u PROJECT        # R64 reference FASTA (+.fai) + GTF
+#                                                #   (needed by examples/ and minimal_example/)
 #   data/download.sh --lm-corpus <tier|all> -u PROJECT     # corpus genomes + TFRecords
 #   data/download.sh --supervised [bigwigs|tfrecords|all] -u PROJECT
 #   data/download.sh --eqtl -u PROJECT          # Figure-7 eQTL scores + DREAM baselines
@@ -32,6 +34,7 @@ MODE=""; SEL="all"; DEST=""; DEST_SET=0; PROJECT=""; DRY_RUN=0
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --minimal)     MODE=minimal; shift;;
+    --genome)      MODE=genome; shift;;
     --models)      MODE=models;     [[ "${2:-}" =~ ^(lm|finetuned|random_init|all)$ ]] && { SEL="$2"; shift; }; shift;;
     --lm-corpus)   MODE=lm_corpus;  SEL="${2:?--lm-corpus needs a tier or 'all'}"; shift 2;;
     --supervised)  MODE=supervised; [[ "${2:-}" =~ ^(bigwigs|tfrecords|all)$ ]] && { SEL="$2"; shift; }; shift;;
@@ -44,7 +47,7 @@ while [[ $# -gt 0 ]]; do
     *) echo "unknown arg: $1" >&2; exit 2;;
   esac
 done
-[[ -n "$MODE" ]] || { echo "pick a mode: --minimal | --models | --lm-corpus | --supervised | --eqtl | --mpra (see --help)" >&2; exit 2; }
+[[ -n "$MODE" ]] || { echo "pick a mode: --minimal | --models | --genome | --lm-corpus | --supervised | --eqtl | --mpra (see --help)" >&2; exit 2; }
 [[ -f "$MANIFEST" ]] || { echo "missing manifest: $MANIFEST" >&2; exit 1; }
 
 # Default dest = config release_root (falls back to ./data_local if config absent).
@@ -52,10 +55,10 @@ if [[ -z "$DEST" ]]; then
   DEST="$(python -c "from shorkie import config; print(config.get('release_root') or './data_local')" 2>/dev/null || echo ./data_local)"
 fi
 
-# Locate gsutil (PATH, then the known SDK install).
+# Locate gsutil (PATH, or an explicit SHORKIE_GSUTIL override).
 GSUTIL="$(command -v gsutil || true)"
-[[ -z "$GSUTIL" && -x /home/kchao10/data_ssalzbe1/khchao/google-cloud-sdk/bin/gsutil ]] \
-  && GSUTIL=/home/kchao10/data_ssalzbe1/khchao/google-cloud-sdk/bin/gsutil
+# Allow an explicit override for non-PATH installs: SHORKIE_GSUTIL=/path/to/gsutil
+[[ -z "$GSUTIL" && -n "${SHORKIE_GSUTIL:-}" && -x "$SHORKIE_GSUTIL" ]] && GSUTIL="$SHORKIE_GSUTIL"
 FETCH="$(command -v wget || true)"
 
 say() { echo "+ $*"; }
@@ -133,6 +136,47 @@ case "$MODE" in
     emit_model_files "$SEL" | while IFS=$'\t' read -r gs https lp md5; do
       get_file "$gs" "$https" "$DEST/$lp" "$md5"
     done
+    ;;
+  genome)
+    # R64 reference used by examples/ + minimal_example/. Requester-pays, so a
+    # single-file fetch with -u (get_file() targets the public model bucket).
+    OUT="$DEST/genome/R64"
+    echo "=== genome (R64 FASTA + GTF) -> $OUT (requester-pays) ==="
+    mkdir -p "$OUT"
+    python - "$MANIFEST" <<'PY' | while IFS=$'\t' read -r gs name md5; do
+import json, sys
+g = json.load(open(sys.argv[1]))["datasets"]["genome"]
+for k in ("fasta", "gtf"):
+    print("\t".join([g[k]["gs_uri"], g[k]["local_name"], str(g[k].get("md5") or "null")]))
+PY
+      out="$OUT/$name"
+      if [[ "$DRY_RUN" == 1 ]]; then
+        say "gsutil -u ${PROJECT:-PROJECT} cp $gs $out"
+      else
+        [[ -n "$GSUTIL" ]] || { echo "gsutil required for $gs (requester-pays)" >&2; exit 1; }
+        [[ -n "$PROJECT" ]] || { echo "requester-pays bucket needs -u PROJECT for $gs" >&2; exit 1; }
+        say "gsutil -u $PROJECT cp $gs $out"
+        "$GSUTIL" -u "$PROJECT" cp "$gs" "$out"
+        if [[ "$md5" != "null" ]]; then
+          got="$(md5sum "$out" | awk '{print $1}')"
+          if [[ "$got" == "$md5" ]]; then echo "  md5 OK  $out"
+          else echo "  md5 FAIL $out (got $got want $md5)" >&2; exit 1; fi
+        fi
+      fi
+    done
+    # pysam needs a .fai next to the FASTA; build it now so examples don't have to.
+    FA="$OUT/GCA_000146045_2.cleaned.fasta"
+    if [[ "$DRY_RUN" == 1 ]]; then
+      say "samtools faidx $FA"
+    elif [[ -f "$FA" ]]; then
+      if command -v samtools >/dev/null; then say "samtools faidx $FA"; samtools faidx "$FA"
+      else python -c "import pysam,sys; pysam.faidx(sys.argv[1])" "$FA" 2>/dev/null \
+             && echo "  indexed via pysam" || echo "  note: install samtools (or pysam) to index $FA" >&2
+      fi
+    fi
+    echo "Point config/paths.yaml at these, e.g.:"
+    echo "  genome.fasta: $OUT/GCA_000146045_2.cleaned.fasta"
+    echo "  genome.gtf:   $OUT/GCA_000146045_2.59.gtf"
     ;;
   lm_corpus)
     echo "=== lm_corpus ($SEL) -> $DEST/data/unsupervised/ (requester-pays) ==="

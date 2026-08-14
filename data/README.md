@@ -16,7 +16,8 @@ on GCS, catalogued in `manifest.json`, and fetched on demand by `download.sh`.
 - **Model weights — public** (`gs://seqnn-share/shorkie_models/`): **all live** — LM `shorkie_lm/`,
   fine-tuned 8-fold `shorkie/f0..f7/`, and the random-init ablation 8-fold `shorkie_random_init/f0..f7/`
   (lr 5e-4). Downloadable with gsutil or plain https.
-- **Datasets — requester-pays** (`gs://shorkie-paper`): **all live** — LM corpora
+- **Datasets — requester-pays** (`gs://shorkie-paper`): **all live** — the R64 reference
+  `genome/R64/` (FASTA + GTF; needed by `examples/` and `minimal_example/`), LM corpora
   `data/unsupervised/{genome,processed}/<tier>/`, supervised `data/supervised/{bigwigs,processed}/`,
   the benchmark scores `eqtl/{scores,dream_eval}/` (Figure 7), and
   `mpra/{ground_truth,test_subset_ids,scores,dream}/` (Figure 6). Need gsutil + a billing project (`-u`).
@@ -34,8 +35,13 @@ lr-1e-4 random-init run) is a **deprecated alias** of `models.shorkie_random_ini
 # Minimal example: 8 fine-tuned folds -> ./my_shorkie (exactly what minimal_example expects)
 data/download.sh --minimal
 
-# All model weights (LM + fine-tuned) -> <dest>/models/...
+# All model weights (LM + fine-tuned + random-init) -> <dest>/models/...
 data/download.sh --models all
+
+# R64 reference genome (FASTA + GTF + .fai) -> <dest>/genome/R64/
+# Required by examples/ and minimal_example/. Chromosome naming is load-bearing:
+# the FASTA uses chrI..chrXVI, the GTF uses I..XVI — an Ensembl download won't match.
+data/download.sh --genome -u my-gcp-project
 
 # LM corpus tier(s) and supervised tracks (requester-pays -> pass -u PROJECT)
 data/download.sh --lm-corpus 165_Saccharomycetales -u my-gcp-project

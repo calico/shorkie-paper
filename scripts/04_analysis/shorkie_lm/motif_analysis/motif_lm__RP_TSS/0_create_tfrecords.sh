@@ -11,6 +11,22 @@
 #SBATCH --array=0-5
 source "$(git rev-parse --show-toplevel)/scripts/common/env.sh"
 
+# ---------------------------------------------------------------------------
+# NOTE: this stage depends on `1_write_data_with_gtf.py`, a helper that is NOT
+# part of this release (it is not the same script as
+# scripts/01_data_build/lm_corpus/4_tf_data_generation/write_data_with_gtf.py,
+# which uses a different, optparse-based interface and does not accept
+# --bed/--fasta/--gtf). Fail fast with an explicit message rather than a cryptic
+# "can't open file" halfway through a SLURM array job.
+# ---------------------------------------------------------------------------
+if [ ! -f "1_write_data_with_gtf.py" ]; then
+    echo "error: 1_write_data_with_gtf.py is not included in this release, so this" >&2
+    echo "       TFRecord-generation stage cannot be run as-is. The downstream" >&2
+    echo "       motif-analysis steps in this directory consume its output; the" >&2
+    echo "       published TF-MoDISco results are available via data/manifest.json." >&2
+    exit 1
+fi
+
 # ------------------------------------------------------------------------------
 # 1) Define your arrays
 # ------------------------------------------------------------------------------

@@ -12,7 +12,7 @@ architecture. They are deliberately minimal variations of one another:
 |---|---|---|---|---|
 | **Shorkie_LM** | `shorkie_lm/` | `hound_train.py` (single fold) | random | 1× `model_best.h5` → `gs://seqnn-share/shorkie_models/shorkie_lm/` |
 | **Shorkie_finetuned** | `shorkie_finetuned/` | `westminster_train_folds.py --restore <LM>` | **from Shorkie_LM** | 8× `model_best.h5` → `gs://seqnn-share/shorkie_models/shorkie/f0..f7/` |
-| **Shorkie_scratch** | `shorkie_scratch/` | `westminster_train_folds.py` (no `--restore`) | random | 8× `model_best.h5` (ablation; not publicly released) |
+| **Shorkie_scratch** | `shorkie_scratch/` | `westminster_train_folds.py` (no `--restore`) | random | 8× `model_best.h5` → `gs://seqnn-share/shorkie_models/shorkie_random_init/f0..f7/` (the released **Shorkie_Random_Init** ablation) |
 
 `Shorkie_LM` is a masked DNA language model pretrained on the 165_Saccharomycetales
 corpus; its `model_best.h5` is the `--restore` target the supervised models start from.
@@ -31,21 +31,20 @@ These two are identical except for **one launch flag** and **two `params.json`
 |---|---|---|
 | `make_model.sh` | **has** `--restore <Shorkie_LM .h5>` | **no** `--restore` |
 | `params.json` → `task` | `fine-tune` | `supervised` |
-| `params.json` → `learning_rate` | `2e-5` | `1e-4` |
+| `params.json` → `learning_rate` | `2e-5` | `5e-4` |
 | `params.json` → `model` block | — identical — | — identical — |
 
 So the ablation cleanly isolates the effect of LM pretraining: drop the `--restore`
 of the pretrained weights and raise the learning rate (random init tolerates / needs
 a larger step), holding architecture, data, warmup, and optimizer betas fixed.
 
-> **Provenance / fidelity.** The committed `shorkie_lm/params.json` and
-> `shorkie_finetuned/params.json` are **byte-identical to the released configs** on
-> `gs://seqnn-share/shorkie_models/{shorkie_lm,shorkie}/params.json` (verified), so this repo's
-> training commands match the published models exactly. `shorkie_scratch/params.json`
-> is the work-dir random-init config (no released counterpart). A separate work-dir
-> fine-tuning run (`self_supervised_unet_small_bert_drop`) used different
-> `warmup_steps`/Adam betas and produced different weights — it is **not** the
-> released model and is not what these scripts reproduce.
+> **Provenance / fidelity.** All three committed `params.json` files match their released
+> counterparts on `gs://seqnn-share/shorkie_models/{shorkie_lm,shorkie,shorkie_random_init}/params.json`
+> field-for-field (the released copies differ only in JSON float formatting, e.g. `1.0e-6` vs `1e-06`).
+> `tests/test_smoke.py::test_committed_params_match_released` pins this, so the training commands here
+> reproduce the published models exactly. A separate work-dir fine-tuning run
+> (`self_supervised_unet_small_bert_drop`) used different `warmup_steps`/Adam betas and produced
+> different weights — it is **not** the released model and is not what these scripts reproduce.
 
 ## The restore mechanism
 

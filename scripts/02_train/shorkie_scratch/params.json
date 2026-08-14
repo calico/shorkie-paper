@@ -4,7 +4,7 @@
         "batch_size": 8,
         "shuffle_buffer": 256,
         "optimizer": "adam",
-        "learning_rate": 0.0001,
+        "learning_rate": 0.0005,
         "momentum": 0.99,
         "loss": "poisson_mn",
         "total_weight": 0.2,

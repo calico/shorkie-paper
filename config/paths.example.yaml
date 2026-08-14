@@ -58,12 +58,17 @@ ssm_results_root:          /home/khc/projects/ssm/results
 # (scripts/03_eval/lm/model_evaluation/); holds {self_supervised,supervised}_unet_big/.
 yeast_seqnn_eval_root:     /home/khc/projects/yeast_seqNN/self_supervised/exp_105/histone__chip_exo__rna_seq/16bp
 
-# --- S. cerevisiae R64 reference genome (lives in the LM corpus data tree) ---
-r64_data_dir: ${data_root}/yeast/ensembl_fungi_59/test_chrXI_chrXIII_chrXV__valid_chrXII_chrXIV_chrXVI/data_r64_gtf
+# --- S. cerevisiae R64 reference genome ---
+# Needed by examples/, minimal_example/, and several figure notebooks. Fetch the
+# released copies with:  data/download.sh --genome -u PROJECT
+# (requester-pays; lands in ${release_root}/genome/R64/, which is what the defaults
+# below point at). NOTE the naming is load-bearing and differs per file: the FASTA
+# uses chrI..chrXVI, the GTF uses I..XVI. A genome pulled straight from Ensembl/SGD
+# will not match and the examples will fail to find their sequence.
+genome_dir: ${release_root}/genome/R64
 genome:
-  fasta:       ${r64_data_dir}/fasta/GCA_000146045_2.cleaned.fasta
-  gtf:         ${r64_data_dir}/gtf/GCA_000146045_2.59.gtf
-  chrom_sizes: ${reference_dir}/chrom.sizes
+  fasta:       ${genome_dir}/GCA_000146045_2.cleaned.fasta
+  gtf:         ${genome_dir}/GCA_000146045_2.59.gtf
   mask_bed:    ${reference_dir}/mask_rossi.bed
   gaps_bed:    ${reference_dir}/assembly_gaps.bed
   # Supervised-track TFRecord build uses the SGD S288C R64-3-1 assembly (publicly

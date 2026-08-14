@@ -45,9 +45,19 @@ bash data/download.sh --minimal                                     # 8 Shorkie 
 
 `data/download.sh` takes `--models [lm|finetuned|random_init|all]` — all three model variants (Shorkie LM,
 the Shorkie 8-fold ensemble, and the Shorkie_Random_Init 8-fold ablation) are **live** on the public bucket
-`gs://seqnn-share` — plus `--lm-corpus <tier>`, `--supervised`, `--eqtl`, `--mpra` (all verified against
-[`data/manifest.json`](./data/manifest.json)). Every filesystem path resolves through `config/paths.yaml`
-— there are no hardcoded machine paths.
+`gs://seqnn-share` — plus `--genome`, `--lm-corpus <tier>`, `--supervised`, `--eqtl`, `--mpra` (all verified
+against [`data/manifest.json`](./data/manifest.json)). Every filesystem path resolves through
+`config/paths.yaml` — there are no hardcoded machine paths.
+
+To actually run the models you also need the **R64 reference genome**:
+
+```bash
+bash data/download.sh --genome -u <your-gcp-project>   # FASTA + GTF + .fai -> <dest>/genome/R64/
+```
+
+> **Use this copy, not a fresh Ensembl download.** The chromosome naming is load-bearing and differs
+> between the two files — the FASTA uses `chrI`…`chrXVI`, the GTF uses `I`…`XVI`. A genome pulled
+> straight from Ensembl or SGD will not match, and every example will fail to find its sequence.
 
 Approximate download sizes: `--minimal` (8 Shorkie folds) ≈ 0.46 GB; `--models all` (LM + both 8-fold
 ensembles) ≈ 1.4 GB. The LM corpora (`--lm-corpus`) and `--supervised` bigwigs/TFRecords are large (tens to
@@ -179,7 +189,9 @@ Effect Difference) score for a single SNP — no fine-tuning required.
    done
    ```
 
-2. **Provide a yeast genome FASTA + GTF** (e.g. *S. cerevisiae* R64).
+2. **Fetch the R64 reference genome**: `bash data/download.sh --genome -u <your-gcp-project>`
+   (FASTA + GTF + `.fai`). See the naming caveat under [Quickstart](#quickstart) — use this copy
+   rather than a fresh Ensembl download.
 
 ### Run
 

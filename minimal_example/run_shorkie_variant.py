@@ -11,7 +11,7 @@ installable package (``shorkie.models.ensemble``); this script is a thin CLI
 showcase around them. Install the package with ``pip install -e .`` from the
 repo root, or rely on the src/ fallback below.
 """
-import os, sys, json, argparse
+import os, sys, json, argparse, pathlib
 import numpy as np
 import pysam
 
@@ -25,15 +25,29 @@ except ImportError:
 
 from baskerville import gene as bgene
 
-# ── Default paths (Salzberg cluster) ────────────────────────────────────────
-_ROOT = ""
-_EXP  = ""
-_DATA = ""
+# ── Default resource paths ──────────────────────────────────────────────────
+# params.json / sheet.txt ship next to this script, so they resolve with no setup.
+# The genome FASTA/GTF are not committed (too large) — they resolve through
+# `shorkie.config` (keys genome.fasta / genome.gtf), which is what
+# `data/download.sh --genome` populates. Every one of these is overridable by flag.
+_HERE = pathlib.Path(__file__).resolve().parent
 
-DEFAULT_PARAMS   = f"{_EXP}/params.json"
-DEFAULT_TARGETS  = f"{_EXP}/sheet.txt"
-DEFAULT_GTF      = f"{_DATA}/gtf/GCA_000146045_2.59.gtf"
-DEFAULT_FASTA    = f"{_DATA}/fasta/GCA_000146045_2.cleaned.fasta"
+DEFAULT_PARAMS  = str(_HERE / "params.json")
+DEFAULT_TARGETS = str(_HERE / "sheet.txt")
+
+
+def _config_path(key):
+    """Resolve a genome path via shorkie.config; None if unset/unavailable."""
+    try:
+        from shorkie import config
+        val = config.path(key)
+    except Exception:
+        return None
+    return str(val) if val else None
+
+
+DEFAULT_GTF   = _config_path("genome.gtf")
+DEFAULT_FASTA = _config_path("genome.fasta")
 # ─────────────────────────────────────────────────────────────────────────────
 
 def parse_args():
@@ -48,13 +62,32 @@ def parse_args():
     p.add_argument("--ref",   default="T")
     p.add_argument("--alt",   default="C")
     p.add_argument("--gene",  default="YAL016C-B")
-    # ── Resources (defaults to cluster paths) ──
-    p.add_argument("--params_file",  default=DEFAULT_PARAMS)
-    p.add_argument("--targets_file", default=DEFAULT_TARGETS)
-    p.add_argument("--gtf_file",     default=DEFAULT_GTF)
-    p.add_argument("--fasta_file",   default=DEFAULT_FASTA)
+    # ── Resources ──
+    # params/targets ship beside this script; genome files come from shorkie.config
+    # (populated by `data/download.sh --genome`).
+    p.add_argument("--params_file",  default=DEFAULT_PARAMS,
+                   help="model architecture params.json (default: alongside this script)")
+    p.add_argument("--targets_file", default=DEFAULT_TARGETS,
+                   help="tab-separated track metadata (default: alongside this script)")
+    p.add_argument("--gtf_file",     default=DEFAULT_GTF,
+                   help="yeast GTF (default: config key genome.gtf)")
+    p.add_argument("--fasta_file",   default=DEFAULT_FASTA,
+                   help="indexed yeast FASTA (default: config key genome.fasta)")
     p.add_argument("--seq_len",      type=int, default=16384)
     return p.parse_args()
+
+
+def _require(path, flag, config_key=None):
+    """Fail early and helpfully when a required resource can't be resolved."""
+    if not path:
+        hint = (f"Set config key '{config_key}' in config/paths.yaml, run "
+                f"`data/download.sh --genome`, or pass {flag} explicitly."
+                if config_key else f"Pass {flag} explicitly.")
+        sys.exit(f"error: no path for {flag}. {hint}")
+    if not os.path.exists(path):
+        sys.exit(f"error: {flag} not found: {path}\n"
+                 f"       Run `data/download.sh --genome` to fetch the reference files.")
+    return path
 
 
 # ── Main ─────────────────────────────────────────────────────────────────────
@@ -62,6 +95,12 @@ def parse_args():
 def main():
     args = parse_args()
     import pandas as pd
+
+    # 0. Resolve + validate resources up front, so failures are actionable.
+    _require(args.params_file,  "--params_file")
+    _require(args.targets_file, "--targets_file")
+    _require(args.gtf_file,     "--gtf_file",   "genome.gtf")
+    _require(args.fasta_file,   "--fasta_file", "genome.fasta")
 
     # 1. Targets
     targets_df   = pd.read_csv(args.targets_file, index_col=0, sep="\t")

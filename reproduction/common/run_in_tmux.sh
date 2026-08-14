@@ -22,7 +22,7 @@ CMDFILE="$(mktemp /tmp/tmux_${SESS}_XXXX.sh)"
 {
   echo '#!/bin/bash'
   echo "cd '$(pwd)'"
-  echo "source /home/kchao10/miniconda3/etc/profile.d/conda.sh 2>/dev/null || true"
+  echo "source \"\${CONDA_EXE:+\$(dirname \$(dirname \$CONDA_EXE))/etc/profile.d/conda.sh}\" 2>/dev/null || source \"\$HOME/miniconda3/etc/profile.d/conda.sh\" 2>/dev/null || true"
   echo "$CMD"
   echo 'echo "DONE_EXIT_$?"'
 } > "$CMDFILE"

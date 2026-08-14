@@ -19,7 +19,7 @@ def condorify(cmds):
 # slurmify
 ############################################################
 def slurmify(cmds, mem_mb=None):
-    if mem != None:
+    if mem_mb is not None:
         mem_str = '--mem %d' % mem_mb
     else:
         mem_str = ''

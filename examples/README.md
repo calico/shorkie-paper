@@ -19,7 +19,10 @@ data/download.sh --models all          # shorkie_lm + shorkie (8-fold) + shorkie
 #   ^ then either set config/paths.yaml:work_root, or `export SHORKIE_MODELS=<dest>/models`
 #     so the notebooks find the checkpoints (default: they resolve via shorkie.config).
 
-# 3. a reference genome FASTA + GTF (config keys genome.fasta / genome.gtf) — S. cerevisiae R64.
+# 3. reference genome (config keys genome.fasta / genome.gtf) — S. cerevisiae R64
+data/download.sh --genome -u <your-gcp-project>   # FASTA + GTF + .fai -> <dest>/genome/R64/
+#   ^ use this released copy, NOT a fresh Ensembl download: the naming is load-bearing and
+#     differs per file (FASTA chrI..chrXVI, GTF I..XVI) — anything else won't resolve.
 ```
 The notebooks resolve model directories with `shorkie.config` (`models.shorkie_lm`,
 `models.shorkie_finetuned`). To point them at downloaded weights instead, set the

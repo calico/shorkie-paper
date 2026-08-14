@@ -20,7 +20,7 @@
 #     echo " ovp_output_f: $ovp_output_f"
 
 #     # python 5_stats.py --input ${ovp_input_f} --output ${ovp_output_f}
-#     python 5_1_stats_new_cleaned_csv.py --input ${ovp_input_f} 
+#     python 5_stats.py --input ${ovp_input_f} 
 # done
 
 #!/bin/bash
@@ -53,7 +53,7 @@ for file in "$FASTA_DIR"/*.cleaned.fasta; do
     echo "  ovp_input_f: $ovp_input_f"
     echo " ovp_output_f: $ovp_output_f"
 
-    report_lines=$(python 5_1_stats_new_cleaned_csv.py --input "${ovp_input_f}")
+    report_lines=$(python 5_stats.py --input "${ovp_input_f}")
 
     echo $report_lines
     python 5_stats.py --input ${ovp_input_f} --output ${ovp_output_f}
@@ -70,7 +70,7 @@ tail -n +2 "$in_species_csv" | while IFS=, read -r line; do
     ovp_input_f="${OUTPUT_DIR}/${base_name}_ovp.txt"
     
     # Capture the report lines from the Python script
-    report_lines=$(python 5_1_stats_new_cleaned_csv.py --input "${ovp_input_f}")
+    report_lines=$(python 5_stats.py --input "${ovp_input_f}")
     
     # Append the report lines to the output CSV
     echo "$line,$report_lines" >> "$out_species_csv"

@@ -2,8 +2,8 @@
 
 > *"Shorkie predicts promoter variant effects validated by MPRAs."*
 
-Reproduces main-text **Figure 6** of the Shorkie paper. Published reference:
-[`../../paper/Figures/Figure_6.pdf`](../../paper/Figures/Figure_6.pdf) (rendered to `published/Figure_6_full.png`).
+Reproduces main-text **Figure 6** of the Shorkie paper. Published reference: [`published/Figure_6_full.png`](published/Figure_6_full.png) — rendered from Figure 6 of the paper
+([bioRxiv preprint](https://doi.org/10.1101/2025.09.19.677475); the manuscript PDFs themselves are not redistributed in this repo).
 
 - **Run:** [`notebooks/fig06_mpra_variant_effects.ipynb`](../../notebooks/fig06_mpra_variant_effects.ipynb) (env `yeast_ml`). It delegates the
   panel building to the single-source builders in [`recheck/`](recheck/).

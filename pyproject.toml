@@ -26,6 +26,13 @@ dev = ["pytest>=7", "black>=23", "ruff>=0.1"]
 
 [project.urls]
 Homepage = "https://github.com/calico/shorkie-paper"
+Documentation = "https://khchao.com/shorkie/"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.pytest.ini_options]
+# Confine collection to tests/. Without this, a bare `pytest` from the repo root
+# walks scripts/ and reproduction/ too, importing analysis scripts that expect
+# cluster data (and, historically, colliding on same-named files in different dirs).
+testpaths = ["tests"]
