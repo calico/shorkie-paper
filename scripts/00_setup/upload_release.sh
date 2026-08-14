@@ -27,7 +27,7 @@ while [[ $# -gt 0 ]]; do case "$1" in
   --all) WHAT=all; shift;; -u|--project) PROJECT="$2"; shift 2;; --dry-run) DRY=1; shift;;
   -h|--help) sed -n '2,24p' "${BASH_SOURCE[0]}"; exit 0;; *) echo "unknown arg: $1" >&2; exit 2;; esac; done
 
-GSUTIL="$(command -v gsutil || echo /home/kchao10/data_ssalzbe1/khchao/google-cloud-sdk/bin/gsutil)"
+GSUTIL="$(command -v gsutil || echo "${SHORKIE_GSUTIL:-gsutil}")"
 [[ -n "$PROJECT" ]] || PROJECT="$("${GSUTIL%gsutil}gcloud" config get-value project 2>/dev/null || true)"
 cfg() { python -c "import sys; from shorkie import config; print(config.path(sys.argv[1]))" "$1"; }
 W="$(cfg work_root)"

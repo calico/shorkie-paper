@@ -15,7 +15,7 @@ set -euo pipefail
 source "$HOME/miniconda3/etc/profile.d/conda.sh"
 conda activate yeast_ml
 
-REPO="/scratch4/ssalzbe1/khchao/shorkie-paper"
+REPO="$(git -C "$(dirname "${BASH_SOURCE[0]}")" rev-parse --show-toplevel)"
 cd "$REPO"
 
 echo "############ [1/3] Mash (panel 1D) ############"

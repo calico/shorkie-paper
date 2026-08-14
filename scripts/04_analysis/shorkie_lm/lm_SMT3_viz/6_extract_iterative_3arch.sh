@@ -7,6 +7,12 @@
 set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck disable=SC1091
-source /home/kchao10/miniconda3/etc/profile.d/conda.sh
+if [ -n "${CONDA_EXE:-}" ] && [ -f "$(dirname "$(dirname "$CONDA_EXE")")/etc/profile.d/conda.sh" ]; then
+  . "$(dirname "$(dirname "$CONDA_EXE")")/etc/profile.d/conda.sh"
+elif [ -f "$HOME/miniconda3/etc/profile.d/conda.sh" ]; then
+  . "$HOME/miniconda3/etc/profile.d/conda.sh"
+elif [ -f "$HOME/anaconda3/etc/profile.d/conda.sh" ]; then
+  . "$HOME/anaconda3/etc/profile.d/conda.sh"
+fi
 conda activate yeast_ml
 python "${HERE}/6_extract_iterative_3arch.py"

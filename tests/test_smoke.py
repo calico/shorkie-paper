@@ -47,6 +47,7 @@ def test_ensemble_constants_and_logsed_math():
 
 def test_make_input_shape_from_synthetic_fasta(tmp_path):
     pysam = pytest.importorskip("pysam")
+    pytest.importorskip("tensorflow")   # make_input builds a tf.Variable
     from shorkie.models.ensemble import make_input, NUM_FEATURES, SCEREVISIAE_COL, N_DNA
     fa = tmp_path / "tiny.fa"
     fa.write_text(">chrI\n" + "ACGT" * 100 + "\n")

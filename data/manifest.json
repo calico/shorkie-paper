@@ -75,6 +75,24 @@
     }
   },
   "datasets": {
+    "genome": {
+      "description": "S. cerevisiae R64 reference used by examples/, minimal_example/, and the figure notebooks: the cleaned genome FASTA and the Ensembl Fungi release-59 GTF. Requester-pays bucket. Fetch with `data/download.sh --genome -u PROJECT`.",
+      "note": "CHROMOSOME NAMING DIFFERS BY FILE AND IS LOAD-BEARING: the FASTA uses chrI..chrXVI, the GTF uses I..XVI (plus Mito). A genome downloaded directly from Ensembl/SGD will NOT match these names and every example will fail to find its sequence — always use these released copies.",
+      "fasta": {
+        "gs_uri": "gs://shorkie-paper/data/unsupervised/genome/R64/GCA_000146045_2.cleaned.fasta.masked.dust.softmask",
+        "local_name": "GCA_000146045_2.cleaned.fasta",
+        "size_bytes": 12272642,
+        "md5": "d5e1bc52edcb2c30fa7507edc8ed01e8",
+        "note": "This is the DUST-softmasked variant of GCA_000146045_2.cleaned.fasta (892009 repeat bases lowercased). It is equivalent for modelling: baskerville.dna.dna_1hot() uppercases before one-hot encoding, so predictions are identical to the unmasked file. download.sh saves it under local_name so config genome.fasta resolves."
+      },
+      "gtf": {
+        "gs_uri": "gs://shorkie-paper/genome/R64/GCA_000146045_2.59.gtf",
+        "local_name": "GCA_000146045_2.59.gtf",
+        "size_bytes": 10463408,
+        "md5": "4546e64e896da01448bd1c207f4bb3c6",
+        "source": "Ensembl Fungi release 59, assembly GCA_000146045.2 (R64-1-1)."
+      }
+    },
     "lm_corpus": {
       "description": "Multi-species fungal pretraining corpus, 4 tiers. Each tier: raw genomes + matched 16384 bp ZLIB TFRecords. Requester-pays bucket. Species sets are committed in data/species_lists/. See scripts/01_data_build/lm_corpus/.",
       "split": "valid = R64 chrXI/XIII/XV ; test = R64 chrXII/XIV/XVI ; chrXI-XVI excluded from train",

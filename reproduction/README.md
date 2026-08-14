@@ -14,7 +14,7 @@ reproduction/
     ├── README.md            what the figure shows + how to run it
     ├── recheck/             panel builders (build_*.py) — single source of truth, called by the notebook
     ├── panels/              CLI scripts for heavy / GPU panels
-    ├── published/           reference panel crops from ../paper/Figures/Figure_N.pdf
+    ├── published/           reference panel crops rendered from the paper's figures
     └── reproduced/          regenerated panels + verify_figNN.csv (reproduced-vs-published checks)
 ```
 

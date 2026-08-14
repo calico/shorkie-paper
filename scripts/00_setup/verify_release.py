@@ -15,13 +15,14 @@ pinned); `--strict` additionally requires the pending ones to be uploaded (run i
 """
 import argparse
 import json
+import os
 import shutil
 import subprocess
 import sys
 from pathlib import Path
 
 MANIFEST = Path(__file__).resolve().parents[2] / "data" / "manifest.json"
-GSUTIL = shutil.which("gsutil") or "/home/kchao10/data_ssalzbe1/khchao/google-cloud-sdk/bin/gsutil"
+GSUTIL = shutil.which("gsutil") or os.environ.get("SHORKIE_GSUTIL", "gsutil")
 
 
 def gsutil(args, project=None):

@@ -19,7 +19,10 @@ data/download.sh --models all          # shorkie_lm + shorkie (8-fold) + shorkie
 #   ^ then either set config/paths.yaml:work_root, or `export SHORKIE_MODELS=<dest>/models`
 #     so the notebooks find the checkpoints (default: they resolve via shorkie.config).
 
-# 3. a reference genome FASTA + GTF (config keys genome.fasta / genome.gtf) — S. cerevisiae R64.
+# 3. reference genome (config keys genome.fasta / genome.gtf) — S. cerevisiae R64
+data/download.sh --genome -u <your-gcp-project>   # FASTA + GTF + .fai -> <dest>/genome/R64/
+#   ^ use this released copy, NOT a fresh Ensembl download: the naming is load-bearing and
+#     differs per file (FASTA chrI..chrXVI, GTF I..XVI) — anything else won't resolve.
 ```
 The notebooks resolve model directories with `shorkie.config` (`models.shorkie_lm`,
 `models.shorkie_finetuned`). To point them at downloaded weights instead, set the
@@ -33,7 +36,8 @@ targets sheet are committed at `minimal_example/{params.json,sheet.txt}` (exampl
 | 2 | `2_lm_embeddings.ipynb` | Shorkie_LM | extract the 1st self-attention layer (`multihead_attention`) embeddings; PCA | CPU ok |
 | 3 | `3_shorkie_load_and_predict.ipynb` | Shorkie (8-fold) | load the ensemble; predict 5215-track coverage `(1,1,896,5215)`; plot a track | CPU ok (slow) / GPU |
 | 4 | `4_shorkie_variant_effect.ipynb` | Shorkie (8-fold) | ref/alt **logSED** variant scoring + per-track effects | CPU ok (slow) / GPU |
-| 5 | `5_finetune_lm_on_rnaseq.sh` | LM → Shorkie | **fine-tune** Shorkie_LM on RNA-seq/ChIP-exo/MNase tracks (`westminster --restore`) | **GPU/SLURM** (documented, not auto-run) |
+| 5 | `5_finetune_lm_on_rnaseq.sh` | LM → Shorkie | **fine-tune** Shorkie_LM on RNA-seq/ChIP-exo/MNase tracks (`westminster --restore`) — the production 8-fold recipe | **GPU/SLURM** (documented, not auto-run) |
+| 6 | `6_finetune_minidemo.sh` | LM → Shorkie | the **same** `--restore` fine-tune on a tiny slice (8/4/4 seqs) so you can watch it work end-to-end; downloads ~96 MB | CPU ok (~40 s train) |
 
 Notes:
 - **Input encoding:** Shorkie takes `(16384, 170)` tensors — channels 0–3 are DNA one-hot, 4–169 are
@@ -45,3 +49,8 @@ Notes:
 - Fine-tuning on **your own** RNA-seq tracks: build a targets sheet + 8-fold TFRecords with
   `scripts/01_data_build/supervised_tracks/`, point `datasets.supervised_data` at them, and run
   example 5 (the LM trunk transfers via `--restore`; only the supervised head is new).
+  Try **example 6** first — it runs that exact mechanism on a tiny slice of the released data
+  in about a minute, so you can confirm the pipeline works before committing GPU-days. Its
+  output is deliberately *not* a usable model (8 training sequences); it proves the mechanics.
+  The `Skipping loading weights ... dense_22 ... expects (384, 5215), received (384, 384)`
+  warning it prints is **expected** — that is the new supervised head not being restored.
