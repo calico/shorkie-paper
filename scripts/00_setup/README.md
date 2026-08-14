@@ -11,6 +11,7 @@ active and `config/paths.yaml` exists.
 | `verify_install.sh` | After `pip install -e .`: `import shorkie`, resolve the released model keys, run `pytest tests/`. |
 | `upload_release.sh` | **Maintainer-only.** Publish release artifacts to the buckets (models → `gs://seqnn-share`; datasets → `gs://shorkie-paper`). Idempotent (`gsutil cp -n`). Needs write access to both buckets. `--dry-run` prints the commands. |
 | `verify_release.py` | Audit `manifest.json` vs the buckets (`gsutil stat`/`ls`): size+md5 for models, non-empty prefixes for datasets. Run after `upload_release.sh` to confirm completeness. |
+| `zenodo_upload.py` | **Maintainer-only.** Publish the models + pretraining corpora to Zenodo, so the release is usable without a Google Cloud billing account (the data bucket is requester-pays, which is impractical in some regions). Reads `$ZENODO_TOKEN`; resumable; **creates a draft and stops** — you review and publish. `--dry-run` lists what would go up. |
 
 ## Order of operations
 
