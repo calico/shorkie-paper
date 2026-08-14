@@ -211,7 +211,7 @@ python minimal_example/run_shorkie_variant.py \
 ==================================================
   Variant  : chrI:124373 T>C
   Gene     : YAL016C-B
-  logSED   : +0.0557
+  logSED   : +0.0643
 ==================================================
   logSED > 0 → alt increases predicted expression
   logSED < 0 → alt decreases predicted expression

@@ -168,6 +168,29 @@ def test_released_params_match_committed():
             f"committed scripts/02_train/{local}/params.json != released {remote}/params.json"
 
 
+# ── config <-> manifest agreement ───────────────────────────────────────────
+# models.shorkie_finetuned used to point at an author work-dir run whose weights
+# are NOT the released ones (f0 md5 5ca26080... vs released 23e79b73...), so the
+# example config silently resolved to a different model than users download.
+
+def test_config_model_dirs_match_download_layout():
+    from shorkie import config
+    cfg = config.load(REPO / "config" / "paths.example.yaml")
+    release_root = str(cfg.path("release_root"))
+    for key, manifest_key in [("models.shorkie_lm", "shorkie_lm"),
+                              ("models.shorkie_finetuned", "shorkie_finetuned"),
+                              ("models.shorkie_random_init", "shorkie_random_init")]:
+        resolved = str(cfg.path(key))
+        assert resolved.startswith(release_root), (
+            f"{key} resolves to {resolved!r}, outside release_root {release_root!r} — a fresh "
+            f"clone would not get the released weights that data/download.sh fetches")
+        # the directory download.sh writes into, derived from the manifest local_path
+        local = MANIFEST["models"][manifest_key]["files"][0]["local_path"]  # models/<name>/...
+        expected_dir = local.split("/")[1]
+        assert Path(resolved).name == expected_dir, (
+            f"{key} -> {Path(resolved).name!r} but download.sh writes to models/{expected_dir}/")
+
+
 # ── minimal_example CLI (the defaults that used to resolve to '/params.json') ──
 
 def test_minimal_example_defaults_resolve_to_real_files():

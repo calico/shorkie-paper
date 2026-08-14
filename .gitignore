@@ -249,3 +249,6 @@ reproduction/figure_*/recheck/original_vs_reproduced_*.png
 reproduction/figure_07/recheck/_pub_*.png
 # minimal_example downloaded model weights (populated by `data/download.sh --minimal`)
 my_shorkie/
+
+# fine-tuning mini-demo scratch output (examples/6_finetune_minidemo.sh)
+minidemo/
