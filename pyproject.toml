@@ -36,3 +36,6 @@ where = ["src"]
 # walks scripts/ and reproduction/ too, importing analysis scripts that expect
 # cluster data (and, historically, colliding on same-named files in different dirs).
 testpaths = ["tests"]
+# `bucket` tests hit GCS and need credentials -> opt in with `pytest -m bucket`.
+markers = ["bucket: needs network + GCS credentials (deselected by default)"]
+addopts = "-m 'not bucket'"

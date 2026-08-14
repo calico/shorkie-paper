@@ -23,7 +23,8 @@ except ImportError:
     sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / "src"))
     from shorkie.models.ensemble import load_ensemble, make_input, predict, logSED
 
-from baskerville import gene as bgene
+# NOTE: `baskerville` (and the TensorFlow stack behind it) is imported lazily inside
+# main(), so `--help` and argument parsing work in a bare environment.
 
 # ── Default resource paths ──────────────────────────────────────────────────
 # params.json / sheet.txt ship next to this script, so they resolve with no setup.
@@ -114,6 +115,7 @@ def main():
 
     # 3. Genomic resources
     fasta         = pysam.Fastafile(args.fasta_file)
+    from baskerville import gene as bgene
     transcriptome = bgene.Transcriptome(args.gtf_file)
 
     # 4. Look up gene
