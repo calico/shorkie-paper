@@ -125,6 +125,7 @@
         "1341_Fungus": {
           "num_species": 1361,
           "name_note": "Public label is '1341_Fungus'; internal dir is data_fungi_1385_gtf; the cleaned corpus contains 1361 assemblies (authoritative). See data/species_lists/README.md.",
+          "layout_note": "UNLIKE THE OTHER THREE TIERS, this tier's TFRecords sit one level deeper on the bucket, under a '1342_Fungus/' subdirectory (note the different number). So `download.sh --lm-corpus 1341_Fungus` produces <dest>/data/unsupervised/processed/1341_Fungus/1342_Fungus/*.tfr, whereas the other tiers land flat. Flatten it if your loader globs a fixed depth.",
           "species_list": "data/species_lists/species_fungi_1385_gtf.cleaned.csv",
           "internal_dir": "data_fungi_1385_gtf",
           "genome": "gs://shorkie-paper/data/unsupervised/genome/1341_Fungus/",
