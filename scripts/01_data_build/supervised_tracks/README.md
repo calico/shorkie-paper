@@ -14,6 +14,29 @@ coverage BigWig → (via `hound_data.py`) TFRecords on the *S. cerevisiae* R64
 > need to reproduce the tracks themselves; the raw sequencing is large and uses
 > several specialized conda envs.
 
+> ### ⚠️ These scripts are not portable as written
+>
+> This stage predates the config-driven refactor that the rest of the repository went through, and it
+> is the **one place** where author-environment paths are still baked in. Lines carrying a
+> `# TODO: verify path` marker point at tool installs, conda activation files, or reference files that
+> existed on the authors' machines and will not exist on yours, for example:
+>
+> - `${WORK_ROOT}/bwa-0.7.17/bwa`, `${WORK_ROOT}/bedGraphToBigWig` — tool binaries under the work dir
+> - `${WORK_ROOT}/mo_envs/cb2.bashrc`, `${WORK_ROOT}/.bashrc` — conda/env activation files
+> - `/group/idea/basenji_yeast/data/references/chrom.sizes` — an absolute path outside `work_root`
+> - `${WORK_ROOT}/mmagzoub/.../bin_sequences.bed` — a per-user intermediate
+>
+> They are left in place rather than guessed at, because we cannot verify replacements without the
+> original raw data. **Treat every `TODO: verify path` line as a substitution point** and repoint it at
+> your own installs before running. `bwa`, `samtools`, `bedtools`, `MACS2` and `bedGraphToBigWig` are
+> expected on `$PATH` or under your work dir.
+>
+> One `TODO` is a genuine methodological note rather than a path:
+> `process_ChIPs.py:73` (`we should actually scale to some common depth`) records that ChIP coverage is
+> not depth-normalised across samples.
+>
+> Everything downstream of this stage — training, evaluation, the figures — *is* fully config-driven.
+
 ## Pipeline
 
 ```

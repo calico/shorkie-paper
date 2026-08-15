@@ -18,6 +18,11 @@ and <a href="https://github.com/calico/westminster" target="_blank"><strong>west
 repositories (pinned as submodules under `external/`); this repo adds an installable helper package
 (`src/shorkie`), the released model/data catalogue, runnable examples, and the figure notebooks.
 
+📖 **Full documentation: [khchao.com/shorkie](https://khchao.com/shorkie/)** — installation, usage guides
+for every model, a [figure-by-figure analysis gallery](https://khchao.com/shorkie/content/gallery.html),
+a [dataset catalogue](https://khchao.com/shorkie/content/data_resources.html), and
+[troubleshooting](https://khchao.com/shorkie/content/troubleshooting.html).
+
 Please open a [GitHub issue](https://github.com/calico/shorkie-paper/issues) for bugs or questions. For other inquiries, contact *[drk (at) calicolabs.com](mailto:drk@calicolabs.com)*, *[jlinder (at) calicolabs.com](mailto:jlinder@calicolabs.com)*, or *[kuanhao.chao (at) gmail.com](mailto:kuanhao.chao@gmail.com)*.
 
 ---
@@ -43,11 +48,11 @@ cp config/paths.example.yaml config/paths.yaml                      # then edit 
 bash data/download.sh --minimal                                     # 8 Shorkie folds for the example below
 ```
 
-`data/download.sh` takes `--models [lm|finetuned|random_init|all]` — all three model variants (Shorkie LM,
-the Shorkie 8-fold ensemble, and the Shorkie_Random_Init 8-fold ablation) are **live** on the public bucket
-`gs://seqnn-share` — plus `--genome`, `--lm-corpus <tier>`, `--supervised`, `--eqtl`, `--mpra` (all verified
-against [`data/manifest.json`](./data/manifest.json)). Every filesystem path resolves through
-`config/paths.yaml` — there are no hardcoded machine paths.
+`data/download.sh` takes `--minimal`, `--models [lm|finetuned|random_init|lm-variants|all]` — all three
+model variants (Shorkie LM, the Shorkie 8-fold ensemble, and the Shorkie_Random_Init 8-fold ablation) are
+**live** on the public bucket `gs://seqnn-share` — plus `--genome`, `--lm-corpus <tier>`, `--supervised`,
+`--eqtl`, `--mpra` (all verified against [`data/manifest.json`](./data/manifest.json)). Every filesystem
+path resolves through `config/paths.yaml` — there are no hardcoded machine paths.
 
 To actually run the models you also need the **R64 reference genome**:
 
@@ -60,19 +65,33 @@ bash data/download.sh --genome -u <your-gcp-project>   # FASTA + GTF + .fai -> <
 > straight from Ensembl or SGD will not match, and every example will fail to find its sequence.
 
 Approximate download sizes: `--minimal` (8 Shorkie folds) ≈ 0.46 GB; `--models all` (LM + both 8-fold
-ensembles) ≈ 1.4 GB. The LM corpora (`--lm-corpus`) and `--supervised` bigwigs/TFRecords are large (tens to
-hundreds of GB — e.g. the supervised bigwigs are ~93 GB); see the `size_bytes` / `approx_size` fields in
-[`data/manifest.json`](./data/manifest.json) for exact figures.
+ensembles) ≈ 0.97 GB; `--genome` ≈ 22 MB. The LM corpora (`--lm-corpus`) and `--supervised`
+bigwigs/TFRecords are large (the 165_Saccharomycetales tier is ~3.7 GB, the supervised bigwigs ~93 GB);
+see [Data availability](#data-availability) below, or the `size_bytes` / `approx_size` fields in
+[`data/manifest.json`](./data/manifest.json), for exact figures.
+
+Then check your install:
+
+```bash
+pytest -q                       # release-integrity + smoke tests (fast, offline, no weights needed)
+```
 
 ## Using Shorkie on your own data
 
 - **[`examples/`](./examples)** — step-by-step notebooks: load each model, run inference, score variant
   effects for Shorkie / Shorkie_LM, and fine-tune the LM on your own RNA-seq tracks. Start here.
+- **[`examples/6_finetune_minidemo.sh`](./examples/6_finetune_minidemo.sh)** — before committing GPU-days
+  to fine-tuning, run this: the real `--restore` pipeline on a tiny slice of the released data,
+  ~96 MB and about a minute on CPU. Its output is deliberately not a usable model — it proves the
+  mechanics work.
 - **[`minimal_example/`](./minimal_example)** — a self-contained CLI that scores one SNP end-to-end
   (see [Minimal Example](#minimal-example-variant-effect-prediction-with-shorkie) below).
 - **[`containers/`](./containers)** — Docker / Apptainer image for a scheduler-free run.
 - **[`src/shorkie/`](./src/shorkie)** — the importable helper package: `config` (path resolution),
   `models.ensemble` (8-fold loader + `logSED`), `helpers.yeast_helpers`, `viz.load_cov`.
+
+Stuck? The [troubleshooting guide](https://khchao.com/shorkie/content/troubleshooting.html) is keyed on
+the exact error messages people actually hit.
 
 ---
 
@@ -92,42 +111,105 @@ are all live on the public bucket `gs://seqnn-share` and catalogued (with md5s) 
 See [`examples/`](./examples) for runnable notebooks on each model — loading, inference, variant-effect
 prediction, and fine-tuning the LM on your own RNA-seq tracks.
 
+### LM checkpoints for the other corpus tiers
+
+Catalogued as `models.lm_variants` (fetch with `data/download.sh --models lm-variants`): the four
+`unet_small` runs behind the Figure 1F/G corpus-scaling comparison, plus 1341_Fungus at
+`unet_small_bert_drop`.
+
+| Variant | Corpus | Architecture | `num_features` |
+|---|---|---|---|
+| `R64_yeast__unet_small` | R64 (1 genome) | `unet_small` | 6 |
+| `80_strains__unet_small` | 80_strains | `unet_small` | 85 |
+| `165_Saccharomycetales__unet_small` | 165_Saccharomycetales | `unet_small` | 170 |
+| `1341_Fungus__unet_small` | 1341_Fungus | `unet_small` | 1366 |
+| `1341_Fungus__unet_small_bert_drop` | 1341_Fungus | `unet_small_bert_drop` | 1366 |
+
+> **Not drop-in replacements for Shorkie LM.** The released Shorkie LM is 165_Saccharomycetales +
+> `unet_small_bert_drop`; the four `unet_small` runs are a *different architecture*, used for the
+> corpus-scaling figure, and are meaningful compared against each other rather than against the released
+> model. The one genuine alternative is `1341_Fungus__unet_small_bert_drop` — same architecture, largest
+> corpus.
+>
+> **`num_features` is not stored in `params.json`** and must be set at load time; it is
+> `4 (DNA) + num_species + 1`. Passing the wrong value raises
+> `Error loading weights by name: axes don't match array`.
+
 ---
 
-## Training Data Availability
+## Data availability
 
-### Shorkie LM
+Everything we curated for this study, with how to get it. All of it is catalogued — with sizes, MD5s and
+destinations — in [`data/manifest.json`](./data/manifest.json), which is what `data/download.sh` reads.
+A browsable version is at
+[khchao.com/shorkie → Datasets](https://khchao.com/shorkie/content/data_resources.html).
 
-Shorkie LM was pretrained on the **165_Saccharomycetales** corpus.  
-To support reproducibility and the Shorkie LM variants introduced in the paper, we also release three companion corpora—**R64**, **80_strains**, and **1341_Fungus**—each with raw genomes and matched TFRecords. These corpora span different phylogenetic distances and were used to train additional DNA language model variants.
+**Two buckets:** model weights are on the **public** `gs://seqnn-share` (plain HTTPS works, no account).
+Datasets are on `gs://shorkie-paper`, which is **requester-pays** — it needs `gsutil` and a
+billing-enabled GCP project via `-u PROJECT`; you pay egress only.
 
-- R64: [genomes] `gs://shorkie-paper/data/unsupervised/genome/R64/` | [tfrecord] `gs://shorkie-paper/data/unsupervised/processed/R64/`
-- 80_strains: [genomes] `gs://shorkie-paper/data/unsupervised/genome/80_strains/` | [tfrecord] `gs://shorkie-paper/data/unsupervised/processed/80_strains/`
-- 165_Saccharomycetales: [genomes] `gs://shorkie-paper/data/unsupervised/genome/165_Saccharomycetales/` | [tfrecord] `gs://shorkie-paper/data/unsupervised/processed/165_Saccharomycetales/`
-- 1341_Fungus: [genomes] `gs://shorkie-paper/data/unsupervised/genome/1341_Fungus/` | [tfrecord] `gs://shorkie-paper/data/unsupervised/processed/1341_Fungus/`
+| Dataset | Size | Get it with |
+|---|---|---|
+| **Model weights** (LM + Shorkie 8-fold + Random_Init) | 0.97 GB | `data/download.sh --models all` |
+| **R64 reference genome** (FASTA + GTF + `.fai`) | 22 MB | `data/download.sh --genome -u PROJECT` |
+| **LM corpus — R64** (1 genome) | 23 MB | `data/download.sh --lm-corpus R64 -u PROJECT` |
+| **LM corpus — 80_strains** (80 genomes) | 1.5 GB | `data/download.sh --lm-corpus 80_strains -u PROJECT` |
+| **LM corpus — 165_Saccharomycetales** ⭐ (165 genomes) | 3.7 GB | `data/download.sh --lm-corpus 165_Saccharomycetales -u PROJECT` |
+| **LM corpus — 1341_Fungus** (1,361 genomes) | 42.5 GB | `data/download.sh --lm-corpus 1341_Fungus -u PROJECT` |
+| **Supervised tracks** — BigWigs | ~93 GB | `data/download.sh --supervised bigwigs -u PROJECT` |
+| **Supervised tracks** — 8-fold TFRecords | ~10 GB | `data/download.sh --supervised tfrecords -u PROJECT` |
+| **cis-eQTL benchmark** (scores + DREAM baselines) | ~64 MB | `data/download.sh --eqtl -u PROJECT` |
+| **MPRA benchmark** (ground truth + cached scores) | ~1.6 GB | `data/download.sh --mpra all -u PROJECT` |
 
-- The training script is at [`scripts/02_train/shorkie_lm/`](./scripts/02_train/shorkie_lm).
+⭐ = the corpus Shorkie_LM was actually pretrained on.
 
-### Shorkie
+> **Cannot use Google Cloud?** Requester-pays needs a billing-enabled GCP project, which is impractical
+> in some regions. `scripts/00_setup/zenodo_upload.py` publishes the models and corpora to Zenodo — see
+> [`data/README.md`](./data/README.md).
 
-Shorkie was fine-tuned from the Shorkie LM using large-scale transcriptomic and epigenomic datasets from S. cerevisiae.
+### The pretraining corpora
 
-- **Induction Dynamics Gene Expression Atlas (IDEA)**: RNA-seq **induction time-point** samples from the *Induction Dynamics Gene Expression Atlas (IDEA)*. New datasets generated by Calico Life Sciences LLC (related to IDEA 1.0; Hackett, S.R. et al., *Mol Syst Biol*, 2020).  
-    - [Coverage tracks (BigWig)] `gs://shorkie-paper/data/supervised/bigwigs/`
-    - [Processed TFRecords] `gs://shorkie-paper/data/supervised/processed/`
+Four tiers of increasing phylogenetic breadth, each with raw genomes and matched 16,384 bp **ZLIB**
+TFRecords. Shorkie LM was pretrained on **165_Saccharomycetales**; the others back the ablations.
 
-- **Yeast strain RNA-seq**: RNA-seq datasets across diverse *S. cerevisiae* strains (Caudal, É. et al., *Nat Genet*, 2024).
+| Tier | Genomes | Train seqs | `gs://shorkie-paper/data/unsupervised/…` |
+|---|---|---|---|
+| R64 | 1 | 1,201 | `{genome,processed}/R64/` |
+| 80_strains | 80 | 102,315 | `{genome,processed}/80_strains/` |
+| 165_Saccharomycetales ⭐ | 165 | 385,551 | `{genome,processed}/165_Saccharomycetales/` |
+| 1341_Fungus | 1,361 | 625,355 | `{genome,processed}/1341_Fungus/` |
 
-- **ChIP-exo** & **ChIP-MNase**: (Rossi, M.J. et al., *Nature*, 2021).
+All four share one held-out split, drawn from *S. cerevisiae* R64 only and split by **whole chromosome**
+— valid: chrXI, chrXIII, chrXV; test: chrXII, chrXIV, chrXVI, with chrXI–XVI excluded from training
+everywhere. Keep that split if you want numbers comparable to ours. Per-tier species lists, with NCBI
+accessions, are committed in [`data/species_lists/`](./data/species_lists).
 
-- The training script is at [`scripts/02_train/shorkie_finetuned/`](./scripts/02_train/shorkie_finetuned).
+> **`1341_Fungus` nests one level deeper.** Its TFRecords live under an extra `1342_Fungus/`
+> subdirectory (yes, a different number), unlike the other three tiers — so
+> `--lm-corpus 1341_Fungus` yields `…/processed/1341_Fungus/1342_Fungus/*.tfr` and a fixed-depth glob
+> will miss them. The public label is also historical: the cleaned corpus holds **1,361** assemblies.
 
+Training script: [`scripts/02_train/shorkie_lm/`](./scripts/02_train/shorkie_lm).
+
+### The supervised tracks
+
+5,215 tracks on *S. cerevisiae* R64 at 16 bp resolution, which Shorkie is fine-tuned on:
+
+- **Induction Dynamics Gene Expression Atlas (IDEA)** — RNA-seq induction time-course samples, generated
+  for this study by Calico Life Sciences (related to IDEA 1.0; Hackett, S.R. *et al.*, *Mol Syst Biol*, 2020)
+- **Yeast strain RNA-seq** across diverse *S. cerevisiae* isolates (Caudal, É. *et al.*, *Nat Genet*, 2024)
+- **ChIP-exo** and **ChIP-MNase** (Rossi, M.J. *et al.*, *Nature*, 2021)
+
+`gs://shorkie-paper/data/supervised/{bigwigs,processed}/`. The targets sheet is also committed at
+[`minimal_example/sheet.txt`](./minimal_example/sheet.txt) so you can inspect track metadata without
+downloading anything. Training script:
+[`scripts/02_train/shorkie_finetuned/`](./scripts/02_train/shorkie_finetuned).
 
 ---
 
 ## Benchmark data availability
 
-This section lists external benchmark datasets used to evaluate **Shorkie**, along with their sources and primary references.
+External benchmark datasets used to evaluate **Shorkie**, with sources and primary references.
 
 > **Released.** The reproduction-critical subsets — the per-SNP eQTL score TSVs (Caudal/Kita/Renganaath,
 > Shorkie / Shorkie_LM / Shorkie_Random_Init) and the MPRA ground-truth expression + cached Shorkie/DREAM
@@ -267,6 +349,11 @@ If you use Shorkie, please cite our preprint:
 
 ## License
 
-Code in this repository is released under the **Apache License 2.0** — see [`LICENSE`](./LICENSE). The
-released model weights (`gs://seqnn-share`) and the third-party benchmark datasets carry their own terms;
-see the original sources cited above.
+| What | Terms |
+|---|---|
+| **Code** in this repository | **Apache License 2.0** — see [`LICENSE`](./LICENSE) |
+| **Model weights** (`gs://seqnn-share/shorkie_models/`) and the data we derived (TFRecords, cached scores) | **CC BY 4.0** — free to use and redistribute with attribution; please cite the preprint |
+| **Genome assemblies** in the LM corpora | Third-party public data (Ensembl Fungi release 59 / NCBI GenBank), redistributed here for reproducibility, under their original providers' terms. Accessions are in [`data/species_lists/`](./data/species_lists) |
+| **Benchmark datasets** (DREAM Challenge MPRA, the eQTL studies, 1002 Yeast Genomes) | Their own terms — see the original sources cited above |
+
+Please cite both the Shorkie preprint and the original data sources when you use the released data.
