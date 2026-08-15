@@ -18,9 +18,12 @@ and <a href="https://github.com/calico/westminster" target="_blank"><strong>west
 repositories (pinned as submodules under `external/`); this repo adds an installable helper package
 (`src/shorkie`), the released model/data catalogue, runnable examples, and the figure notebooks.
 
-📖 **Full documentation: [khchao.com/shorkie](https://khchao.com/shorkie/)** — installation, usage guides
-for every model, a [figure-by-figure analysis gallery](https://khchao.com/shorkie/content/gallery.html),
-a [dataset catalogue](https://khchao.com/shorkie/content/data_resources.html), and
+📖 **Full documentation: [khchao.com/shorkie](https://khchao.com/shorkie/)** — installation, the
+[released models](https://khchao.com/shorkie/content/models.html), usage guides for
+[Shorkie](https://khchao.com/shorkie/content/shorkie_usage.html) and
+[Shorkie_LM](https://khchao.com/shorkie/content/shorkie_lm_usage.html), a
+[figure-by-figure analysis gallery](https://khchao.com/shorkie/content/gallery.html), a
+[dataset catalogue](https://khchao.com/shorkie/content/data_resources.html), and
 [troubleshooting](https://khchao.com/shorkie/content/troubleshooting.html).
 
 Please open a [GitHub issue](https://github.com/calico/shorkie-paper/issues) for bugs or questions. For other inquiries, contact *[drk (at) calicolabs.com](mailto:drk@calicolabs.com)*, *[jlinder (at) calicolabs.com](mailto:jlinder@calicolabs.com)*, or *[kuanhao.chao (at) gmail.com](mailto:kuanhao.chao@gmail.com)*.
@@ -96,6 +99,10 @@ the exact error messages people actually hit.
 ---
 
 ## Model Availability
+
+> 📖 **Detailed documentation: [khchao.com/shorkie → Released models](https://khchao.com/shorkie/content/models.html)**
+> — what each model is and when to use it, the on-disk layout, the shared `unet_small_bert_drop`
+> architecture and its `(16384, 170)` input encoding, and guidance on choosing between the three.
 
 The model weights are downloaded as .h5 files from the URLs below (or with
 `data/download.sh --models all`). **Shorkie LM**, **Shorkie** (8-fold), and **Shorkie_Random_Init** (8-fold)
