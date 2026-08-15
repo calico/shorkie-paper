@@ -9,7 +9,10 @@
 # Usage:
 #   data/download.sh --minimal                  # 8 fine-tuned folds -> ./my_shorkie
 #                                                #   (exactly what minimal_example expects)
-#   data/download.sh --models [lm|finetuned|random_init|all]  # weights -> <dest>/models/...
+#   data/download.sh --models [lm|finetuned|random_init|lm-variants|all]  # weights -> <dest>/models/...
+#                                                #   lm-variants = LM checkpoints for the OTHER corpus
+#                                                #   tiers (R64/80_strains/1341_Fungus); see manifest
+#                                                #   models.lm_variants for the required num_features
 #   data/download.sh --genome -u PROJECT        # R64 reference FASTA (+.fai) + GTF
 #                                                #   (needed by examples/ and minimal_example/)
 #   data/download.sh --lm-corpus <tier|all> -u PROJECT     # corpus genomes + TFRecords
@@ -35,7 +38,7 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --minimal)     MODE=minimal; shift;;
     --genome)      MODE=genome; shift;;
-    --models)      MODE=models;     [[ "${2:-}" =~ ^(lm|finetuned|random_init|all)$ ]] && { SEL="$2"; shift; }; shift;;
+    --models)      MODE=models;     [[ "${2:-}" =~ ^(lm|finetuned|random_init|lm-variants|all)$ ]] && { SEL="$2"; shift; }; shift;;
     --lm-corpus)   MODE=lm_corpus;  SEL="${2:?--lm-corpus needs a tier or 'all'}"; shift 2;;
     --supervised)  MODE=supervised; [[ "${2:-}" =~ ^(bigwigs|tfrecords|all)$ ]] && { SEL="$2"; shift; }; shift;;
     --eqtl)        MODE=eqtl; shift;;
@@ -104,7 +107,8 @@ manifest, sel, strip = sys.argv[1], sys.argv[2], sys.argv[3]
 m = json.load(open(manifest))["models"]
 names = {"lm": ["shorkie_lm"], "finetuned": ["shorkie_finetuned"],
          "random_init": ["shorkie_random_init"],
-         "all": ["shorkie_lm", "shorkie_finetuned", "shorkie_random_init"]}[sel]
+         "lm-variants": ["lm_variants"],
+         "all": ["shorkie_lm", "shorkie_finetuned", "shorkie_random_init", "lm_variants"]}[sel]
 # For "all", skip models not yet on the bucket (pending_upload) so the fetch never 404s;
 # an explicit selection (e.g. random_init) still attempts it — works once it is uploaded.
 if sel == "all":

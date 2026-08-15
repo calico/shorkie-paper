@@ -1,6 +1,11 @@
+; HTTPS, not SSH: `git clone --recurse-submodules` uses the URL recorded here
+; regardless of how the top-level repo was cloned, so an SSH URL breaks the
+; documented HTTPS clone for anyone without GitHub SSH keys. Both repos are
+; public, so HTTPS works for everyone; contributors who prefer SSH can set
+; `git config url."git@github.com:".insteadOf https://github.com/`.
 [submodule "external/baskerville-yeast"]
 	path = external/baskerville-yeast
-	url = git@github.com:calico/baskerville-yeast.git
+	url = https://github.com/calico/baskerville-yeast.git
 [submodule "external/westminster"]
 	path = external/westminster
-	url = git@github.com:calico/westminster.git
+	url = https://github.com/calico/westminster.git
