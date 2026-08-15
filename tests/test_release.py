@@ -63,10 +63,52 @@ def test_model_uris_live_under_the_shorkie_models_prefix():
                 assert "/shorkie_models/" in f["https_uri"], f"{name}: stale {f['https_uri']}"
 
 
-def test_released_models_are_not_marked_pending():
+def test_model_release_state_is_coherent():
+    """A catalogued model is either live or pending, never both and never neither.
+
+    `pending_upload` means "staged and catalogued, but the maintainer has not pushed
+    it to the bucket yet" -- `download.sh --models all` skips those so nothing 404s,
+    while an explicit selection warns and still tries.
+    """
     for name, m in MANIFEST["models"].items():
-        if m.get("files"):
-            assert not m.get("pending_upload"), f"{name} has files but is marked pending_upload"
+        files, pending = m.get("files"), bool(m.get("pending_upload"))
+        released = m.get("released", bool(files) and not pending)
+        if not files:
+            continue                      # deprecated alias, documented only
+        assert not (released and pending), f"{name}: marked both released and pending_upload"
+        assert released or pending, f"{name}: has files but is neither released nor pending_upload"
+
+
+def test_pending_models_still_carry_full_metadata():
+    """Pending entries must be complete enough to be usable the moment they go live."""
+    for name, m in MANIFEST["models"].items():
+        if not m.get("pending_upload"):
+            continue
+        assert m.get("files"), f"{name} is pending but catalogues no files"
+        for f in m["files"]:
+            assert f["gs_uri"] and f["local_path"], f"{name}: incomplete file entry {f}"
+            assert f.get("size_bytes", 0) > 0, f"{name}: {f['local_path']} has no size"
+            assert re.fullmatch(r"[0-9a-f]{32}", f.get("md5") or ""), \
+                f"{name}: {f['local_path']} md5 not pinned"
+
+
+def test_lm_variants_document_num_features():
+    """params.json does NOT record num_features, and passing the wrong value raises
+    "axes don't match array" (issue #2). The manifest must therefore state it per
+    variant, or these checkpoints are unusable.
+    """
+    lv = MANIFEST["models"].get("lm_variants")
+    if lv is None:
+        return
+    assert lv.get("variants"), "lm_variants must describe each variant"
+    for name, v in lv["variants"].items():
+        assert v["num_features"] == 4 + v["num_species"] + 1, (
+            f"{name}: num_features {v['num_features']} != 4 + {v['num_species']} + 1")
+        assert v.get("architecture") and v.get("corpus_tier")
+    # every catalogued file must belong to a described variant
+    for f in lv["files"]:
+        variant = f["local_path"].split("/")[2]
+        assert variant in lv["variants"], f"file for undescribed variant {variant}"
 
 
 def test_genome_entries_are_complete():
@@ -212,6 +254,38 @@ def test_minimal_example_defaults_resolve_to_real_files():
 def test_minimal_example_ships_its_default_resources():
     for name in ("params.json", "sheet.txt"):
         assert (REPO / "minimal_example" / name).exists()
+
+
+# ── clone-ability ───────────────────────────────────────────────────────────
+
+def test_submodules_use_https_not_ssh():
+    """`git clone --recurse-submodules` uses the URL in .gitmodules regardless of how
+    the top-level repo was cloned. SSH URLs therefore broke the documented HTTPS
+    clone for anyone without GitHub SSH keys (issue #1) -- both submodules failed
+    with "Could not read from remote repository". Both repos are public, so HTTPS
+    works for everyone.
+    """
+    gm = (REPO / ".gitmodules").read_text()
+    urls = re.findall(r"^\s*url\s*=\s*(\S+)", gm, re.MULTILINE)
+    assert urls, ".gitmodules declares no submodule URLs"
+    ssh = [u for u in urls if u.startswith("git@") or u.startswith("ssh://")]
+    assert not ssh, (f"submodule URLs must be HTTPS so a keyless clone works; found SSH: {ssh}")
+    assert all(u.startswith("https://") for u in urls), urls
+
+
+# ── citation metadata ───────────────────────────────────────────────────────
+
+def test_citation_authors_are_consistent():
+    """CITATION.cff lists the authors twice (top level and preferred-citation).
+    They drifted once -- Stoops was 'Emily H.' in one block and 'E.' in the other.
+    """
+    cff = (REPO / "CITATION.cff").read_text()
+    blocks = re.findall(r"family-names:\s*(\S+)\s*\n\s*given-names:\s*(.+)", cff)
+    by_family = {}
+    for family, given in blocks:
+        by_family.setdefault(family, set()).add(given.strip().strip('"\''))
+    inconsistent = {f: sorted(g) for f, g in by_family.items() if len(g) > 1}
+    assert not inconsistent, f"same author rendered differently in CITATION.cff: {inconsistent}"
 
 
 # ── documentation links ─────────────────────────────────────────────────────
