@@ -1,0 +1,3 @@
+panel,metric,reported,reproduced,delta,rtol,atol,verdict
+loss weights,repetitive fraction of R64 (%),7.39,7.389,-0.0009999999999994458,0.01,0.0,PASS
+loss weights,"coding fraction of R64 (%), closest definition: coding: exon, protein_coding genes only",72.0,71.215,-0.7849999999999966,0.02,0.0,PASS

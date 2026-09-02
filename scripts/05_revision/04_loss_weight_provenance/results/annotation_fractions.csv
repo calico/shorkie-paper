@@ -1,0 +1,8 @@
+definition,bp_genome,pct_of_genome,bp_in_lm_windows,pct_of_lm_windows,published_value,abs_diff_genome
+repetitive: soft-masked (RepeatMasker + DUST),892009,7.389,781063,6.674,7.39,0.001
+"coding: exon, all gene biotypes",8911811,73.826,8672935,74.113,72.0,1.826
+"coding: exon, all biotypes, 2 bp chew",8884893,73.603,8646863,73.89,72.0,1.603
+coding: CDS,8578446,71.065,8364713,71.479,72.0,0.935
+"coding: CDS, 2 bp chew",8553470,70.858,8340447,71.272,72.0,1.142
+"coding: exon, protein_coding genes only",8596591,71.215,8382321,71.63,72.0,0.785
+"coding: exon, protein_coding, 2 bp chew",8571661,71.008,8358101,71.423,72.0,0.992

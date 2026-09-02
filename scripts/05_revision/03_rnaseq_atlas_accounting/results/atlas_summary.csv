@@ -1,0 +1,8 @@
+partition,detail,genes,tracks
+Induction RNA-seq: 8 TF perturbations in replicate,"ARG80, CUP2, GAT4, MET4, MSN2, MSN4, NDT80, RPN4; schedule (0, 5, 10, 15, 30, 45, 60, 90) min; 4-12 replicates per timepoint",8,580
+Induction RNA-seq: broader gene panel,"kinases, phosphatases and other regulators; schedule (0, 5, 10, 20, 40, 70, 120, 180) min",329,2473
+Induction RNA-seq: TOTAL (group 'RNA-Seq'),"the 3,053 tracks generated for this study",337,3053
+Yeast-strain RNA-seq (Caudal et al.),targets-sheet group '1000-RNA-Seq',,1014
+ChIP-exo (Rossi et al.),targets-sheet group 'Other',,1128
+ChIP-MNase (Rossi et al.),targets-sheet group 'Chip-MNase',,20
+ALL TRACKS,the supervised training set,,5215

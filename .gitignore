@@ -252,3 +252,14 @@ my_shorkie/
 
 # fine-tuning mini-demo scratch output (examples/6_finetune_minidemo.sh)
 minidemo/
+
+# Local-only working directory for revision drafting. Nothing here is published.
+revision/
+# Revision-experiment outputs are COMMITTED — the derived tables, verification CSVs and
+# figures under scripts/05_revision/**/results/ are the record of what each analysis found.
+# Only these two are excluded: both are large, regenerable inputs to the next step rather
+# than results, and each is rebuilt by step 1 of its own experiment.
+scripts/05_revision/01_headline_uncertainty/results/fold_metrics.csv
+scripts/05_revision/02_ism_motif_recovery/results/saliency_cache.npz
+# Model checkpoints an experiment may write locally (also covered by the global *.h5 rule).
+scripts/05_revision/11_layerwise_reinit/results/checkpoints/

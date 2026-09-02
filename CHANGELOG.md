@@ -8,32 +8,31 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
-### Fixed
-- **`git clone --recurse-submodules` over HTTPS now works.** `.gitmodules` pinned both submodules to
-  SSH URLs, so the clone command the README recommends "for users without SSH access" failed for
-  exactly those users — both submodules aborted with *"Could not read from remote repository"*, leaving
-  `external/` empty. Both repos are public, so the URLs are now HTTPS.
-  ([#1](https://github.com/calico/shorkie-paper/issues/1))
-- `CITATION.cff` rendered Emily H. Stoops as "E." in the `preferred-citation` block; the two author
-  lists now agree.
-
 ### Added
-- **LM checkpoints for the other pretraining corpus tiers**, catalogued as `models.lm_variants`: the
-  four `unet_small` runs behind the Figure 1F/G corpus-scaling comparison (R64 / 80_strains /
-  165_Saccharomycetales / 1341_Fungus), plus 1341_Fungus at `unet_small_bert_drop` — the same
-  architecture as the released Shorkie_LM, on the largest corpus. Each records the `num_features` value
-  it must be loaded with, since `params.json` does not.
-  ([#3](https://github.com/calico/shorkie-paper/issues/3))
-- `data/download.sh --models lm-variants`.
-- Orientation READMEs for `config/`, `containers/`, `src/shorkie/`, `tests/`, `reproduction/common/`,
-  and the `scripts/` stages that lacked one.
-- This changelog.
 
-### Changed
-- `scripts/01_data_build/supervised_tracks/README.md` now states plainly that the stage still contains
-  author-environment paths, and lists them as substitution points.
-- Removed `scripts/01_data_build/lm_corpus/phylogentic_tree/` — a misspelled, unreferenced duplicate,
-  byte-identical to the `scripts/04_analysis/others/phylogenetic_tree/` copy that Figure 1 actually uses.
+- `scripts/05_revision/` — eleven follow-up analyses and controls for claims in the Shorkie paper,
+  one directory per question, with [`EXPERIMENTS.md`](scripts/05_revision/EXPERIMENTS.md) as the
+  design document. Six run on CPU from artifacts already on disk and are executed with their results
+  committed; the rest are dry-run-verified SLURM scripts. Highlights:
+  cross-fold confidence intervals on the headline expression-prediction gap (paired Δ +0.063
+  [+0.028, +0.098], Wilcoxon p = 0.016, 7/8 folds); a quantitative replacement for the ISM
+  motif-recovery claim (2 of 121 motifs significant after Holm correction, both core
+  promoter/splicing rather than TF motifs); the arithmetic reconciling the 3,053 induction RNA-seq
+  tracks to 580 + 2,473 over 337 induced genes; a measured, colour-vision-safe redraw of Figure 6B/C
+  (worst-case ΔE76 4.3 → 31.1, numbers unchanged); and a Figure 4D schematic redrawn from measured
+  intron geometry (321 introns, median 116 nt, branch point 40 nt from the 3' splice site).
+  `reproduction/` is unmodified — it reproduces what was published, and revised panels are new
+  outputs under `scripts/05_revision/**/results/`.
+- Two findings from the corpus-scope analysis that are recorded because they bear on published
+  claims: the broad fungal corpus has **1.62× more** training windows than the Saccharomycetales
+  corpus (so data volume alone cannot explain the "sweet spot"), and the four corpus tiers were
+  **not trained on a matched schedule** — R64/80_strains used `train_epochs_max=500` / `patience=50`
+  against `10000` / `1000` for the other two. Each run converged within its own budget, but the
+  cross-tier comparison carries that difference.
+- `scripts/05_revision/06_mpra_random_init/0_build_context_tsv.py` regenerates the MPRA
+  insertion-context TSVs from the R64 GTF, replacing a lost intermediate that had left the MPRA
+  pipeline unrunnable for any model. Verified byte-identical to the surviving originals for all 22
+  reporter genes.
 
 ## [v1.2.0] — 2026-08-14
 

@@ -1,0 +1,25 @@
+palette,pair,vision,delta_E76,delta_lightness
+published (dark green / dark red / black),25-75 vs 5-25,normal,94.7,8.1
+published (dark green / dark red / black),25-75 vs 5-25,protanopia,25.0,18.0
+published (dark green / dark red / black),25-75 vs 5-25,deuteranopia,4.3,2.8
+published (dark green / dark red / black),25-75 vs 5-25,tritanopia,93.7,4.6
+published (dark green / dark red / black),25-75 vs 75-95,normal,71.4,28.1
+published (dark green / dark red / black),25-75 vs 75-95,protanopia,34.5,19.8
+published (dark green / dark red / black),25-75 vs 75-95,deuteranopia,52.0,32.2
+published (dark green / dark red / black),25-75 vs 75-95,tritanopia,77.1,31.6
+published (dark green / dark red / black),5-25 vs 75-95,normal,70.3,36.2
+published (dark green / dark red / black),5-25 vs 75-95,protanopia,59.3,37.9
+published (dark green / dark red / black),5-25 vs 75-95,deuteranopia,51.4,35.0
+published (dark green / dark red / black),5-25 vs 75-95,tritanopia,45.7,36.2
+revised (Tol high-contrast),25-75 vs 5-25,normal,66.0,20.3
+revised (Tol high-contrast),25-75 vs 5-25,protanopia,44.5,12.5
+revised (Tol high-contrast),25-75 vs 5-25,deuteranopia,66.0,24.8
+revised (Tol high-contrast),25-75 vs 5-25,tritanopia,78.5,17.1
+revised (Tol high-contrast),25-75 vs 75-95,normal,68.2,22.9
+revised (Tol high-contrast),25-75 vs 75-95,protanopia,70.4,25.1
+revised (Tol high-contrast),25-75 vs 75-95,deuteranopia,53.2,21.7
+revised (Tol high-contrast),25-75 vs 75-95,tritanopia,31.1,22.5
+revised (Tol high-contrast),5-25 vs 75-95,normal,115.8,43.3
+revised (Tol high-contrast),5-25 vs 75-95,protanopia,114.6,37.5
+revised (Tol high-contrast),5-25 vs 75-95,deuteranopia,118.9,46.5
+revised (Tol high-contrast),5-25 vs 75-95,tritanopia,69.7,39.6

@@ -1,0 +1,128 @@
+#!/bin/bash
+# Revision 06 step 1 — score the DREAM MPRA library with Shorkie_Random_Init
+#.
+#
+# This is the SAME pipeline the published Figure 6 used, with only the model swapped:
+# the four upstream scripts in scripts/04_analysis/shorkie/mpra/2_hound_mpra_run/ are
+# collapsed into one parameterised runner, and the positional params.json + train dir point
+# at models.shorkie_random_init instead of the fine-tuned model. Everything else — the 10
+# reporter genes, the sequence categories, --rc, --stats, the targets sheet, the genome —
+# is held fixed, because the whole point is that only the initialisation differs.
+#
+# Usage:
+#   scripts/common/submit.sh --profile gpu --array 0-49 \
+#     scripts/05_revision/06_mpra_random_init/1_run_mpra_random_init.sh single pos
+#   scripts/common/submit.sh --profile gpu --array 0-29 \
+#     scripts/05_revision/06_mpra_random_init/1_run_mpra_random_init.sh dual pos
+#   scripts/common/submit.sh --profile gpu --array 0-59 \
+#     scripts/05_revision/06_mpra_random_init/1_run_mpra_random_init.sh single neg
+#   scripts/common/submit.sh --profile gpu --array 0-35 \
+#     scripts/05_revision/06_mpra_random_init/1_run_mpra_random_init.sh dual neg
+#
+# Array sizes are (#genes x #categories): 10x5, 10x3, 12x5, 12x3 -- matching the published
+# --array=0-49 / 0-29 / 0-59 / 0-35.
+#
+#   MODE   : single | dual   (single-sequence categories vs ref/alt paired categories)
+#   STRAND : pos | neg       (reporter-gene strand; the published figure uses both)
+#
+# Without a scheduler, set SLURM_ARRAY_TASK_ID yourself and run directly:
+#   SLURM_ARRAY_TASK_ID=0 bash 1_run_mpra_random_init.sh single pos
+# Add --dry-run to print the fully-resolved command without running it.
+set -euo pipefail
+
+#SBATCH --job-name=mpra_random_init
+#SBATCH --output=job_output_%A_%a.log
+#SBATCH --time=48:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=8
+#SBATCH --export=ALL
+#SBATCH --mail-type=end
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+# shellcheck source=/dev/null
+source "$REPO_ROOT/scripts/common/env.sh"
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cfg() { python -c "import sys; from shorkie import config; print(config.get(sys.argv[1]) or '')" "$1"; }
+
+MODE="${1:-single}"
+STRAND="${2:-pos}"
+DRY_RUN=0
+for a in "$@"; do [[ "$a" == "--dry-run" ]] && DRY_RUN=1; done
+
+# Reporter genes and sequence categories, verbatim from the published run scripts. The
+# plus-strand and minus-strand panels use different gene sets (run_MPRA_pos.sh vs
+# run_MPRA_neg.sh), so the list is selected by STRAND.
+if [[ "$STRAND" == "pos" ]]; then
+  genes=("GPM3" "SLI1" "VPS52" "YMR160W" "MRPS28" "YCT1" "RDL2" "PHS1" "RTC3" "MSN4")
+else
+  genes=("COA4" "ERI1" "RSM25" "ERD1" "MRM2" "SNT2" "CSI2" "RPE1" "PKC1" "AIM11" "MAE1" "MRPL1")
+fi
+# --f_list must match the PUBLISHED run for this mode, or the comparison is not matched.
+# The published single-sequence runs (run_MPRA_{pos,neg}.sh) ensemble all 8 folds; the
+# published dual-sequence runs (run_MPRA_{pos,neg}_dual_each.sh) use fold 7 ONLY. Scoring
+# Shorkie_Random_Init with 8 folds against a 1-fold Shorkie would compare ensembles, not
+# initialisations.
+if [[ "$MODE" == "dual" ]]; then
+  exps=("all_SNVs_seqs" "motif_perturbation" "motif_tiling_seqs")
+  SCRIPT="hound_MPRA_dual_folds.py"
+  STATS="logSED,logSED_ALT_ORIG,logSED_REF_ORIG"
+  F_LIST="7"                      # mirrors run_MPRA_pos_dual_each.sh
+else
+  exps=("all_random_seqs" "challenging_seqs" "yeast_seqs" "high_exp_seqs" "low_exp_seqs")
+  SCRIPT="hound_MPRA_folds.py"
+  STATS="logSED"
+  F_LIST="0,1,2,3,4,5,6,7"        # mirrors run_MPRA_pos.sh
+fi
+
+TASK="${SLURM_ARRAY_TASK_ID:-0}"
+gene=${genes[$(( TASK % ${#genes[@]} ))]}
+exp=${exps[$(( TASK / ${#genes[@]} ))]}
+
+if [[ "$STRAND" == "pos" ]]; then
+  promoter_seqs="${WORK_ROOT}/data/MPRA/test_subset_ids/fix/${exp}_fix.csv"
+else
+  promoter_seqs="${WORK_ROOT}/data/MPRA/test_subset_ids/fix/${exp}_fix_rev.csv"
+fi
+# -o MUST be relative. hound_MPRA_folds.py builds the output path by string concatenation
+# (it_out_dir = '%s/%s' % (it_dir, options.out_dir), :228), so an absolute -o is not
+# honoured — it is appended to the model's fold dir and creates a deep junk tree inside the
+# released model directory. The published runners pass a relative path for the same reason.
+# Results therefore land at <model_dir>/train/f{fold}c0/${output_dir}/sed.h5.
+output_dir="MPRA_random_init/${exp}/${gene}_${STRAND}"
+
+# Shorkie_Random_Init: the released 8-fold ablation (lr 5e-4), resolved through config so a
+# fresh clone picks up `data/download.sh --models random_init` rather than a work-dir path.
+MODEL_DIR="$(cfg models.shorkie_random_init)"
+# hound_MPRA_folds.py fans its per-fold jobs out to this queue itself, so it is a site
+# setting rather than a fixed value; read it from config/slurm.yaml (published runs used
+# `parallel` for single-sequence and `bigmem` for dual).
+QUEUE="${QUEUE:-$(cfg profiles.gpu.partition)}"
+[[ -n "$QUEUE" ]] || QUEUE=gpu
+# Insertion contexts: regenerated by step 0 (verified byte-identical to the originals).
+# Override CTX_DIR to point at another copy.
+CTX_DIR="${CTX_DIR:-${HERE}/results/ctx}"
+if [[ ! -f "${CTX_DIR}/${STRAND}/${gene}.tsv" ]]; then
+  echo "error: no context TSV at ${CTX_DIR}/${STRAND}/${gene}.tsv" >&2
+  echo "       run 0_build_context_tsv.py first, or set CTX_DIR" >&2
+  exit 1
+fi
+SUP_ROOT="$(cfg datasets.supervised_root)"
+GENOME_FASTA="$(cfg genome.fasta)"
+GENOME_GTF="$(cfg genome.gtf)"
+
+CMD=(python "${BASKERVILLE_SCRIPTS}/${SCRIPT}"
+  --f_list "${F_LIST}"
+  -e yeast_ml -r
+  --tsv "${promoter_seqs}"
+  --ctx "${CTX_DIR}/${STRAND}/${gene}.tsv"
+  -o "${output_dir}"
+  --rc -q "${QUEUE}" --stats "${STATS}"
+  -t "${SUP_ROOT}/cleaned_sheet_all_RNA-Seq_strand.txt"
+  -f "${GENOME_FASTA}"
+  -g "${GENOME_GTF}"
+  "${MODEL_DIR}/params.json"
+  "${MODEL_DIR}/train/")
+
+echo "mode=${MODE} strand=${STRAND} task=${TASK} gene=${gene} exp=${exp}"
+if [[ "$DRY_RUN" == 1 ]]; then printf '%q ' "${CMD[@]}"; echo; exit 0; fi
+"${CMD[@]}"

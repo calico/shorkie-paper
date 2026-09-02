@@ -1,0 +1,3 @@
+panel,metric,reported,reproduced,delta,rtol,atol,verdict
+6B,mean AUROC (unchanged by the redraw),0.9953,0.9953,0.0,0.001,0.0,PASS
+6C,mean AUPRC (unchanged by the redraw),0.9958,0.9958,0.0,0.001,0.0,PASS
