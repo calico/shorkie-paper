@@ -1,0 +1,8 @@
+panel,metric,reported,reproduced,delta,rtol,atol,verdict
+atlas,RNA-Seq tracks,3053,3053,0,0.0,0.0,PASS
+atlas,1000-RNA-Seq tracks,1014,1014,0,0.0,0.0,PASS
+atlas,ChIP-exo tracks,1128,1128,0,0.0,0.0,PASS
+atlas,ChIP-MNase tracks,20,20,0,0.0,0.0,PASS
+atlas,total tracks,5215,5215,0,0.0,0.0,PASS
+atlas,8 TF perturbations,8,8,0,0.0,0.0,PASS
+atlas,partitions sum to the RNA-Seq total,3053,3053,0,0.0,0.0,PASS

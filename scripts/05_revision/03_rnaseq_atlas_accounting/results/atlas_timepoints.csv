@@ -1,0 +1,17 @@
+partition,timepoint,tracks,genes
+8_TF,0,72,8
+8_TF,5,78,8
+8_TF,10,70,8
+8_TF,15,75,8
+8_TF,30,72,8
+8_TF,45,72,8
+8_TF,60,77,8
+8_TF,90,64,8
+gene_panel,0,312,294
+gene_panel,5,307,296
+gene_panel,10,312,300
+gene_panel,20,296,281
+gene_panel,40,325,308
+gene_panel,70,314,298
+gene_panel,120,305,289
+gene_panel,180,302,287

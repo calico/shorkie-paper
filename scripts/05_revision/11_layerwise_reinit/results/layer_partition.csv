@@ -1,0 +1,4 @@
+group,layers,parameters,pct_parameters
+conv_tower,74,2232864,16.34
+transformer,78,8152448,59.66
+decoder,74,3280516,24.01

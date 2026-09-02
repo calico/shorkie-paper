@@ -1,0 +1,4 @@
+run,description,params_json,task,loss,mask_rate,learning_rate,has_mask,has_repeat_mask,use_bert,exon_loss_scale,non_exon_loss_scale,repeat_loss_scale,non_repeat_loss_scale,exon_relative_weight,repeat_relative_weight
+shorkie_lm,Shorkie LM (masked-language-model pretraining),scripts/02_train/shorkie_lm/params.json,self-supervised,mlm,0.15,0.0001,True,True,True,0.1,1.0,0.1,1.0,0.1,0.1
+shorkie_finetuned,Shorkie (supervised fine-tuning from the LM checkpoint),scripts/02_train/shorkie_finetuned/params.json,fine-tune,poisson_mn,,2e-05,False,False,True,1.0,4.0,1.0,4.0,0.25,0.25
+shorkie_scratch,"Shorkie_Random_Init (supervised, random initialisation)",scripts/02_train/shorkie_scratch/params.json,supervised,poisson_mn,,0.0005,False,False,True,1.0,4.0,1.0,4.0,0.25,0.25

@@ -1,0 +1,3 @@
+panel,metric,reported,reproduced,delta,rtol,atol,verdict
+5D,panel D is the normalised-Pearson boxplot (reproduction writes Figure_5D_MSN2_boxplot.png),1,1,0,0.0,0.0,PASS
+5I,panel I is the normalised-Pearson boxplot (reproduction writes Figure_5I_MSN4_boxplot.png),1,1,0,0.0,0.0,PASS

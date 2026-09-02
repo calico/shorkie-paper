@@ -1,0 +1,5 @@
+panel,metric,reported,reproduced,delta,rtol,atol,verdict
+"3C[RNA-Seq,Shorkie]",published point estimate,0.78,0.7763,-0.0037000000000000366,0.02,0.0,PASS
+"3C[RNA-Seq,Shorkie_Random_Init_untuned]",published point estimate,0.67,0.6664,-0.0036000000000000476,0.02,0.0,PASS
+"3E[RNA-Seq,Shorkie]",published point estimate,0.88,0.8797,-0.00029999999999996696,0.02,0.0,PASS
+"3E[RNA-Seq,Shorkie_Random_Init_untuned]",published point estimate,0.74,0.7425,0.0025000000000000577,0.02,0.0,PASS

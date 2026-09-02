@@ -359,3 +359,56 @@ def test_no_script_invokes_a_python_file_that_does_not_exist():
                 missing.append(f"{rel}: {name}")
     assert not missing, ("scripts invoking .py files that exist nowhere (and are not guarded):\n  "
                          + "\n  ".join(missing))
+
+
+# ── revision stage (scripts/05_revision) ────────────────────────────────────
+# The revision experiments follow the same conventions as the rest of scripts/:
+# numbered steps, every working *.py paired with a *.sh runner, and a README per
+# leaf stating the question it answers. These guards pin that, and pin that the two
+# large regenerable caches and the local-only `revision/` working directory stay
+# out of git.
+
+REVISION = REPO / "scripts" / "05_revision"
+
+
+def _revision_leaves():
+    if not REVISION.is_dir():
+        return []
+    return sorted(d for d in REVISION.iterdir()
+                  if d.is_dir() and d.name[0].isdigit())
+
+
+def test_every_revision_experiment_has_a_readme():
+    missing = [d.name for d in _revision_leaves() if not (d / "README.md").is_file()]
+    assert not missing, (
+        "revision experiments without a README (each must state the question it "
+        f"answers): {missing}")
+
+
+def test_every_revision_python_step_has_a_paired_shell_runner():
+    """`scripts/README.md`: 'each working *.py keeps its paired *.sh runner'."""
+    missing = []
+    for leaf in _revision_leaves():
+        for py in sorted(leaf.glob("[0-9]*.py")):
+            if not py.with_suffix(".sh").is_file():
+                missing.append(str(py.relative_to(REPO)))
+    assert not missing, f"revision steps without a paired *.sh runner: {missing}"
+
+
+def test_large_revision_caches_and_scratch_are_git_ignored():
+    """The two large regenerable caches, and the local-only working directory, stay out of git.
+
+    Everything else under results/ IS committed — the derived tables, the verification
+    CSVs and the figures. Only these two files are large enough to be worth excluding,
+    and both are rebuilt by step 1 of their own experiment.
+    """
+    probes = ["scripts/05_revision/01_headline_uncertainty/results/fold_metrics.csv",
+              "scripts/05_revision/02_ism_motif_recovery/results/saliency_cache.npz",
+              "revision/scratch.md"]
+    out = subprocess.run(["git", "check-ignore", "-v", *probes],
+                         capture_output=True, text=True, cwd=REPO)
+    assert out.returncode == 0, (
+        "revision outputs are NOT git-ignored — `git check-ignore` matched nothing for "
+        f"{probes}. stdout={out.stdout!r} stderr={out.stderr!r}")
+    for probe in probes:
+        assert probe in out.stdout, f"{probe} is not covered by a .gitignore rule"

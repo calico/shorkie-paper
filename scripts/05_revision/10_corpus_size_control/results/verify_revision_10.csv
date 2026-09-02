@@ -1,0 +1,9 @@
+panel,metric,reported,reproduced,delta,rtol,atol,verdict
+corpora,R64 genome count,1,1,0,0.0,0.0,PASS
+corpora,80_strains genome count,80,80,0,0.0,0.0,PASS
+corpora,165_Saccharomycetales genome count,165,165,0,0.0,0.0,PASS
+corpora,1341_Fungus genome count,1361,1361,0,0.0,0.0,PASS
+corpora,R64 training windows,1201,1201,0,0.0,0.0,PASS
+corpora,80_strains training windows,102315,102315,0,0.0,0.0,PASS
+corpora,165_Saccharomycetales training windows,385551,385551,0,0.0,0.0,PASS
+corpora,1341_Fungus training windows,625355,625355,0,0.0,0.0,PASS

@@ -1,0 +1,5 @@
+tier,genomes,total_bp,total_gb,mean_genome_mb,median_genome_mb,max_genome_mb,chromosome_level,scaffold_level,pct_chromosome_level,median_contigs,taxonomic_orders,train_seqs,valid_seqs,test_seqs,seq_length,train_window_bp,unique_train_bp,train_windows_per_genome,pct_assembly_sampled
+R64,1,12071326,0.012,12.07,12.07,12.07,1,0,100.0,16,1,1201,518,528,16384,19677184,4919296,1201.0,40.75
+80_strains,80,998832409,0.999,12.49,12.44,13.45,80,0,100.0,16,1,102315,518,528,16384,1676328960,419082240,1278.9,41.96
+165_Saccharomycetales,165,2079791815,2.08,12.6,12.32,24.0,60,105,36.4,13,1,385551,518,528,16384,6316867584,1579216896,2336.7,75.93
+1341_Fungus,1361,41620329631,41.62,30.58,28.2,755.35,129,1232,9.5,76,67,625355,518,528,16384,10245816320,2561454080,459.5,6.15

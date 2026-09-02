@@ -1,0 +1,2 @@
+feature_set,n_per_class,n_classes,cv_accuracy,cv_accuracy_sd,cv_macro_f1,chance_accuracy
+log10(element length) only,91,5,0.8088,0.033,0.8047,0.2

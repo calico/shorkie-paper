@@ -23,6 +23,7 @@ local/container fallback.
 | 03 | `03_eval/lm/` | MLM perplexity, genome evaluation, architecture comparison |
 | 03 | `03_eval/supervised/` | track-prediction metrics |
 | 04 | `04_analysis/` | eQTL, MPRA, motif/MoDISco, ISM, attention, UMAP, SMT3, dependency maps, phylogeny |
+| 05 | `05_revision/` | follow-up analyses and controls for the paper's claims — one directory per question (see [`05_revision/EXPERIMENTS.md`](05_revision/EXPERIMENTS.md)) |
 | —  | `common/` | portable SLURM submit wrapper + shared runners |
 
 Some stage directories carry a `README.md` with stage-specific detail. Shared
